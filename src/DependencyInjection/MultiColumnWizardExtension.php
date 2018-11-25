@@ -12,6 +12,7 @@
 namespace MenAtWork\MultiColumnWizardBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
+use Contao\CoreBundle\DependencyInjection\Configuration;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
@@ -38,6 +39,20 @@ class MultiColumnWizardExtension extends ConfigurableExtension
     public function getAlias()
     {
         return 'multicolumnwizard';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConfiguration(array $config, ContainerBuilder $container)
+    {
+        // Add the resource to the container
+        parent::getConfiguration($config, $container);
+
+        return new Configuration(
+            $container->getParameter('kernel.debug'),
+            $container->getParameter('kernel.project_dir')
+        );
     }
 
     /**
