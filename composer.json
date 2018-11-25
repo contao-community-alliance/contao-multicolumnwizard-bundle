@@ -1,70 +1,74 @@
 {
-	"name": "menatwork/contao-multicolumnwizard",
-	"description":"MultiColumWizard for Contao OpenSource CMS",
-	"keywords":["contao", "widget", "wizard"],
-	"type": "contao-module",
-	"homepage":"http://www.men-at-work.de",
-	"license":"LGPL-3.0-or-later",
-	"authors":[
-		{
-			"name": "Andreas Isaak",
-			"email": "contao@men-at-work.de",
-			"homepage": "http://www.men-at-work.de",
-			"role":"Project leader"
-		},
-		{
-			"name":"David Maack",
-			"email": "contao@men-at-work.de",
-			"homepage": "http://www.men-at-work.de",
-			"role":"Developer"
-		},
-		{
-			"name":"Andreas Schempp",
-			"email":"andreas.schempp@terminal42.ch",
-			"homepage":"http://www.terminal42.ch",
-			"role":"Developer"
-		},
-		{
-			"name":"Yanick Witschi",
-			"email":"yanick.witschi@terminal42.ch",
-			"homepage":"http://www.terminal42.ch",
-			"role":"Developer"
-		},
-		{
-			"name":"Tristan Lins",
-			"email":"tristan.lins@bit3.de",
-			"homepage":"http://bit3.de",
-			"role":"Developer"
-		}
-	],
-	"support":{
-		"issues":"https://github.com/menatwork/MultiColumnWizard/issues",
-		"wiki":"http://de.contaowiki.org/MultiColumnWizard",
-		"irc":"irc://irc.freenode.org/contao.dev",
-		"source":"https://github.com/menatwork/MultiColumnWizard"
-	},
-	"require": {
-		"contao/core-bundle":"~3.5 || ~4.1",
-		"contao-community-alliance/composer-plugin":"~2.4 || ~3.0"
-	},
-	"autoload":{
-		"classmap":["system/"],
-		"psr-4": {
-			"MenAtWork\\MultiColumnWizard\\": "system/modules/multicolumnwizard/src/"
-		}
-	},
-	"replace": {
-		"contao-legacy/multicolumnwizard": "*"
-	},
-	"extra": {
-		"contao": {
-			"sources": {
-				"system/modules/multicolumnwizard": "system/modules/multicolumnwizard"
-			}
-		},
-		"branch-alias": {
-			"dev-master": "3.3.x-dev",
-			"dev-dev": "3.4.x-dev"
-		}
-	}
+  "name": "menatwork/contao-multicolumnwizard",
+  "description": "MultiColumWizard for Contao OpenSource CMS",
+  "keywords": [
+    "contao",
+    "widget",
+    "wizard"
+  ],
+  "type": "contao-module",
+  "homepage": "http://www.men-at-work.de",
+  "license": "LGPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Andreas Isaak",
+      "email": "contao@men-at-work.de",
+      "homepage": "http://www.men-at-work.de",
+      "role": "Project leader"
+    },
+    {
+      "name": "David Maack",
+      "email": "contao@men-at-work.de",
+      "homepage": "http://www.men-at-work.de",
+      "role": "Developer"
+    },
+    {
+      "name": "Andreas Schempp",
+      "email": "andreas.schempp@terminal42.ch",
+      "homepage": "http://www.terminal42.ch",
+      "role": "Developer"
+    },
+    {
+      "name": "Yanick Witschi",
+      "email": "yanick.witschi@terminal42.ch",
+      "homepage": "http://www.terminal42.ch",
+      "role": "Developer"
+    },
+    {
+      "name": "Tristan Lins",
+      "email": "tristan.lins@bit3.de",
+      "homepage": "http://bit3.de",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/menatwork/MultiColumnWizard/issues",
+    "wiki": "http://de.contaowiki.org/MultiColumnWizard",
+    "irc": "irc://irc.freenode.org/contao.dev",
+    "source": "https://github.com/menatwork/MultiColumnWizard"
+  },
+  "require": {
+    "php": "^5.6 || ^7.0",
+    "contao/core-bundle": "^4.4.8"
+  },
+  "require-dev": {
+    "cyberspectrum/contao-toolbox": "~0.7",
+    "phpcq/all-tasks": "~1.2",
+    "contao/manager-bundle": "~4.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "MenAtWork\\MultiColumnWizard\\": "src"
+    }
+  },
+  "replace": {
+    "contao-legacy/multicolumnwizard": "*"
+  },
+  "extra": {
+    "contao-manager-plugin": "MenAtWork\\MultiColumnWizardBundle\\ContaoManager\\Plugin",
+    "branch-alias": {
+      "dev-master": "3.3.x-dev",
+      "dev-develop": "3.4.x-dev"
+    }
+  }
 }
