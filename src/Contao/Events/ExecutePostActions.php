@@ -9,6 +9,8 @@
 namespace MenAtWork\MultiColumnWizardBundle\Contao\Events;
 
 
+use Contao\Session;
+
 class ExecutePostActions
 {
     /**
@@ -20,7 +22,7 @@ class ExecutePostActions
     {
         if ($action == 'reloadFiletree_mcw' || $action == 'reloadPagetree_mcw') {
             //get the fieldname
-            $strRef   = $this->Session->get('filePickerRef');
+            $strRef   = Session::getInstance()->get('filePickerRef');
             $strRef   = substr($strRef, stripos($strRef, 'field=') + 6);
             $arrRef   = explode('&', $strRef);
             $strField = $arrRef[0];
