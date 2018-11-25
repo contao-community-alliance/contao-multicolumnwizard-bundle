@@ -34,7 +34,7 @@ $GLOBALS['BE_FFL']['multiColumnWizard'] = '\MenAtWork\MultiColumnWizardBundle\Co
  * Hooks
  */
 $GLOBALS['TL_HOOKS']['loadDataContainer'][]  = array(
-    'maw.mcw.events.listener.execute_post_actions',
+    'maw.mcw.events.listener.load_data_container',
     'supportModalSelector'
 );
 $GLOBALS['TL_HOOKS']['initializeSystem'][]   = array(
@@ -42,7 +42,7 @@ $GLOBALS['TL_HOOKS']['initializeSystem'][]   = array(
     'changeAjaxPostActions'
 );
 $GLOBALS['TL_HOOKS']['executePostActions'][] = array(
-    'maw.mcw.events.listener.load_data_container',
+    'maw.mcw.events.listener.execute_post_actions',
     'executePostActions'
 );
 
