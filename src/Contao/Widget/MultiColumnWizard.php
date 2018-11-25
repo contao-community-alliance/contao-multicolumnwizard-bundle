@@ -11,6 +11,8 @@
  * @filesource
  */
 
+namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
+
 /**
  * Class MultiColumnWizard
  *
@@ -21,7 +23,7 @@
  * @author     Sven Baumann <baumann.sv@gmail.com> 2017
  * @package    MultiColumnWizard
  */
-class MultiColumnWizard extends Widget implements uploadable
+class MultiColumnWizard extends \Contao\Widget implements \uploadable
 {
 
     /**
@@ -1038,10 +1040,14 @@ class MultiColumnWizard extends Widget implements uploadable
         $model->setId(9999999);
         $model->setProperty($property->getName(), $arrField['value']);
 
-        $manager = new \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager(
-            $environment,
-            $model
-        );
+        if (TL_MODE === 'FE') {
+            $manager = new \ContaoCommunityAlliance\DcGeneral\ContaoFrontend\View\WidgetManager($environment, $model);
+        } else {
+            $manager = new \ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager(
+                $environment,
+                $model
+            );
+        }
 
         $widget = $manager->getWidget($property->getName());
 

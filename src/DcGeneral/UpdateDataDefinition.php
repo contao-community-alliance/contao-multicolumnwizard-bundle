@@ -9,7 +9,7 @@
  * @filesource
  */
 
-namespace MultiColumnWizard\DcGeneral;
+namespace MenAtWork\MultiColumnWizardBundle\DcGeneral;
 
 use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\DefaultProperty;
 use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\PropertyInterface;

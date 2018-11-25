@@ -11,6 +11,8 @@
  * @filesource
  */
 
+namespace MenAtWork\MultiColumnWizardBundle\Helper;
+
 /**
  * Class MultiColumnWizardHelper
  *
@@ -18,7 +20,7 @@
  * @author     Ingolf Steinhardt <info@e-spin.de> 2017
  * @package    MultiColumnWizard
  */
-class MultiColumnWizardHelper extends System
+class MultiColumnWizardHelper extends \Contao\System
 {
     /**
      * Just here to make the constructor public.

@@ -10,7 +10,7 @@
  * @filesource
  */
 
-namespace MultiColumnWizard\Event;
+namespace MenAtWork\MultiColumnWizardBundle\Event;
 
 use ContaoCommunityAlliance\DcGeneral\Data\ModelInterface;
 use ContaoCommunityAlliance\DcGeneral\EnvironmentInterface;
