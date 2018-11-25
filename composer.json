@@ -1,12 +1,12 @@
 {
-  "name": "menatwork/contao-multicolumnwizard",
+  "name": "menatwork/contao-multicolumnwizard-bundle",
+  "type":"contao-bundle",
   "description": "MultiColumWizard for Contao OpenSource CMS",
   "keywords": [
     "contao",
     "widget",
     "wizard"
   ],
-  "type": "contao-module",
   "homepage": "http://www.men-at-work.de",
   "license": "LGPL-3.0-or-later",
   "authors": [
