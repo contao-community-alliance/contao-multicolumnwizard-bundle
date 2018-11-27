@@ -13,6 +13,9 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
 
+use Contao\Widget;
+use MenAtWork\MultiColumnWizard\Event\GetOptionsEvent;
+
 /**
  * Class MultiColumnWizard
  *
@@ -23,7 +26,7 @@ namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
  * @author     Sven Baumann <baumann.sv@gmail.com> 2017
  * @package    MultiColumnWizard
  */
-class MultiColumnWizard extends \Contao\Widget implements \uploadable
+class MultiColumnWizard extends Widget implements \uploadable
 {
 
     /**
@@ -143,7 +146,7 @@ class MultiColumnWizard extends \Contao\Widget implements \uploadable
             case 'columnsCallback':
                 if (!is_array($varValue))
                 {
-                    throw new Exception('Parameter "columns" has to be an array: array(\'Class\', \'Method\')!');
+                    throw new \Exception('Parameter "columns" has to be an array: array(\'Class\', \'Method\')!');
                 }
 
                 $this->arrCallback = $varValue;
@@ -1108,13 +1111,13 @@ class MultiColumnWizard extends \Contao\Widget implements \uploadable
             }
             // FIXME: end of legacy code to be removed.
 
-            $event = new \MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent(
+            $event = new GetOptionsEvent(
                 $this->strName,
                 $strName,
                 $environment,
                 $this->objDca->getModel(),
                 $this,
-                $arrData['options']
+                (array) $arrData['options']
             );
             $environment->getEventDispatcher()->dispatch($event::NAME, $event);
 
