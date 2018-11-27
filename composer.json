@@ -1,6 +1,6 @@
 {
   "name": "menatwork/contao-multicolumnwizard-bundle",
-  "type":"contao-bundle",
+  "type": "contao-bundle",
   "description": "MultiColumWizard for Contao OpenSource CMS",
   "keywords": [
     "contao",
@@ -58,8 +58,13 @@
   },
   "autoload": {
     "psr-4": {
-      "MenAtWork\\MultiColumnWizardBundle\\": "src"
-    }
+      "MenAtWork\\MultiColumnWizardBundle\\": "src",
+      "MenAtWork\\MultiColumnWizard\\": "legacy_layer/psr-4-maw",
+      "MultiColumnWizard\\": "legacy_layer/psr-4-mcw"
+    },
+    "classmap": [
+      "legacy_layer/classmap"
+    ]
   },
   "replace": {
     "contao-legacy/multicolumnwizard": "*",
