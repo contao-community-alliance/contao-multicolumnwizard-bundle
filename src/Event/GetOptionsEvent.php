@@ -14,6 +14,7 @@ namespace MenAtWork\MultiColumnWizardBundle\Event;
 
 use ContaoCommunityAlliance\DcGeneral\Data\ModelInterface;
 use ContaoCommunityAlliance\DcGeneral\EnvironmentInterface;
+use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard as BundleMultiColumnWizard;
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -68,24 +69,24 @@ class GetOptionsEvent extends Event
     /**
      * Create a new instance.
      *
-     * @param string               $propertyName    The name of the multi column wizard widget.
+     * @param string                                     $propertyName    The name of the multi column wizard widget.
      *
-     * @param string               $subPropertyName The name of the sub widget.
+     * @param string                                     $subPropertyName The name of the sub widget.
      *
-     * @param EnvironmentInterface $environment     The environment instance.
+     * @param EnvironmentInterface                       $environment     The environment instance.
      *
-     * @param ModelInterface       $model           The current model.
+     * @param ModelInterface                             $model           The current model.
      *
-     * @param \MultiColumnWizard   $widget          The multi column wizard instance.
+     * @param \MultiColumnWizard|BundleMultiColumnWizard $widget          The multi column wizard instance.
      *
-     * @param array                $options         The current options (defaults to empty array).
+     * @param array                                      $options         The current options (defaults to empty array).
      */
     public function __construct(
         $propertyName,
         $subPropertyName,
         EnvironmentInterface $environment,
         ModelInterface $model,
-        \MultiColumnWizard $widget,
+        $widget,
         $options = array()
     ) {
         $this->propertyName    = $propertyName;

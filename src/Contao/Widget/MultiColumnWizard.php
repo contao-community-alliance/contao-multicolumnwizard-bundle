@@ -405,7 +405,7 @@ class MultiColumnWizard extends \Contao\Widget implements \uploadable
                 }
 
                 // Reload the page
-                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', Environment::get('request'))));
+                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', \Environment::get('request'))));
             }
             // Unknow
             else
@@ -984,7 +984,7 @@ class MultiColumnWizard extends \Contao\Widget implements \uploadable
             return $this->buildWidgetForDcGeneral($arrData, $arrField);
         }
 
-        return new $strClass(\MultiColumnWizard::getAttributesFromDca($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable, $this));
+        return new $strClass(MultiColumnWizard::getAttributesFromDca($arrData, $arrField['name'], $arrField['value'], $arrField['strField'], $this->strTable, $this));
     }
 
     /**
@@ -1108,7 +1108,7 @@ class MultiColumnWizard extends \Contao\Widget implements \uploadable
             }
             // FIXME: end of legacy code to be removed.
 
-            $event = new \MenAtWork\MultiColumnWizard\Event\GetOptionsEvent(
+            $event = new \MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent(
                 $this->strName,
                 $strName,
                 $environment,

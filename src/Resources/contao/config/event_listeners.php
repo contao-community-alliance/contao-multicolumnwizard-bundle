@@ -10,7 +10,7 @@
  */
 
 use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
-use MultiColumnWizard\DcGeneral\UpdateDataDefinition;
+use MenAtWork\MultiColumnWizardBundle\DcGeneral\UpdateDataDefinition;
 
 if (class_exists(BuildDataDefinitionEvent::class)) {
     return array
