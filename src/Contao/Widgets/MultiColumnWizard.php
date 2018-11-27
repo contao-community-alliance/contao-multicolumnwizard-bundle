@@ -341,11 +341,11 @@ class MultiColumnWizard extends \Contao\Widget implements \uploadable
 
         // use BE script in FE for now
         $GLOBALS['TL_JAVASCRIPT']['mcw'] = $GLOBALS['TL_CONFIG']['debugMode']
-            ? 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be_src.js'
-            : 'system/modules/multicolumnwizard/html/js/multicolumnwizard_be.js';
+            ? 'bundles/multicolumnwizard/js/multicolumnwizard_be_src.js'
+            : 'bundles/multicolumnwizard/js/multicolumnwizard_be.js';
         $GLOBALS['TL_CSS']['mcw']        = $GLOBALS['TL_CONFIG']['debugMode']
-            ? 'system/modules/multicolumnwizard/html/css/multicolumnwizard_src.css'
-            : 'system/modules/multicolumnwizard/html/css/multicolumnwizard.css';
+            ? 'bundles/multicolumnwizard/css/multicolumnwizard_src.css'
+            : 'bundles/multicolumnwizard/css/multicolumnwizard.css';
 
         $this->strCommand = 'cmd_' . $this->strField;
 
@@ -558,7 +558,7 @@ class MultiColumnWizard extends \Contao\Widget implements \uploadable
                                 break;
                         }
 
-                        $datepicker = ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $objWidget->id . '" style="vertical-align:-6px;">
+                        $datepicker = ' <img src="bundles/multicolumnwizard/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $objWidget->id . '" style="vertical-align:-6px;">
                           <script>
 							  window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $objWidget->id . '\', {
 							  allowEmpty:true,
@@ -707,7 +707,7 @@ class MultiColumnWizard extends \Contao\Widget implements \uploadable
                     break;
             }
 
-            return ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;cursor:pointer;">
+            return ' <img src="bundles/multicolumnwizard/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;cursor:pointer;">
                         <script>
                         window.addEvent("domready", function() {
                             new Picker.Date($$("#ctrl_' . $strId . '"), {
@@ -743,7 +743,7 @@ class MultiColumnWizard extends \Contao\Widget implements \uploadable
                     break;
             }
 
-            return ' <img src="system/modules/multicolumnwizard/html/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;cursor:pointer;">
+            return ' <img src="bundles/multicolumnwizard/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;cursor:pointer;">
                         <script>
                         window.addEvent("domready", function() {
                             new Picker.Date($("ctrl_' . $strId . '"), {
