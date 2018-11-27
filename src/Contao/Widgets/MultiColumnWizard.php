@@ -13,6 +13,7 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
 
+use Contao\BackendTemplate;
 use Contao\Widget;
 use MenAtWork\MultiColumnWizard\Event\GetOptionsEvent;
 
@@ -1173,9 +1174,17 @@ class MultiColumnWizard extends Widget implements \uploadable
             }
         }
 
-
-        $return = '
-<table' . (($this->style) ? (' style="' . $this->style . '"') : ('')) . ' data-operations="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',', $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . '] colorpicker[' . implode(',', $arrColorpicker) . ']" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard">';
+        $return = \sprintf(
+            '<table %s data-operations="maxCount[%s] minCount[%s] unique[%s] datepicker[%s] colorpicker[%s]" data-name="%s" id="ctrl_%s" class="tl_modulewizard multicolumnwizard">',
+            (($this->style) ? (\sprintf('style="%s"', $this->style)) : ('')),
+            ($this->maxCount ? $this->maxCount : '0'),
+            ($this->minCount ? $this->minCount : '0'),
+            implode(',', $arrUnique),
+            implode(',', $arrDatepicker),
+            implode(',', $arrColorpicker),
+            $this->name,
+            $this->strId
+        );
 
         if ($this->columnTemplate == '')
         {
@@ -1193,7 +1202,7 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         foreach ($arrItems as $k => $arrValue)
         {
-            $return .= '<tr>';
+            $return .= \sprintf('<tr data-rowId="%s">', $k);
             foreach ($arrValue as $itemKey => $itemValue)
             {
                 if ($itemValue['hide'] == true)
@@ -1294,23 +1303,42 @@ class MultiColumnWizard extends Widget implements \uploadable
     }
 
     /**
-     * Generate button string
-     * @return string
+     * Generate the HTML for the operation buttons, as string.
+     *
+     * @param int $level The level.
+     *
+     * @return string The HTML with all buttons.
      */
     protected function generateButtonString($level = 0)
     {
         $return = '';
-
-        // Add buttons
-        foreach ($this->arrButtons as $button => $image)
-        {
-
-            if ($image === false)
-            {
+        foreach ($this->arrButtons as $button => $image) {
+            // If we have no images go to the next image.
+            if ($image === false) {
                 continue;
             }
 
-            $return .= '<a data-operations="' . $button . '" href="' . $this->addToUrl('&' . $this->strCommand . '=' . $button . '&cid=' . $level . '&id=' . $this->currentRecord) . '" class="widgetImage" title="' . $GLOBALS['TL_LANG']['MSC']['tw_r' . specialchars($button) . ''] . '">' . $this->generateImage($image, $GLOBALS['TL_LANG']['MSC']['tw_r' . specialchars($button) . ''], 'class="tl_listwizard_img"') . '</a> ';
+            $btnName = \sprintf('tw_r%s', specialchars($button));
+            $return .=
+                \sprintf(
+                    '<a data-operations="%s" href="%s" class="widgetImage" title="%s">%s</a> ',
+                    $button,
+                    $this->addToUrl(
+                        \sprintf(
+                            '&%s=%s&cid=%s&id=',
+                            $this->strCommand,
+                            $button,
+                            $level,
+                            $this->currentRecord
+                        )
+                    ),
+                    $GLOBALS['TL_LANG']['MSC'][$btnName],
+                    $this->generateImage(
+                        $image,
+                        $GLOBALS['TL_LANG']['MSC'][$btnName],
+                        'class="tl_listwizard_img"'
+                    )
+                );
         }
 
         return $return;
