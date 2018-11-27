@@ -8,7 +8,6 @@
 
 namespace MultiColumnWizard\DcGeneral;
 
-
 use MenAtWork\MultiColumnWizardBundle\DcGeneral\UpdateDataDefinition as BundleUpdateDataDefinition;
 
 /**
@@ -31,7 +30,8 @@ class UpdateDataDefinition extends BundleUpdateDataDefinition
                 'Use of deprecated class %s. Use instead %s',
                 __CLASS__,
                 BundleUpdateDataDefinition::class
-            )
+            ),
+            E_USER_DEPRECATED
         );
     }
 }

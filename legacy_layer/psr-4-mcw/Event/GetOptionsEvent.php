@@ -17,7 +17,7 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent as BundleGetOptionsE
  *
  * @deprecated Use instead \MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent
  */
-class GetOptionsEvent extends \MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent
+class GetOptionsEvent extends BundleGetOptionsEvent
 {
     /**
      * @inheritdoc
@@ -35,7 +35,8 @@ class GetOptionsEvent extends \MenAtWork\MultiColumnWizardBundle\Event\GetOption
                 'Use of deprecated class %s. Use instead %s',
                 __CLASS__,
                 BundleGetOptionsEvent::class
-            )
+            ),
+            E_USER_DEPRECATED
         );
 
         parent::__construct($propertyName, $subPropertyName, $environment, $model, $widget, $options);

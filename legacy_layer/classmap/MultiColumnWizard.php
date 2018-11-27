@@ -24,7 +24,8 @@ class MultiColumnWizard extends BundleMultiColumnWizard
                 'Use of deprecated class %s. Use instead %s',
                 __CLASS__,
                 BundleMultiColumnWizard::class
-            )
+            ),
+            E_USER_DEPRECATED
         );
 
         parent::__construct($arrAttributes);

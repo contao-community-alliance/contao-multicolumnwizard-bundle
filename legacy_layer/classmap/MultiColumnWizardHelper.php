@@ -24,7 +24,8 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
                 'Use of deprecated class %s. Use instead %s',
                 __CLASS__,
                 BundleMultiColumnWizardHelper::class
-            )
+            ),
+            E_USER_DEPRECATED
         );
 
         parent::__construct();
@@ -47,7 +48,8 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
                 __FUNCTION__,
                 $serviceName,
                 __FUNCTION__
-            )
+            ),
+            E_USER_DEPRECATED
         );
 
         /** @var \MenAtWork\MultiColumnWizardBundle\Contao\Events\ParseTemplate $helper */
@@ -72,7 +74,8 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
                 __FUNCTION__,
                 $serviceName,
                 __FUNCTION__
-            )
+            ),
+            E_USER_DEPRECATED
         );
 
         /** @var \MenAtWork\MultiColumnWizardBundle\Contao\Events\LoadDataContainer $helper */
@@ -95,7 +98,8 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
                 __FUNCTION__,
                 $serviceName,
                 __FUNCTION__
-            )
+            ),
+            E_USER_DEPRECATED
         );
 
         /** @var \MenAtWork\MultiColumnWizardBundle\Contao\Events\InitializeSystem $helper */
@@ -122,7 +126,8 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
                 __FUNCTION__,
                 $serviceName,
                 __FUNCTION__
-            )
+            ),
+            E_USER_DEPRECATED
         );
 
         /** @var \MenAtWork\MultiColumnWizardBundle\Contao\Events\ExecutePostActions $helper */
@@ -139,6 +144,17 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      */
     public function mcwFilePicker(DataContainer $dc)
     {
+        trigger_error(
+            sprintf(
+                'Use of deprecated function %s::%s. Use instead the service %s::%s',
+                __CLASS__,
+                __FUNCTION__,
+                BundleMultiColumnWizardHelper::class,
+                __FUNCTION__
+            ),
+            E_USER_DEPRECATED
+        );
+
         return parent::mcwFilePicker($dc);
     }
 }
