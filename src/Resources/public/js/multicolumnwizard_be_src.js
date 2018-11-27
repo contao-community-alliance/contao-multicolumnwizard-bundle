@@ -538,6 +538,39 @@ Object.append(MultiColumnWizard,
     },
 
     /**
+     * Call PHP/Contao/Widget to get a new row.
+     *
+     * @param el The button.
+     *
+     * @param row The tr of the table.
+     *
+     * @return void
+     */
+    insertNewElement: function (el, row) {
+        var parentMcw = $(row).getParent('.tl_modulewizard.multicolumnwizard');
+        var fieldName = $(parentMcw).getAttribute('data-name');
+        var rows = $(parentMcw).getElements('tr');
+        var maxRowId = 0;
+        for (var i = 0; i < rows.length; i++)
+        {
+            maxRowId = Math.max(maxRowId, ($(rows[i]).getAttribute('data-rowid')));
+        }
+
+        new Request.Contao({
+            evalScripts: false,
+            onSuccess:   function (txt, json) {
+                console.log('in');
+                console.dir(json);
+            }
+        }).post({
+            "action":        "mcwCreateNewRow",
+            "name":          fieldName,
+            "rowId":         (maxRowId + 1),
+            "REQUEST_TOKEN": Contao.request_token
+        });
+    },
+
+    /**
     * Operation "new" - update
     * @param Element the icon element
     * @param Element the row
@@ -818,8 +851,10 @@ Object.append(MultiColumnWizard,
 /**
  * Register default callbacks
  */
-MultiColumnWizard.addOperationUpdateCallback('new', MultiColumnWizard.newUpdate);
-MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.newClick);
+// MultiColumnWizard.addOperationUpdateCallback('new', MultiColumnWizard.newUpdate);
+// MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.newClick);
+
+MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.insertNewElement);
 MultiColumnWizard.addOperationUpdateCallback('copy', MultiColumnWizard.copyUpdate);
 MultiColumnWizard.addOperationClickCallback('copy', MultiColumnWizard.copyClick);
 MultiColumnWizard.addOperationUpdateCallback('delete', MultiColumnWizard.deleteUpdate);
