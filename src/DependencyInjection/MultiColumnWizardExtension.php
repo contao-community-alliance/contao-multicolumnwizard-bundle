@@ -29,7 +29,7 @@ class MultiColumnWizardExtension extends ConfigurableExtension
      */
     private $files = [
 //        'commands.yml',
-//        'listener.yml',
+        'listener.yml',
         'services.yml',
     ];
 

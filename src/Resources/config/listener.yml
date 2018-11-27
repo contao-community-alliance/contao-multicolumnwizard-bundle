@@ -1,0 +1,8 @@
+services:
+    manatwork.multicolumnwizard.build-data-definition:
+        class: MenAtWork\MultiColumnWizardBundle\DcGeneral\UpdateDataDefinition
+        tags:
+            -   name: kernel.event_listener
+                event: dc-general.factory.build-data-definition
+                method: addMcwFields
+                priority: -5000
