@@ -45,6 +45,10 @@ $GLOBALS['TL_HOOKS']['executePostActions'][] = array(
     'maw.mcw.events.listener.execute_post_actions',
     'executePostActions'
 );
+$GLOBALS['TL_HOOKS']['executePostActions'][] = array(
+    'maw.mcw.events.listener.execute_post_actions',
+    'handleRowCreation'
+);
 
 if (TL_MODE == 'BE') {
     $GLOBALS['TL_HOOKS']['parseTemplate'][] = array(
