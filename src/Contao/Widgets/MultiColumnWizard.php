@@ -14,6 +14,7 @@
 namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
 
 use Contao\BackendTemplate;
+use Contao\Date;
 use Contao\Widget;
 use MenAtWork\MultiColumnWizard\Event\GetOptionsEvent;
 
@@ -86,13 +87,16 @@ class MultiColumnWizard extends Widget implements \uploadable
 
     /**
      * Buttons
+     *
      * @var array
      */
-    protected $arrButtons = array('new'    => 'new.gif',
-                                  'copy'   => 'copy.gif',
-                                  'up'     => 'up.gif',
-                                  'down'   => 'down.gif',
-                                  'delete' => 'delete.gif');
+    protected $arrButtons = [
+        'new'    => 'new.gif',
+        //        'copy'   => 'copy.gif', // Removed since we can't support dom manipulation anymore.
+        'up'     => 'up.gif',
+        'down'   => 'down.gif',
+        'delete' => 'delete.gif'
+    ];
 
     /**
      * Initialize the object
@@ -350,19 +354,19 @@ class MultiColumnWizard extends Widget implements \uploadable
      * @param bool     $onlyRows               If true, only row's will be output.
      *
      * @return string The HTML code of the widget.
-     * @return string
+     *
      * @throws \Exception
      */
     public function generate($overwriteRowCurrentRow = null, $onlyRows = false)
     {
         // load the callback data if there's any (do not do this in __set() already because then we don't have access to currentRecord)
-        if (is_array($this->arrCallback))
-        {
+        if (is_array($this->arrCallback)) {
             $this->import($this->arrCallback[0]);
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
         }
 
-        // use BE script in FE for now
+        // Use BE script in FE for now. For the BE we are using the
+        // \MenAtWork\MultiColumnWizardBundle\Contao\Events\ParseTemplate::addScriptsAndStyles
         $GLOBALS['TL_JAVASCRIPT']['mcw'] = $GLOBALS['TL_CONFIG']['debugMode']
             ? 'bundles/multicolumnwizard/js/multicolumnwizard_be_src.js'
             : 'bundles/multicolumnwizard/js/multicolumnwizard_be.js';
@@ -373,11 +377,9 @@ class MultiColumnWizard extends Widget implements \uploadable
         $this->strCommand = 'cmd_' . $this->strField;
 
         // Change the order
-        if ($this->Input->get($this->strCommand) && is_numeric($this->Input->get('cid')) && $this->Input->get('id') == $this->currentRecord)
-        {
+        if ($this->Input->get($this->strCommand) && is_numeric($this->Input->get('cid')) && $this->Input->get('id') == $this->currentRecord) {
 
-            switch ($this->Input->get($this->strCommand))
-            {
+            switch ($this->Input->get($this->strCommand)) {
                 case 'copy':
                     $this->varValue = array_duplicate($this->varValue, $this->Input->get('cid'));
                     break;
@@ -396,78 +398,69 @@ class MultiColumnWizard extends Widget implements \uploadable
             }
 
             // Save in File
-            if ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'File')
-            {
-                $this->Config->update(sprintf("\$GLOBALS['TL_CONFIG']['%s']", $this->strField), serialize($this->varValue));
+            if ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'File') {
+                $this->Config->update(sprintf("\$GLOBALS['TL_CONFIG']['%s']", $this->strField),
+                    serialize($this->varValue));
 
                 // Reload the page
-                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', Environment::get('request'))));
-            }
-            // Save in table
-            else if ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'Table')
-            {
-                if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback']))
-                {
+                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '',
+                    preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '',
+                        \Environment::get('request'))));
+            } // Save in table
+            else if ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'Table') {
+                if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'])) {
                     $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
 
-                    $dc            = new $dataContainer($this->strTable);
-                    $dc->field     = $this->strField;
-                    $dc->inputName = $this->strField;
+                    $dc               = new $dataContainer($this->strTable);
+                    $dc->field        = $this->strField;
+                    $dc->inputName    = $this->strField;
                     $dc->strInputName = $this->strField;
 
-                    foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'] AS $callback)
-                    {
+                    foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'] AS $callback) {
                         $this->import($callback[0]);
                         $this->{$callback[0]}->{$callback[1]}(serialize($this->varValue), $dc);
                     }
-                }
-                else
-                {
+                } else {
                     $this->Database->prepare("UPDATE " . $this->strTable . " SET " . $this->strField . "=? WHERE id=?")
-                            ->execute(serialize($this->varValue), $this->currentRecord);
+                        ->execute(serialize($this->varValue), $this->currentRecord);
                 }
 
                 // Reload the page
-                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '', preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '', \Environment::get('request'))));
-            }
-            // Unknow
-            else
-            {
-               // What to do here?
+                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '',
+                    preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '',
+                        \Environment::get('request'))));
+            } // Unknow
+            else {
+                // What to do here?
             }
         }
 
-        $arrUnique = array();
-        $arrDatepicker = array();
+        $arrUnique      = array();
+        $arrDatepicker  = array();
         $arrColorpicker = array();
-        $arrTinyMCE = array();
+        $arrTinyMCE     = array();
         $arrHeaderItems = array();
 
-        foreach ($this->columnFields as $strKey => $arrField)
-        {
-            $fullName =  $this->strName . '__' . $strKey;
+        foreach ($this->columnFields as $strKey => $arrField) {
+            $fullName = $this->strName . '__' . $strKey;
 
             // Store unique fields
-            if ($arrField['eval']['unique'])
-            {
+            if ($arrField['eval']['unique']) {
                 $arrUnique[] = $strKey;
             }
 
             // Store date picker fields
-            if ($arrField['eval']['datepicker'])
-            {
+            if ($arrField['eval']['datepicker']) {
                 $arrDatepicker[] = $strKey;
             }
 
             // Store color picker fields
-            if ($arrField['eval']['colorpicker'])
-            {
-				$arrColorpicker[] = $strKey;
+            if ($arrField['eval']['colorpicker']) {
+                $arrColorpicker[] = $strKey;
             }
 
             // Store tiny mce fields
-            if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
-            {
+            if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
                 foreach ($this->varValue as $row => $value) {
                     $tinyId = 'ctrl_' . $this->strField . '_row' . $row . '_' . $strKey;
 
@@ -481,8 +474,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                 $arrTinyMCE[] = $strKey;
             }
 
-            if ($arrField['inputType'] == 'hidden')
-            {
+            if ($arrField['inputType'] == 'hidden') {
                 continue;
             }
         }
@@ -490,84 +482,72 @@ class MultiColumnWizard extends Widget implements \uploadable
         $intNumberOfRows = max(count($this->varValue), 1);
 
         // always show the minimum number of rows if set
-        if ($this->minCount && ($intNumberOfRows < $this->minCount))
-        {
+        if ($this->minCount && ($intNumberOfRows < $this->minCount)) {
             $intNumberOfRows = $this->minCount;
         }
 
-        $arrItems = array();
+        $arrItems        = array();
         $arrHiddenHeader = array();
 
+        if ($overwriteRowCurrentRow !== null) {
+            $i               = \intval($overwriteRowCurrentRow);
+            $intNumberOfRows = $i + 1;
+        } else {
+            $i = 0;
+        }
+
         // Add input fields
-        for ($i = 0; $i < $intNumberOfRows; $i++)
-        {
+        for (; $i < $intNumberOfRows; $i++) {
             $this->activeRow = $i;
             $strHidden       = '';
 
             // Walk every column
-            foreach ($this->columnFields as $strKey => $arrField)
-            {
+            foreach ($this->columnFields as $strKey => $arrField) {
                 $strWidget     = '';
                 $blnHiddenBody = false;
 
-                if ($arrField['eval']['hideHead'] == true)
-                {
+                if ($arrField['eval']['hideHead'] == true) {
                     $arrHiddenHeader[$strKey] = true;
                 }
 
                 // load row specific data (useful for example for default values in different rows)
-                if (isset($this->arrRowSpecificData[$i][$strKey]))
-                {
+                if (isset($this->arrRowSpecificData[$i][$strKey])) {
                     $arrField = array_merge($arrField, $this->arrRowSpecificData[$i][$strKey]);
                 }
 
                 $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
 
                 // load errors if there are any
-                if (!empty($this->arrWidgetErrors[$strKey][$i]))
-                {
-                    foreach ($this->arrWidgetErrors[$strKey][$i] as $strErrorMsg)
-                    {
+                if (!empty($this->arrWidgetErrors[$strKey][$i])) {
+                    foreach ($this->arrWidgetErrors[$strKey][$i] as $strErrorMsg) {
                         $objWidget->addError($strErrorMsg);
                     }
                 }
 
-                if ($objWidget === null)
-                {
+                if ($objWidget === null) {
                     continue;
-                }
-                elseif (is_string($objWidget))
-                {
+                } elseif (is_string($objWidget)) {
                     $strWidget = $objWidget;
-                }
-                elseif ($arrField['inputType'] == 'hidden')
-                {
+                } elseif ($arrField['inputType'] == 'hidden') {
                     $strHidden .= $objWidget->generate();
                     continue;
-                }
-                elseif ($arrField['eval']['hideBody'] == true || $arrField['eval']['hideHead'] == true)
-                {
-                    if ($arrField['eval']['hideBody'] == true)
-                    {
+                } elseif ($arrField['eval']['hideBody'] == true || $arrField['eval']['hideHead'] == true) {
+                    if ($arrField['eval']['hideBody'] == true) {
                         $blnHiddenBody = true;
                     }
 
                     $strWidget = $objWidget->parse();
-                }
-                else
-                {
-                    $datepicker = '';
+                } else {
+                    $datepicker  = '';
                     $colorpicker = '';
-                    $tinyMce    = '';
+                    $tinyMce     = '';
 
                     // Datepicker
-                    if ($arrField['eval']['datepicker'])
-                    {
+                    if ($arrField['eval']['datepicker']) {
                         $rgxp   = $arrField['eval']['rgxp'];
                         $format = $this->getNumericDateFormat($rgxp);
 
-                        switch ($rgxp)
-                        {
+                        switch ($rgxp) {
                             case 'datim':
                                 $time = ",\n      timePicker:true";
                                 break;
@@ -607,13 +587,13 @@ class MultiColumnWizard extends Widget implements \uploadable
                           </script>'; */
                     }
 
-					// Color picker
-					if ($arrField['eval']['colorpicker'])
-					{
-						// Support single fields as well (see #5240)
-						//$strKey = $arrData['eval']['multiple'] ? $this->strField . '_0' : $this->strField;
+                    // Color picker
+                    if ($arrField['eval']['colorpicker']) {
+                        // Support single fields as well (see #5240)
+                        //$strKey = $arrData['eval']['multiple'] ? $this->strField . '_0' : $this->strField;
 
-						$colorpicker = ' ' . \Image::getHtml('pickcolor.gif', $GLOBALS['TL_LANG']['MSC']['colorpicker'], 'style="vertical-align:top;cursor:pointer" title="'.specialchars($GLOBALS['TL_LANG']['MSC']['colorpicker']).'" id="moo_' . $objWidget->id . '"') . '
+                        $colorpicker = ' ' . \Image::getHtml('pickcolor.gif', $GLOBALS['TL_LANG']['MSC']['colorpicker'],
+                                'style="vertical-align:top;cursor:pointer" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['colorpicker']) . '" id="moo_' . $objWidget->id . '"') . '
 			  <script>
 				window.addEvent("domready", function() {
 				  new MooRainbow("moo_' . $objWidget->id . '", {
@@ -626,39 +606,33 @@ class MultiColumnWizard extends Widget implements \uploadable
 				  });
 				});
 			  </script>';
-					}
+                    }
 
 
                     // Tiny MCE
-                    if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0)
-                    {
-                        $tinyMce = $this->getMcWTinyMCEString($objWidget->id, $arrField);
+                    if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
+                        $tinyMce                      = $this->getMcWTinyMCEString($objWidget->id, $arrField);
                         $arrField['eval']['tl_class'] .= ' tinymce';
                     }
 
                     // Add custom wizard
-                    if ($arrField['wizard'])
-                    {
+                    if ($arrField['wizard']) {
                         $wizard = '';
 
                         $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
 
-                        $dc            = new $dataContainer($this->strTable);
-                        $dc->field     = $strKey;
-                        $dc->inputName = $objWidget->id;
+                        $dc               = new $dataContainer($this->strTable);
+                        $dc->field        = $strKey;
+                        $dc->inputName    = $objWidget->id;
                         $dc->strInputName = $objWidget->id;
-                        $dc->value     = $objWidget->value;
+                        $dc->value        = $objWidget->value;
 
-                        if (is_array($arrField['wizard']))
-                        {
-                            foreach ($arrField['wizard'] as $callback)
-                            {
+                        if (is_array($arrField['wizard'])) {
+                            foreach ($arrField['wizard'] as $callback) {
                                 $this->import($callback[0]);
                                 $wizard .= $this->{$callback[0]}->{$callback[1]}($dc, $objWidget);
                             }
-                        }
-                        elseif (is_callable($arrField['wizard']))
-                        {
+                        } elseif (is_callable($arrField['wizard'])) {
                             $wizard .= $arrField['wizard']($dc, $objWidget);
                         }
 
@@ -669,17 +643,14 @@ class MultiColumnWizard extends Widget implements \uploadable
                 }
 
                 // Build array of items
-                if ($arrField['eval']['columnPos'] != '')
-                {
-                    $arrItems[$i][$objWidget->columnPos]['entry'] .= $strWidget;
+                if ($arrField['eval']['columnPos'] != '') {
+                    $arrItems[$i][$objWidget->columnPos]['entry']    .= $strWidget;
                     $arrItems[$i][$objWidget->columnPos]['valign']   = $arrField['eval']['valign'];
                     $arrItems[$i][$objWidget->columnPos]['tl_class'] = $arrField['eval']['tl_class'];
                     $arrItems[$i][$objWidget->columnPos]['hide']     = $blnHiddenBody;
-                }
-                else
-                {
+                } else {
                     $arrItems[$i][$strKey] = array
-                        (
+                    (
                         'entry'    => $strWidget,
                         'valign'   => $arrField['eval']['valign'],
                         'tl_class' => $arrField['eval']['tl_class'],
