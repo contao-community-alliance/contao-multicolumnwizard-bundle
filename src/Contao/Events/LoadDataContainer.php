@@ -25,15 +25,17 @@ namespace MenAtWork\MultiColumnWizardBundle\Contao\Events;
  */
 class LoadDataContainer
 {
+    /**
+     * Deprecated in Contao 4.x since we didn't have the data in access.
+     *
+     * @param string $strTable Name of the table.
+     *
+     * @deprecated Removed in version 4 of mcw. There is no replacement.
+     */
     public function supportModalSelector($strTable)
     {
-        if (strpos(\Environment::get('script'), 'contao/file.php') !== false
-            || strpos(\Environment::get('script'), 'contao/page.php') !== false) {
-            list($strField, $strColumn) = explode('__', \Input::get('field'));
-            if ($GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['inputType'] == 'multiColumnWizard') {
-                $GLOBALS['TL_DCA'][$strTable]['fields'][$strField . '__' . $strColumn] =
-                    $GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['eval']['columnFields'][$strColumn];
-            }
-        }
+        // In previous versions of contao, we got the filed and could add the information to the list. But now, it
+        // is not possible, because contao add the information into the url under extra. So we have
+        // to add all on the right place when the widget generates the data.
     }
 }
