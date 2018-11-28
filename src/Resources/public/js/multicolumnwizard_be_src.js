@@ -556,16 +556,45 @@ Object.append(MultiColumnWizard,
             maxRowId = Math.max(maxRowId, ($(rows[i]).getAttribute('data-rowid')));
         }
 
+        var self=this;
+
         new Request.Contao({
             evalScripts: false,
             onSuccess:   function (txt, json) {
-                console.log('in');
-                console.dir(json);
+                // Text to html.
+                var newEl = new Element('div', {
+                    html: json.content
+                });
+                // Inject it on the right place.
+                $(newEl).getElement('tr').inject(row, 'after');
+                // Execute the JS from widgets.
+                json.javascript && Browser.exec(json.javascript);
+                // Rebind the events.
+                $(newEl).getElements('td.operations a').each(function (operation) {
+                    var key = operation.get('data-operations');
+
+                    // call static load callbacks
+                    if (MultiColumnWizard.operationLoadCallbacks[key])
+                    {
+                        MultiColumnWizard.operationLoadCallbacks[key].each(function (callback) {
+                            callback.pass([operation, el], self)();
+                        });
+                    }
+
+                    // call instance load callbacks
+                    if (self.operationLoadCallbacks[key])
+                    {
+                        self.operationLoadCallbacks[key].each(function (callback) {
+                            callback.pass([operation, el], self)();
+                        });
+                    }
+                });
+                self.updateOperations();
             }
         }).post({
             "action":        "mcwCreateNewRow",
             "name":          fieldName,
-            "rowId":         (maxRowId + 1),
+            "maxRowId":      maxRowId,
             "REQUEST_TOKEN": Contao.request_token
         });
     },
@@ -780,7 +809,7 @@ Object.append(MultiColumnWizard,
      */
     upClick: function(el, row)
     {
-        this.killAllTinyMCE(el, row);
+//         this.killAllTinyMCE(el, row);
 
         var previous = row.getPrevious();
         if (previous)
@@ -789,17 +818,17 @@ Object.append(MultiColumnWizard,
             // we have to set it to a value that is not in the DOM first, otherwise the values will get lost!!
             var previousPosition = previous.getAllPrevious().length;
 
-            // this is the dummy setting (guess no one will have more than 99999 entries ;-))
-            previous = this.updateRowAttributes(99999, previous);
-
-            // now set the correct values again
-            row = this.updateRowAttributes(previousPosition, row);
-            previous = this.updateRowAttributes(previousPosition+1, previous);
+//             // this is the dummy setting (guess no one will have more than 99999 entries ;-))
+//             previous = this.updateRowAttributes(99999, previous);
+//
+//             // now set the correct values again
+//             row = this.updateRowAttributes(previousPosition, row);
+//             previous = this.updateRowAttributes(previousPosition+1, previous);
 
             row.inject(previous, 'before');
         }
 
-        this.reinitTinyMCE(el, row, false);
+//         this.reinitTinyMCE(el, row, false);
     },
 
     /**
@@ -809,7 +838,7 @@ Object.append(MultiColumnWizard,
      */
     downClick: function(el, row)
     {
-        this.killAllTinyMCE(el, row);
+//         this.killAllTinyMCE(el, row);
 
         var next = row.getNext();
         if (next)
@@ -818,17 +847,17 @@ Object.append(MultiColumnWizard,
             // we have to set it to a value that is not in the DOM first, otherwise the values will get lost!!
             var rowPosition = row.getAllPrevious().length;
 
-            // this is the dummy setting (guess no one will have more than 99999 entries ;-))
-            row = this.updateRowAttributes(99999, row);
-
-            // now set the correct values again
-            next = this.updateRowAttributes(rowPosition, next);
-            row = this.updateRowAttributes(rowPosition+1, row);
+//             // this is the dummy setting (guess no one will have more than 99999 entries ;-))
+//             row = this.updateRowAttributes(99999, row);
+//
+//             // now set the correct values again
+//             next = this.updateRowAttributes(rowPosition, next);
+//             row = this.updateRowAttributes(rowPosition+1, row);
 
             row.inject(next, 'after');
         }
 
-        this.reinitTinyMCE(el, row, false);
+//         this.reinitTinyMCE(el, row, false);
     },
 
     /**
@@ -853,10 +882,9 @@ Object.append(MultiColumnWizard,
  */
 // MultiColumnWizard.addOperationUpdateCallback('new', MultiColumnWizard.newUpdate);
 // MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.newClick);
-
+// MultiColumnWizard.addOperationUpdateCallback('copy', MultiColumnWizard.copyUpdate);
+// MultiColumnWizard.addOperationClickCallback('copy', MultiColumnWizard.copyClick);
 MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.insertNewElement);
-MultiColumnWizard.addOperationUpdateCallback('copy', MultiColumnWizard.copyUpdate);
-MultiColumnWizard.addOperationClickCallback('copy', MultiColumnWizard.copyClick);
 MultiColumnWizard.addOperationUpdateCallback('delete', MultiColumnWizard.deleteUpdate);
 MultiColumnWizard.addOperationClickCallback('delete', MultiColumnWizard.deleteClick);
 MultiColumnWizard.addOperationClickCallback('up', MultiColumnWizard.upClick);
