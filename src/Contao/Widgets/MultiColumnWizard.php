@@ -343,9 +343,17 @@ class MultiColumnWizard extends Widget implements \uploadable
 
     /**
      * Generate the widget and return it as string
+     *
+     * @param null|int $overwriteRowCurrentRow Overwrite the row count. This will generate only one row with the given
+     *                                         id.
+     *
+     * @param bool     $onlyRows               If true, only row's will be output.
+     *
+     * @return string The HTML code of the widget.
      * @return string
+     * @throws \Exception
      */
-    public function generate()
+    public function generate($overwriteRowCurrentRow = null, $onlyRows = false)
     {
         // load the callback data if there's any (do not do this in __set() already because then we don't have access to currentRecord)
         if (is_array($this->arrCallback))
@@ -681,22 +689,36 @@ class MultiColumnWizard extends Widget implements \uploadable
             }
         }
 
-        $strOutput = '';
-
-        if ($this->blnTableless)
-        {
-            $strOutput = $this->generateDiv($arrUnique, $arrDatepicker, $arrColorpicker, $strHidden, $arrItems, $arrHiddenHeader);
-        }
-        else
-        {
-            if ($this->columnTemplate != '')
-            {
-                $strOutput = $this->generateTemplateOutput($arrUnique, $arrDatepicker, $arrColorpicker, $strHidden, $arrItems, $arrHiddenHeader);
-            }
-            else
-            {
-                $strOutput = $this->generateTable($arrUnique, $arrDatepicker, $arrColorpicker, $strHidden, $arrItems, $arrHiddenHeader);
-            }
+        if ($this->blnTableless) {
+            $strOutput = $this->generateDiv(
+                $arrUnique,
+                $arrDatepicker,
+                $arrColorpicker,
+                $strHidden,
+                $arrItems,
+                $arrHiddenHeader,
+                $onlyRows
+            );
+        } else if ($this->columnTemplate != '') {
+            $strOutput = $this->generateTemplateOutput(
+                $arrUnique,
+                $arrDatepicker,
+                $arrColorpicker,
+                $strHidden,
+                $arrItems,
+                $arrHiddenHeader,
+                $onlyRows
+            );
+        } else {
+            $strOutput = $this->generateTable(
+                $arrUnique,
+                $arrDatepicker,
+                $arrColorpicker,
+                $strHidden,
+                $arrItems,
+                $arrHiddenHeader,
+                $onlyRows
+            );
         }
 
         return $strOutput;
@@ -1155,69 +1177,77 @@ class MultiColumnWizard extends Widget implements \uploadable
 
     /**
      * Generates a table formatted MCW
-     * @param array
-     * @param array
-     * @param string
-     * @param array
+     *
+     * @param array  $arrUnique
+     *
+     * @param array  $arrDatepicker
+     *
+     * @param array  $arrColorpicker
+     *
+     * @param string $strHidden
+     *
+     * @param array  $arrItems
+     *
+     * @param array  $arrHiddenHeader
+     *
+     * @param bool   $onlyRows
+     *
      * @return string
      */
-    protected function generateTable($arrUnique, $arrDatepicker, $arrColorpicker, $strHidden, $arrItems, $arrHiddenHeader = array())
-    {
+    protected function generateTable(
+        $arrUnique,
+        $arrDatepicker,
+        $arrColorpicker,
+        $strHidden,
+        $arrItems,
+        $arrHiddenHeader = array(),
+        $onlyRows = false
+    ) {
 
-        // generate header fields
-        foreach ($this->columnFields as $strKey => $arrField)
-        {
+        $return = '';
 
-            if ($arrField['eval']['columnPos'])
-            {
-                $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
+        if ($onlyRows == false) {
+            // Generate header fields.
+            foreach ($this->columnFields as $strKey => $arrField) {
+                if ($arrField['eval']['columnPos']) {
+                    $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
+                } else {
+                    $strHeaderItem = '<th>';
+
+                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="invisible">' : '';
+                    $strHeaderItem .= (is_array($arrField['label'])) ? $arrField['label'][0] : ($arrField['label'] != null ? $arrField['label'] : $strKey);
+                    $strHeaderItem .= ((is_array($arrField['label']) && $arrField['label'][1] != '') ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>' : '');
+                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
+
+                    $arrHeaderItems[] = $strHeaderItem . '</th>';
+                }
             }
-            else
-            {
-                $strHeaderItem = '<th>';
 
-                $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="invisible">' : '';
-                $strHeaderItem .= (is_array($arrField['label'])) ? $arrField['label'][0] : ($arrField['label'] != null ? $arrField['label'] : $strKey);
-                $strHeaderItem .= ((is_array($arrField['label']) && $arrField['label'][1] != '') ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>' : '');
-                $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
+            $return = \sprintf(
+                '<table %s data-operations="maxCount[%s] minCount[%s] unique[%s] datepicker[%s] colorpicker[%s]" data-name="%s" id="ctrl_%s" class="tl_modulewizard multicolumnwizard">',
+                (($this->style) ? (\sprintf('style="%s"', $this->style)) : ('')),
+                ($this->maxCount ? $this->maxCount : '0'),
+                ($this->minCount ? $this->minCount : '0'),
+                implode(',', $arrUnique),
+                implode(',', $arrDatepicker),
+                implode(',', $arrColorpicker),
+                $this->name,
+                $this->strId
+            );
 
-                $arrHeaderItems[] = $strHeaderItem . '</th>';
+            if ($this->columnTemplate == '') {
+                $return .= \sprintf('<thead><tr>%s<th></th></tr></thead>', implode("\n      ", $arrHeaderItems));
             }
+
+            $return .= '<tbody>';
+        } else {
+            $return .= '<table>';
         }
 
-        $return = \sprintf(
-            '<table %s data-operations="maxCount[%s] minCount[%s] unique[%s] datepicker[%s] colorpicker[%s]" data-name="%s" id="ctrl_%s" class="tl_modulewizard multicolumnwizard">',
-            (($this->style) ? (\sprintf('style="%s"', $this->style)) : ('')),
-            ($this->maxCount ? $this->maxCount : '0'),
-            ($this->minCount ? $this->minCount : '0'),
-            implode(',', $arrUnique),
-            implode(',', $arrDatepicker),
-            implode(',', $arrColorpicker),
-            $this->name,
-            $this->strId
-        );
-
-        if ($this->columnTemplate == '')
-        {
-            $return .= '
-  <thead>
-    <tr>
-      ' . implode("\n      ", $arrHeaderItems) . '
-      <th></th>
-    </tr>
-  </thead>';
-        }
-
-        $return .='
-  <tbody>';
-
-        foreach ($arrItems as $k => $arrValue)
-        {
+        foreach ($arrItems as $k => $arrValue) {
             $return .= \sprintf('<tr data-rowId="%s">', $k);
-            foreach ($arrValue as $itemKey => $itemValue)
-            {
-                if ($itemValue['hide'] == true)
-                {
+            foreach ($arrValue as $itemKey => $itemValue) {
+                if ($itemValue['hide'] == true) {
                     $itemValue['tl_class'] .= ' invisible';
                 }
 
@@ -1231,9 +1261,9 @@ class MultiColumnWizard extends Widget implements \uploadable
             $return .= '</tr>';
         }
 
-        $return .= '</tbody></table>';
-
-        $return .= '<script>
+        if ($onlyRows == false) {
+            $return .= '</tbody></table>';
+            $return .= '<script>
         window.addEvent("load", function() {
             window["MCW_" + ' . json_encode($this->strId) . '] = new MultiColumnWizard({
                 table: "ctrl_" + ' . json_encode($this->strId) . ',
@@ -1243,6 +1273,9 @@ class MultiColumnWizard extends Widget implements \uploadable
             });
         });
         </script>';
+        } else {
+            $return .= '</table>';
+        }
 
         return $return;
     }
