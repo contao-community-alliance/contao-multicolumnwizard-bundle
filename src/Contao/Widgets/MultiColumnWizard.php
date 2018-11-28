@@ -237,32 +237,34 @@ class MultiColumnWizard extends Widget implements \uploadable
 
     protected function validator($varInput)
     {
-        $blnHasError = false;
+        // The order of the data are in the right order. So just catch it and save it.
+        $sortOrder = [];
+        $sortId    = 0;
+        foreach (\array_keys($varInput) as $id){
+            $sortOrder[$sortId] = $id;
+            $sortId++;
+        }
 
-        for ($i = 0; $i < count($varInput); $i++)
-        {
+        $blnHasError = false;
+        for ($i = 0; $i < count($varInput); $i++) {
             $this->activeRow = $i;
 
-            if (!$this->columnFields)
-            {
+            if (!$this->columnFields) {
                 continue;
             }
 
             // Walk every column
-            foreach ($this->columnFields as $strKey => $arrField)
-            {
+            foreach ($this->columnFields as $strKey => $arrField) {
                 $objWidget = $this->initializeWidget($arrField, $i, $strKey, $varInput[$i][$strKey]);
 
                 // can be null on error, or a string on input_field_callback
-                if (!is_object($objWidget))
-                {
+                if (!is_object($objWidget)) {
                     continue;
                 }
 
-                // hack for checkboxes
-                if ($arrField['inputType'] == 'checkbox' && isset($varInput[$i][$strKey]))
-                {
-                    $_POST[$objWidget->name] = $varInput[$i][$strKey];
+                // Hack for Checkboxes.
+                if ($arrField['inputType'] == 'checkbox' && isset($varInput[$i][$strKey])) {
+                    \Input::setPost($objWidget->name, $varInput[$i][$strKey]);
                 }
 
                 $objWidget->validate();
@@ -271,25 +273,19 @@ class MultiColumnWizard extends Widget implements \uploadable
 
                 // Convert date formats into timestamps (check the eval setting first -> #3063)
                 $rgxp = $arrField['eval']['rgxp'];
-                if (!$objWidget->hasErrors() && ($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '')
-                {
-                    $objDate  = new Date($varValue,$this->getNumericDateFormat($rgxp));
+                if (!$objWidget->hasErrors() && ($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '') {
+                    $objDate  = new Date($varValue, $this->getNumericDateFormat($rgxp));
                     $varValue = $objDate->tstamp;
                 }
 
                 // Save callback
-                if (is_array($arrField['save_callback']))
-                {
-                    foreach ($arrField['save_callback'] as $callback)
-                    {
+                if (is_array($arrField['save_callback'])) {
+                    foreach ($arrField['save_callback'] as $callback) {
                         $this->import($callback[0]);
 
-                        try
-                        {
+                        try {
                             $varValue = $this->{$callback[0]}->{$callback[1]}($varValue, $this);
-                        }
-                        catch (Exception $e)
-                        {
+                        } catch (\Exception $e) {
                             $objWidget->class = 'error';
                             $objWidget->addError($e->getMessage());
                         }
@@ -299,8 +295,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                 $varInput[$i][$strKey] = $varValue;
 
                 // Do not submit if there are errors
-                if ($objWidget->hasErrors())
-                {
+                if ($objWidget->hasErrors()) {
                     // store the errors
                     $this->arrWidgetErrors[$strKey][$i] = $objWidget->getErrors();
 
@@ -309,26 +304,42 @@ class MultiColumnWizard extends Widget implements \uploadable
             }
         }
 
-        if ($this->minCount > 0 && count($varInput) < $this->minCount)
-        {
+        if ($this->minCount > 0 && count($varInput) < $this->minCount) {
             $this->blnSubmitInput = false;
             $this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['mcwMinCount'], $this->minCount));
         }
 
-        if ($this->maxCount > 0 && count($varInput) > $this->maxCount)
-        {
+        if ($this->maxCount > 0 && count($varInput) > $this->maxCount) {
             $this->blnSubmitInput = false;
             $this->addError(sprintf($GLOBALS['TL_LANG']['ERR']['mcwMaxCount'], $this->maxCount));
         }
 
-        if ($blnHasError)
-        {
+        if ($blnHasError) {
             $this->blnSubmitInput = false;
             $this->addError($GLOBALS['TL_LANG']['ERR']['general']);
         }
 
-        return $varInput;
+        // Rebuild the order.
+        $sortedData = [];
+        foreach ($sortOrder as $sortId => $dataId) {
+            $sortedData[$sortId] = $varInput[$dataId];
+        }
+
+        // Rebuild the errors.
+        $dataIdToSortId = \array_flip($sortOrder);
+        $newWidgetError = [];
+        foreach (\array_keys($this->arrWidgetErrors) as $field) {
+            foreach ($this->arrWidgetErrors[$field] as $rowId => $fieldErrors) {
+                $sortId                          = $dataIdToSortId[$rowId];
+                $newWidgetError[$field][$sortId] = $fieldErrors;
+            }
+        }
+        $this->arrWidgetErrors = $newWidgetError;
+
+
+        return $sortedData;
     }
+
 
     /**
      * Generate the widget and return it as string
