@@ -30,29 +30,34 @@ use Contao\Session;
 class InitializeSystem
 {
     /**
-     *
+     * The MCW use some strange construction from point of contao.
+     * Contao will rewrite the [rowId][fieldname]. This will cause a problem in the validate function
+     * of the MCW, 'cause it is not able to find the data. So we have to replace the call, rewrite some elements.
+     * And return the "right" mcw context.
      */
     public function changeAjaxPostActions()
     {
-        if (version_compare(VERSION, '3.1', '>=')) {
-            if (Environment::get('isAjaxRequest')) {
-                switch (Input::post('action')) {
-                    case 'reloadPagetree':
-                    case 'reloadFiletree':
-                        //get the fieldnames
-                        $strRef      = Session::getInstance()->get('filePickerRef');
-                        $strRef      = substr($strRef, stripos($strRef, 'field=') + 6);
-                        $arrRef      = explode('&', $strRef);
-                        $arrRefField = explode('__', $arrRef[0]);
-                        $arrField    = preg_split('/_row[0-9]*_/i', \Input::post('name'));
-                        //change action if modal selector was found
-                        if (count($arrRefField) > 1 && $arrRefField === $arrField) {
-                            Input::setPost('action', Input::post('action') . '_mcw');
-                        }
-                        break;
-                }
-            }
+        if (!Environment::get('isAjaxRequest')) {
+            return;
         }
 
+        $name = \Input::post('name');
+        if (!\preg_match('/_row[0-9]*_/i', $name)) {
+            return;
+        }
+
+        switch (Input::post('action')) {
+            // Contao.
+            case 'reloadFiletree':
+            case 'reloadPagetree':
+                Input::setPost('action', Input::post('action') . '_mcw');
+                break;
+
+            // DMA
+            case 'reloadFiletreeDMA':
+            case 'reloadPagetreeDMA':
+                Input::setPost('action', \str_replace('DMA', '_mcw', Input::post('action')));
+                break;
+        }
     }
 }
