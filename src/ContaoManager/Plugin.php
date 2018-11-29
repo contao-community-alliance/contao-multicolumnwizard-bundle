@@ -32,12 +32,17 @@ class Plugin implements BundlePluginInterface
     {
         return [
             BundleConfig::create(MultiColumnWizardBundle::class)
-                        ->setLoadAfter(
-                            [
-                                ContaoCoreBundle::class,
-                                ContaoManagerBundle::class,
-                            ]
-                        ),
+                ->setLoadAfter(
+                    [
+                        ContaoCoreBundle::class,
+                        ContaoManagerBundle::class,
+                    ]
+                )
+                ->setReplace(
+                    [
+                        'multicolumnwizard',
+                    ]
+                ),
         ];
     }
 }
