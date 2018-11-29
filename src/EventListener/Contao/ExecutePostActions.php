@@ -16,7 +16,7 @@
  * @license    LGPL
  */
 
-namespace MenAtWork\MultiColumnWizardBundle\Contao\Events;
+namespace MenAtWork\MultiColumnWizardBundle\EventListener\Contao;
 
 use Contao\Config;
 use Contao\CoreBundle\Exception\ResponseException;
@@ -32,6 +32,7 @@ use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
 use FilesModel;
 use FileTree;
+use MenAtWork\MultiColumnWizardBundle\Contao\Events\BaseListener;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 

@@ -1,12 +1,12 @@
 services:
   maw.mcw.events.listener.execute_post_actions:
-    class: MenAtWork\MultiColumnWizardBundle\Contao\Events\ExecutePostActions
+    class: MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions
 
   maw.mcw.events.listener.initialize_system:
-    class: MenAtWork\MultiColumnWizardBundle\Contao\Events\InitializeSystem
+    class: MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem
 
   maw.mcw.events.listener.load_data_container:
-    class: MenAtWork\MultiColumnWizardBundle\Contao\Events\LoadDataContainer
+    class: MenAtWork\MultiColumnWizardBundle\EventListener\Contao\LoadDataContainer
 
   maw.mcw.events.listener.parse_template:
-    class: MenAtWork\MultiColumnWizardBundle\Contao\Events\ParseTemplate
+    class: MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ParseTemplate
