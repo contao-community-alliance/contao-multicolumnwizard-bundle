@@ -17,6 +17,8 @@ use Contao\BackendTemplate;
 use Contao\Date;
 use Contao\Widget;
 use MenAtWork\MultiColumnWizard\Event\GetOptionsEvent;
+use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class MultiColumnWizard
@@ -30,6 +32,10 @@ use MenAtWork\MultiColumnWizard\Event\GetOptionsEvent;
  */
 class MultiColumnWizard extends Widget implements \uploadable
 {
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
+    protected $eventDispatcher;
 
     /**
      * Submit user input
@@ -112,6 +118,8 @@ class MultiColumnWizard extends Widget implements \uploadable
             $this->strTemplate = 'form_widget';
             $this->loadDataContainer($arrAttributes['strTable']);
         }
+
+        $this->eventDispatcher = \System::getContainer()->get('event_dispatcher');
     }
 
     /**
@@ -237,6 +245,39 @@ class MultiColumnWizard extends Widget implements \uploadable
                 return parent::__get($strKey);
                 break;
         }
+    }
+
+    /**
+     * Trigger the event men-at-work.multi-column-wizard.get-tiny-mce
+     * Try to get help for generating the TinyMceScript.
+     *
+     * @param string $fieldId            The id of the field.
+     *
+     * @param array  $fieldConfiguration The filed configuration.
+     *
+     * @param string $tableName          The name of the table.
+     *
+     * @return string
+     */
+    protected function getMcWTinyMCEString($fieldId, $fieldConfiguration, $tableName)
+    {
+        // Final check if we have the right context.
+        if (empty($fieldConfiguration['eval']['rte'])) {
+            return '';
+        }
+
+        // Create a new event and dispatch it. Hope that someone have a good solution.
+        $event = new GetTinyMceEvent(
+            VERSION,
+            BUILD,
+            $fieldId,
+            $tableName,
+            $fieldConfiguration
+        );
+        $this->eventDispatcher->dispatch($event::NAME, $event);
+
+        // Return the result.
+        return $event->getTinyMce();
     }
 
     protected function validator($varInput)
@@ -767,48 +808,6 @@ class MultiColumnWizard extends Widget implements \uploadable
                         });
                         </script>';
         }
-    }
-
-    /**
-     * @param $strId
-     *
-     * @param $arrField
-     *
-     * @return string
-     *
-     * ToDo: This has to be part of an event. Since we have to check which contao version we have.
-     */
-    protected function getMcWTinyMCEString($strId, $arrField)
-    {
-        // Replace the textarea with an RTE instance
-        if (empty($arrField['eval']['rte'])) {
-            return '';
-        }
-
-        list ($file, $type) = explode('|', $arrField['eval']['rte'], 2);
-
-        $fileBrowserTypes = array();
-        $pickerBuilder    = \System::getContainer()->get('contao.picker.builder');
-
-        foreach (array('file' => 'image', 'link' => 'file') as $context => $fileBrowserType) {
-            if ($pickerBuilder->supportsContext($context)) {
-                $fileBrowserTypes[] = $fileBrowserType;
-            }
-        }
-
-        /** @var BackendTemplate|object $objTemplate */
-        $objTemplate                   = new \BackendTemplate('be_' . $file);
-        $objTemplate->selector         = 'ctrl_' . $strId;
-        $objTemplate->type             = $type;
-        $objTemplate->fileBrowserTypes = $fileBrowserTypes;
-        $objTemplate->source           = $this->strTable . '.' . $strId;
-
-        // Deprecated since Contao 4.0, to be removed in Contao 5.0
-        $objTemplate->language = \Backend::getTinyMceLanguage();
-
-        unset($file, $type, $pickerBuilder, $fileBrowserTypes, $fileBrowserType);
-
-        return $objTemplate->parse();
     }
 
     /**
