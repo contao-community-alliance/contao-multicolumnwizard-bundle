@@ -28,6 +28,8 @@ use Contao\PageTree;
 use Contao\Session;
 use Contao\StringUtil;
 use Contao\System;
+use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
 use FilesModel;
 use FileTree;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
@@ -58,41 +60,80 @@ class ExecutePostActions extends BaseListener
             return;
         }
 
-        // Get the field name, handel editAll as well.
-        $fieldName = $dc->inputName = Input::post('name');
-        if (Input::get('act') == 'editAll') {
-            $fieldName = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $fieldName);
+        if ($dc instanceof DcCompat) {
+            /** @var  DcCompat $dcGeneral */
+            $dcGeneral = $dc;
+
+            // Get the field name, handel editAll as well.
+            $fieldName = Input::post('name');
+            if (Input::get('act') == 'editAll') {
+                $fieldName = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $fieldName);
+            }
+
+            // Trigger the dcg to generate the data.
+            $env = $dcGeneral->getEnvironment();
+            $model = $dcGeneral
+                ->getEnvironment()
+                ->getDataProvider()
+                ->getEmptyModel();
+
+            $dcgContaoWidgetManager = new ContaoWidgetManager($env, $model);
+            /** @var MultiColumnWizard $widget */
+            $widget                 = $dcgContaoWidgetManager->getWidget($fieldName);
+
+            // The field does not exist
+            if (empty($widget)) {
+                $this->log('Field "' . $fieldName . '" does not exist in definition "' . $dc->table . '"',
+                    __METHOD__,
+                    TL_ERROR
+                );
+                throw new BadRequestHttpException('Bad request');
+            }
+
+            // Get the max row count or preset it.
+            $maxRowCount = Input::post('maxRowId');
+            if (empty($maxRowCount)) {
+                $maxRowCount = 0;
+            }
+
+            throw new ResponseException($this->convertToResponse($widget->generate(($maxRowCount + 1), true)));
+        } else {
+            // Get the field name, handel editAll as well.
+            $fieldName = $dc->inputName = Input::post('name');
+            if (Input::get('act') == 'editAll') {
+                $fieldName = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $fieldName);
+            }
+            $dc->field = $fieldName;
+
+            // The field does not exist
+            if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$fieldName])) {
+                $this->log('Field "' . $fieldName . '" does not exist in DCA "' . $dc->table . '"', __METHOD__, TL_ERROR);
+                throw new BadRequestHttpException('Bad request');
+            }
+
+            /** @var string $widgetClassName */
+            $widgetClassName = $GLOBALS['BE_FFL']['multiColumnWizard'];
+
+            // Get the max row count or preset it.
+            $maxRowCount = Input::post('maxRowId');
+            if (empty($maxRowCount)) {
+                $maxRowCount = 0;
+            }
+
+            /** @var MultiColumnWizard $widget */
+            $widget = new $widgetClassName(
+                $widgetClassName::getAttributesFromDca(
+                    $GLOBALS['TL_DCA'][$dc->table]['fields'][$fieldName],
+                    $dc->inputName,
+                    '',
+                    $fieldName,
+                    $dc->table,
+                    $dc
+                )
+            );
+
+            throw new ResponseException($this->convertToResponse($widget->generate(($maxRowCount + 1), true)));
         }
-        $dc->field = $fieldName;
-
-        // The field does not exist
-        if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$fieldName])) {
-            $this->log('Field "' . $fieldName . '" does not exist in DCA "' . $dc->table . '"', __METHOD__, TL_ERROR);
-            throw new BadRequestHttpException('Bad request');
-        }
-
-        /** @var string $widgetClassName */
-        $widgetClassName = $GLOBALS['BE_FFL']['multiColumnWizard'];
-
-        // Get the max row count or preset it.
-        $maxRowCount = Input::post('maxRowId');
-        if (empty($maxRowCount)) {
-            $maxRowCount = 0;
-        }
-
-        /** @var MultiColumnWizard $widget */
-        $widget = new $widgetClassName(
-            $widgetClassName::getAttributesFromDca(
-                $GLOBALS['TL_DCA'][$dc->table]['fields'][$fieldName],
-                $dc->inputName,
-                '',
-                $fieldName,
-                $dc->table,
-                $dc
-            )
-        );
-
-        throw new ResponseException($this->convertToResponse($widget->generate(($maxRowCount + 1), true)));
     }
 
     /**

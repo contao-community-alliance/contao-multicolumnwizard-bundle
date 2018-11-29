@@ -769,39 +769,46 @@ class MultiColumnWizard extends Widget implements \uploadable
         }
     }
 
+    /**
+     * @param $strId
+     *
+     * @param $arrField
+     *
+     * @return string
+     *
+     * ToDo: This has to be part of an event. Since we have to check which contao version we have.
+     */
     protected function getMcWTinyMCEString($strId, $arrField)
     {
-        if (version_compare(VERSION, '3.3', '<'))
-        {
-            return "<script>
-            tinyMCE.execCommand('mceAddControl', false, 'ctrl_" . $strId . "');
-            $('ctrl_" . $strId . "').erase('required');
-                </script>";
+        // Replace the textarea with an RTE instance
+        if (empty($arrField['eval']['rte'])) {
+            return '';
         }
 
         list ($file, $type) = explode('|', $arrField['eval']['rte'], 2);
 
-        if (!file_exists(TL_ROOT . '/system/config/' . $file . '.php'))
-        {
-            throw new \Exception(sprintf('Cannot find editor configuration file "%s.php"', $file));
+        $fileBrowserTypes = array();
+        $pickerBuilder    = \System::getContainer()->get('contao.picker.builder');
+
+        foreach (array('file' => 'image', 'link' => 'file') as $context => $fileBrowserType) {
+            if ($pickerBuilder->supportsContext($context)) {
+                $fileBrowserTypes[] = $fileBrowserType;
+            }
         }
 
-        // Backwards compatibility
-        $language = substr($GLOBALS['TL_LANGUAGE'], 0, 2);
+        /** @var BackendTemplate|object $objTemplate */
+        $objTemplate                   = new \BackendTemplate('be_' . $file);
+        $objTemplate->selector         = 'ctrl_' . $strId;
+        $objTemplate->type             = $type;
+        $objTemplate->fileBrowserTypes = $fileBrowserTypes;
+        $objTemplate->source           = $this->strTable . '.' . $strId;
 
-        if (!file_exists(TL_ROOT . '/assets/tinymce/langs/' . $language . '.js'))
-        {
-            $language = 'en';
-        }
+        // Deprecated since Contao 4.0, to be removed in Contao 5.0
+        $objTemplate->language = \Backend::getTinyMceLanguage();
 
-        $selector = 'ctrl_' . $strId;
+        unset($file, $type, $pickerBuilder, $fileBrowserTypes, $fileBrowserType);
 
-        ob_start();
-        include TL_ROOT . '/system/config/' . $file . '.php';
-        $editor = ob_get_contents();
-        ob_end_clean();
-
-        return $editor;
+        return $objTemplate->parse();
     }
 
     /**
