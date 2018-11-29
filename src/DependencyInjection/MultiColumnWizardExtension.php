@@ -38,7 +38,7 @@ class MultiColumnWizardExtension extends ConfigurableExtension
      */
     public function getAlias()
     {
-        return 'multicolumnwizard';
+        return 'multicolumnwizard-bundle';
     }
 
     /**
