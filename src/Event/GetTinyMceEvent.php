@@ -159,7 +159,7 @@ class GetTinyMceEvent extends Event
      *
      * @return string
      */
-    public function getTableName(): string
+    public function getTableName()
     {
         return $this->tableName;
     }
