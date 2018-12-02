@@ -44,6 +44,23 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class ExecutePostActions extends BaseListener
 {
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * ExecutePostActions constructor.
+     *
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        parent::__construct();
+
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
      * Create a new row.
      *
      * @param string        $action The action.
