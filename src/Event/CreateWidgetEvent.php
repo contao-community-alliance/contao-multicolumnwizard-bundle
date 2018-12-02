@@ -10,13 +10,14 @@ namespace MenAtWork\MultiColumnWizardBundle\Event;
 
 use Contao\DataContainer;
 use Contao\Widget;
+use Symfony\Component\EventDispatcher\Event;
 
 /**
- * Class CreateNewRow
+ * Class CreateWidgetEvent
  *
  * @package MenAtWork\MultiColumnWizardBundle\Event
  */
-class CreateWidget
+class CreateWidgetEvent extends Event
 {
     /**
      * Name of the event.
