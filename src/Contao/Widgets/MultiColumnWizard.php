@@ -134,8 +134,11 @@ class MultiColumnWizard extends Widget implements \uploadable
     /**
      * Add specific attributes
      *
-     * @param string
-     * @param mixed
+     * @param string $strKey
+     *
+     * @param mixed  $varValue
+     *
+     * @throws \Exception
      */
     public function __set($strKey, $varValue)
     {
@@ -216,6 +219,13 @@ class MultiColumnWizard extends Widget implements \uploadable
         }
     }
 
+    /**
+     * Get specific attributes
+     *
+     * @param string $strKey
+     *
+     * @return array|string
+     */
     public function __get($strKey)
     {
         switch ($strKey) {
