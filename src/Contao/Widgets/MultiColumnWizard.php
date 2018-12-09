@@ -290,6 +290,68 @@ class MultiColumnWizard extends Widget implements \uploadable
         return $event->getTinyMce();
     }
 
+    /**
+     * Trigger the event men-at-work.multi-column-wizard.get-date-picker
+     *
+     * @param string $fieldId
+     *
+     * @param string $fieldName          The name of the column/field.
+     *
+     * @param string $rgxp               Never used. But needed for API.
+     *
+     * @param array  $fieldConfiguration The filed configuration.
+     *
+     * @param string $tableName          The name of the table.
+     *
+     * @return string
+     */
+    protected function getMcWDatePickerString(
+        $fieldId,
+        $fieldName,
+        $rgxp = null,
+        $fieldConfiguration = null,
+        $tableName = null
+    ) {
+        // Datepicker
+        if (!$fieldConfiguration['eval']['datepicker'] || !isset($fieldConfiguration['eval']['rgxp'])) {
+            return '';
+        }
+
+        // Add a warning if some one use the old rgxp parameter.
+        if (!empty($rgxp)) {
+            trigger_error(
+                sprintf(
+                    'Use of deprecated parameter for %s::%s - %s. 
+                    Use instead the $fieldConfiguration and $fieldConfiguration[\'eval\'][\'rgxp\'] for this.',
+                    __CLASS__,
+                    __FUNCTION__,
+                    $rgxp
+                ),
+                E_USER_DEPRECATED
+            );
+        }
+
+        // Create a new event and dispatch it. Hope that someone have a good solution.
+        $event = new GetDatePickerStringEvent(
+            VERSION,
+            BUILD,
+            $fieldId,
+            $tableName,
+            $fieldConfiguration,
+            $fieldName,
+            $fieldConfiguration['eval']['rgxp']
+        );
+        $this->eventDispatcher->dispatch($event::NAME, $event);
+
+        // Return the result.
+        return $event->getDatePicker();
+    }
+
+    /**
+     * @param mixed $varInput
+     *
+     * @return array|mixed
+     */
     protected function validator($varInput)
     {
         // The order of the data are in the right order. So just catch it and save it.
@@ -589,54 +651,16 @@ class MultiColumnWizard extends Widget implements \uploadable
 
                     $strWidget = $objWidget->parse();
                 } else {
-                    $datepicker  = '';
                     $colorpicker = '';
-                    $tinyMce     = '';
 
-                    // Datepicker
-                    if ($arrField['eval']['datepicker']) {
-                        $rgxp   = $arrField['eval']['rgxp'];
-                        $format = $this->getNumericDateFormat($rgxp);
-
-                        switch ($rgxp) {
-                            case 'datim':
-                                $time = ",\n      timePicker:true";
-                                break;
-
-                            case 'time':
-                                $time = ",\n      timePickerOnly:true";
-                                break;
-
-                            default:
-                                $time = '';
-                                break;
-                        }
-
-                        $datepicker = ' <img src="bundles/multicolumnwizard/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $objWidget->id . '" style="vertical-align:-6px;">
-                          <script>
-							  window.datepicker_' . $this->strName . '_' . $strKey . ' = new DatePicker(\'#ctrl_' . $objWidget->id . '\', {
-							  allowEmpty:true,
-							  toggleElements:\'#toggle_' . $objWidget->id . '\',
-							  pickerClass:\'datepicker_dashboard\',
-							  format:\'' . $format . '\',
-							  inputOutputFormat:\'' . $format . '\',
-							  positionOffset:{x:130,y:-185}' . $time . ',
-							  startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
-							  days:[\'' . implode("','", $GLOBALS['TL_LANG']['DAYS']) . '\'],
-							  dayShort:' . $GLOBALS['TL_LANG']['MSC']['dayShortLength'] . ',
-							  months:[\'' . implode("','", $GLOBALS['TL_LANG']['MONTHS']) . '\'],
-							  monthShort:' . $GLOBALS['TL_LANG']['MSC']['monthShortLength'] . '
-                          });
-                          </script>';
-
-                        $datepicker = $this->getMcWDatePickerString($objWidget->id, $strKey, $rgxp);
-
-                        /* $datepicker = '<script>
-                          window.addEvent(\'domready\', function() {
-                          ' . sprintf($this->getDatePickerString(), 'ctrl_' . $objWidget->strId) . '
-                          });
-                          </script>'; */
-                    }
+                    // Get the datepicker.
+                    $datepicker = $this->getMcWDatePickerString(
+                        $objWidget->id,
+                        $strKey,
+                        null,
+                        $arrField,
+                        $this->strTable
+                    );
 
                     // Color picker
                     if ($arrField['eval']['colorpicker']) {
@@ -659,11 +683,12 @@ class MultiColumnWizard extends Widget implements \uploadable
 			  </script>';
                     }
 
-
                     // Tiny MCE
                     if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
-                        $tinyMce                      = $this->getMcWTinyMCEString($objWidget->id, $arrField);
+                        $tinyMce                      = $this->getMcWTinyMCEString($objWidget->id, $arrField, $this->strTable);
                         $arrField['eval']['tl_class'] .= ' tinymce';
+                    } else {
+                        $tinyMce     = '';
                     }
 
                     // Add custom wizard
@@ -744,75 +769,6 @@ class MultiColumnWizard extends Widget implements \uploadable
         }
 
         return $strOutput;
-    }
-
-    protected function getMcWDatePickerString($strId, $strKey, $rgxp)
-    {
-        if (version_compare(VERSION, '3.3', '<')) {
-
-            $format = Date::formatToJs($this->getNumericDateFormat($rgxp));
-            switch ($rgxp) {
-                case 'datim':
-                    $time = ",\n      timePicker:true";
-                    break;
-
-                case 'time':
-                    $time = ",\n      pickOnly:\"time\"";
-                    break;
-
-                default:
-                    $time = '';
-                    break;
-            }
-
-            return ' <img src="bundles/multicolumnwizard/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;cursor:pointer;">
-                        <script>
-                        window.addEvent("domready", function() {
-                            new Picker.Date($$("#ctrl_' . $strId . '"), {
-                            draggable:false,
-                            toggle:$$("#toggle_' . $strId . '"),
-                            format:"' . $format . '",
-                            positionOffset:{x:-197,y:-182}' . $time . ',
-                            pickerClass:"datepicker_dashboard",
-                            useFadeInOut:!Browser.ie,
-                            startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
-                            titleFormat:"' . $GLOBALS['TL_LANG']['MSC']['titleFormat'] . '"
-                            });
-                        });
-                        </script>';
-
-        } else {
-            $format = Date::formatToJs($this->getNumericDateFormat($rgxp));
-            switch ($rgxp) {
-                case 'datim':
-                    $time = ",\n      timePicker:true";
-                    break;
-
-                case 'time':
-                    $time = ",\n      pickOnly:\"time\"";
-                    break;
-
-                default:
-                    $time = '';
-                    break;
-            }
-
-            return ' <img src="bundles/multicolumnwizard/img/datepicker.gif" width="20" height="20" alt="" id="toggle_' . $strId . '" style="vertical-align:-6px;cursor:pointer;">
-                        <script>
-                        window.addEvent("domready", function() {
-                            new Picker.Date($("ctrl_' . $strId . '"), {
-                            draggable:false,
-                            toggle:$("toggle_' . $strId . '"),
-                            format:"' . $format . '",
-                            positionOffset:{x:-211,y:-209}' . $time . ',
-                            pickerClass:"datepicker_bootstrap",
-                            useFadeInOut:!Browser.ie,
-                            startDay:' . $GLOBALS['TL_LANG']['MSC']['weekOffset'] . ',
-                            titleFormat:"' . $GLOBALS['TL_LANG']['MSC']['titleFormat'] . '"
-                            });
-                        });
-                        </script>';
-        }
     }
 
     /**

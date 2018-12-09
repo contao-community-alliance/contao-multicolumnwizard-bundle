@@ -14,6 +14,13 @@ services:
         event: men-at-work.multi-column-wizard.get-tiny-mce
         method: executeEvent
 
+  menatwork.multicolumnwizard.events_listener.build-date-picker:
+    class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\DatePicker
+    tags:
+      - name: kernel.event_listener
+        event: men-at-work.multi-column-wizard.get-date-picker
+        method: executeEvent
+
   menatwork.multicolumnwizard.events_listener.create-widget:
     class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\CreateWidget
     tags:
