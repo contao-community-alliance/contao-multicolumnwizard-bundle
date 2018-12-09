@@ -29,9 +29,9 @@ use Contao\StringUtil;
 use Contao\System;
 use FilesModel;
 use FileTree;
-use MenAtWork\MultiColumnWizardBundle\Contao\Events\BaseListener;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
 use MenAtWork\MultiColumnWizardBundle\Event\CreateWidgetEvent;
+use MenAtWork\MultiColumnWizardBundle\EventListener\BaseListener;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
