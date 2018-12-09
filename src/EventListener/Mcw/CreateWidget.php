@@ -40,8 +40,8 @@ class CreateWidget
         $dcDriver->field = $fieldName;
 
         // The field does not exist
-        if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$fieldName])) {
-            System::log('Field "' . $fieldName . '" does not exist in DCA "' . $dc->table . '"', __METHOD__, TL_ERROR);
+        if (!isset($GLOBALS['TL_DCA'][$dcDriver->table]['fields'][$fieldName])) {
+            System::log('Field "' . $fieldName . '" does not exist in DCA "' . $dcDriver->table . '"', __METHOD__, TL_ERROR);
             throw new BadRequestHttpException('Bad request');
         }
 
