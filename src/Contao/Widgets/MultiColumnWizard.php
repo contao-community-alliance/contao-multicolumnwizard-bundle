@@ -17,7 +17,9 @@ use Contao\BackendTemplate;
 use Contao\Date;
 use Contao\Widget;
 use MenAtWork\MultiColumnWizard\Event\GetOptionsEvent;
-use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceEvent;
+use MenAtWork\MultiColumnWizardBundle\Event\GetDatePickerStringEvent;
+use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
+use MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\CreateDatePicker;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -275,7 +277,7 @@ class MultiColumnWizard extends Widget implements \uploadable
         }
 
         // Create a new event and dispatch it. Hope that someone have a good solution.
-        $event = new GetTinyMceEvent(
+        $event = new GetTinyMceStringEvent(
             VERSION,
             BUILD,
             $fieldId,

@@ -19,7 +19,7 @@
 namespace MenAtWork\MultiColumnWizardBundle\EventListener\Mcw;
 
 use Contao\BackendTemplate;
-use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceEvent;
+use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
 
 /**
  * Class TinyMce
@@ -29,11 +29,11 @@ class TinyMce
     /**
      * Listener for building the tiny mce.
      *
-     * @param GetTinyMceEvent $event
+     * @param GetTinyMceStringEvent $event
      *
      * @return void
      */
-    public function executeEvent(GetTinyMceEvent $event)
+    public function executeEvent(GetTinyMceStringEvent $event)
     {
         $version = $event->getVersion();
         if (version_compare($version, '4.4', '>=')) {
@@ -44,11 +44,11 @@ class TinyMce
     /**
      * Generate the TinyMce Script.
      *
-     * @param GetTinyMceEvent $event
+     * @param GetTinyMceStringEvent $event
      *
      * @return void
      */
-    private function contao44x(GetTinyMceEvent $event)
+    private function contao44x(GetTinyMceStringEvent $event)
     {
         // Get some vars.
         $field = $event->getFieldConfiguration();
