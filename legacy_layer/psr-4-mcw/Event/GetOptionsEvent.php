@@ -28,7 +28,7 @@ class GetOptionsEvent extends BundleGetOptionsEvent
         $environment,
         $model,
         $widget,
-        array $options = array()
+        $options = null
     ) {
         trigger_error(
             sprintf(
