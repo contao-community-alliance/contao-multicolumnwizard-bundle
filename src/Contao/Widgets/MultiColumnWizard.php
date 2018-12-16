@@ -16,6 +16,7 @@ namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
 use Contao\BackendTemplate;
 use Contao\Date;
 use Contao\Widget;
+use MenAtWork\MultiColumnWizardBundle\Event\GetColorPickerStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetDatePickerStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
@@ -291,7 +292,7 @@ class MultiColumnWizard extends Widget implements \uploadable
     /**
      * Trigger the event men-at-work.multi-column-wizard-bundle.get-date-picker
      *
-     * @param string $fieldId
+     * @param string $fieldId            The id of the field.
      *
      * @param string $fieldName          The name of the column/field.
      *
@@ -343,6 +344,43 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Return the result.
         return $event->getDatePicker();
+    }
+
+    /**
+     * Trigger the event men-at-work.multi-column-wizard-bundle.get-color-picker
+     *
+     * @param string $fieldId            The id of the field.
+     *
+     * @param array  $fieldConfiguration The filed configuration.
+     *
+     * @param string $tableName          The name of the table.
+     *
+     * @return string
+     */
+    protected function getMcWColorPicker(
+        $fieldId,
+        $fieldName,
+        $fieldConfiguration = null,
+        $tableName = null
+    ) {
+        // Check if we have an configuration.
+        if (!isset($fieldConfiguration['eval']['colorpicker'])) {
+            return '';
+        }
+
+        // Create a new event and dispatch it. Hope that someone have a good solution.
+        $event = new GetColorPickerStringEvent(
+            VERSION,
+            BUILD,
+            $fieldId,
+            $tableName,
+            $fieldConfiguration,
+            $fieldName
+        );
+        $this->eventDispatcher->dispatch($event::NAME, $event);
+
+        // Return the result.
+        return $event->getColorPicker();
     }
 
     /**
@@ -650,10 +688,10 @@ class MultiColumnWizard extends Widget implements \uploadable
                     $strWidget = $objWidget->parse();
                 } else {
                     $additionalCode = [];
-                    $colorpicker = '';
 
-                    // Get the datepicker.
-                    $additionalCode['datePicker'] = $this->getMcWDatePickerString(
+                    // Date picker.
+                    $additionalCode['datePicker'] = $this->getMcWDatePickerString
+                    (
                         $objWidget->id,
                         $strKey,
                         null,
@@ -661,30 +699,16 @@ class MultiColumnWizard extends Widget implements \uploadable
                         $this->strTable
                     );
 
-                    // Color picker
-                    if ($arrField['eval']['colorpicker']) {
-                        // Support single fields as well (see #5240)
-                        //$strKey = $arrData['eval']['multiple'] ? $this->strField . '_0' : $this->strField;
+                    // Color picker.
+                    $additionalCode['colorPicker'] = $this->getMcWColorPicker
+                    (
+                        $objWidget->id,
+                        $strKey,
+                        $arrField,
+                        $this->strTable
+                    );
 
-                        $colorpicker = ' ' . \Image::getHtml('pickcolor.gif', $GLOBALS['TL_LANG']['MSC']['colorpicker'],
-                                'style="vertical-align:top;cursor:pointer" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['colorpicker']) . '" id="moo_' . $objWidget->id . '"') . '
-			  <script>
-				window.addEvent("domready", function() {
-				  new MooRainbow("moo_' . $objWidget->id . '", {
-					id: "ctrl_' . $objWidget->id . '",
-					startColor: ((cl = $("ctrl_' . $objWidget->id . '").value.hexToRgb(true)) ? cl : [255, 0, 0]),
-					imgPath: "assets/mootools/colorpicker/' . $GLOBALS['TL_ASSETS']['COLORPICKER'] . '/images/",
-					onComplete: function(color) {
-					  $("ctrl_' . $objWidget->id . '").value = color.hex.replace("#", "");
-					}
-				  });
-				});
-			  </script>';
-                    }
-
-                    $additionalCode['colorPicker'] = $colorpicker;
-
-                    // Tiny MCE
+                    // Tiny MCE.
                     if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
                         $additionalCode['tinyMce']    = $this->getMcWTinyMCEString
                         (
@@ -719,6 +743,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                         $objWidget->wizard = $wizard;
                     }
 
+                    // Remove empty elements.
                     $additionalCode = array_filter
                     (
                         $additionalCode,
