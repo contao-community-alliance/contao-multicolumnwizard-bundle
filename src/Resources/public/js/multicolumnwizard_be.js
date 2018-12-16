@@ -772,7 +772,6 @@ Object.append(MultiColumnWizard,
          */
         deleteClick: function(el, row)
                      {
-                         this.killAllTinyMCE(el, row);
                          var parent = row.getParent('.multicolumnwizard');
 
                          if (row.getSiblings().length > 0) {
@@ -784,22 +783,7 @@ Object.append(MultiColumnWizard,
                              //destroy current row
                              row.dispose();
                              row.destroy.delay(10, row); // destroy delayed, to ensure all remaining event handlers are called
-
-                             var that = this;
-                             //update index of following rows
-                             rows.each(function(row){
-
-                                 that.updateRowAttributes(level++, row);
-                             });
                          }
-                         else
-                         {
-                             row.getElements('input,select,textarea').each(function(el){
-                                 MultiColumnWizard.clearElementValue(el);
-                             });
-                         }
-
-                         this.reinitTinyMCE(el, parent, true);
                      },
 
         /**
@@ -884,6 +868,7 @@ Object.append(MultiColumnWizard,
 // MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.newClick);
 // MultiColumnWizard.addOperationUpdateCallback('copy', MultiColumnWizard.copyUpdate);
 // MultiColumnWizard.addOperationClickCallback('copy', MultiColumnWizard.copyClick);
+
 MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.insertNewElement);
 MultiColumnWizard.addOperationUpdateCallback('delete', MultiColumnWizard.deleteUpdate);
 MultiColumnWizard.addOperationClickCallback('delete', MultiColumnWizard.deleteClick);

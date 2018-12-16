@@ -1129,7 +1129,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                 $environment,
                 $this->objDca->getModel(),
                 $this,
-                (array) $arrData['options']
+                (array_key_exists('options', $arrData) ? $arrData['options'] : null)
             );
             $environment->getEventDispatcher()->dispatch($event::NAME, $event);
 
