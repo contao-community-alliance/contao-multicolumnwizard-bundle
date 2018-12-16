@@ -16,11 +16,9 @@ namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
 use Contao\BackendTemplate;
 use Contao\Date;
 use Contao\Widget;
-use MenAtWork\MultiColumnWizard\Event\GetOptionsEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetDatePickerStringEvent;
+use MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
-use MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\CreateDatePicker;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class MultiColumnWizard
