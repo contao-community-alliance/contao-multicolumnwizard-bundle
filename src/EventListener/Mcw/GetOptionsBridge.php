@@ -2,8 +2,8 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\EventListener\Mcw;
 
+use MenAtWork\MultiColumnWizard\Event\GetOptionsEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent as GetOptionEventBundle;
-use MultiColumnWizard\Event\GetOptionsEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
