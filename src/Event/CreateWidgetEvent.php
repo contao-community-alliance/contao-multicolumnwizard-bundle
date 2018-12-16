@@ -22,7 +22,7 @@ class CreateWidgetEvent extends Event
     /**
      * Name of the event.
      */
-    const NAME = 'men-at-work.multi-column-wizard.create-widget';
+    const NAME = 'men-at-work.multi-column-wizard-bundle.create-widget';
 
     /**
      * @var DataContainer

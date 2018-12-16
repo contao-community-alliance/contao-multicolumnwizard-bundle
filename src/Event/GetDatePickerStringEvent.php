@@ -28,7 +28,7 @@ class GetDatePickerStringEvent extends GetStringEvent
     /**
      * Name of the event.
      */
-    const NAME = 'men-at-work.multi-column-wizard.get-date-picker';
+    const NAME = 'men-at-work.multi-column-wizard-bundle.get-date-picker';
 
     /**
      * @var string

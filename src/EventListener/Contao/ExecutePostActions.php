@@ -61,7 +61,7 @@ class ExecutePostActions extends BaseListener
 
     /**
      * Create a new row.
-     * Will call the event men-at-work.multi-column-wizard.create-widget to get the widget.
+     * Will call the event men-at-work.multi-column-wizard-bundle.create-widget to get the widget.
      *
      * @param string        $action The action.
      *

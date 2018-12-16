@@ -31,7 +31,7 @@ class GetTinyMceStringEvent extends GetStringEvent
     /**
      * Name of the event.
      */
-    const NAME = 'men-at-work.multi-column-wizard.get-tiny-mce';
+    const NAME = 'men-at-work.multi-column-wizard-bundle.get-tiny-mce';
 
     /**
      * @var string

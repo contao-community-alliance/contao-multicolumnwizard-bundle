@@ -258,7 +258,7 @@ class MultiColumnWizard extends Widget implements \uploadable
     }
 
     /**
-     * Trigger the event men-at-work.multi-column-wizard.get-tiny-mce
+     * Trigger the event men-at-work.multi-column-wizard-bundle.get-tiny-mce
      * Try to get help for generating the TinyMceScript.
      *
      * @param string $fieldId            The id of the field.
@@ -291,7 +291,7 @@ class MultiColumnWizard extends Widget implements \uploadable
     }
 
     /**
-     * Trigger the event men-at-work.multi-column-wizard.get-date-picker
+     * Trigger the event men-at-work.multi-column-wizard-bundle.get-date-picker
      *
      * @param string $fieldId
      *

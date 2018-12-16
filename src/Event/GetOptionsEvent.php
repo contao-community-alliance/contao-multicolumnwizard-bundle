@@ -22,7 +22,7 @@ use Symfony\Component\EventDispatcher\Event;
  */
 class GetOptionsEvent extends Event
 {
-    const NAME = 'men-at-work.multi-column-wizard.get-options';
+    const NAME = 'men-at-work.multi-column-wizard-bundle.get-options';
 
     /**
      * The name of the multi column wizard.

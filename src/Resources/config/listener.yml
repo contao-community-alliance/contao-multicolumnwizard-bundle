@@ -11,22 +11,22 @@ services:
     class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\TinyMce
     tags:
       - name: kernel.event_listener
-        event: men-at-work.multi-column-wizard.get-tiny-mce
+        event: men-at-work.multi-column-wizard-bundle.get-tiny-mce
         method: executeEvent
 
   menatwork.multicolumnwizard.events_listener.build-date-picker:
     class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\DatePicker
     tags:
       - name: kernel.event_listener
-        event: men-at-work.multi-column-wizard.get-date-picker
+        event: men-at-work.multi-column-wizard-bundle.get-date-picker
         method: executeEvent
 
   menatwork.multicolumnwizard.events_listener.create-widget:
     class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\CreateWidget
     tags:
       - name: kernel.event_listener
-        event: men-at-work.multi-column-wizard.create-widget
+        event: men-at-work.multi-column-wizard-bundle.create-widget
         method: createWidgetContao
       - name: kernel.event_listener
-        event: men-at-work.multi-column-wizard.create-widget
+        event: men-at-work.multi-column-wizard-bundle.create-widget
         method: createWidgetDcGeneral
