@@ -1,14 +1,18 @@
 services:
-  menatwork.multicolumnwizard.events_listener.execute_post_actions:
+  menatwork.multicolumnwizard-bundle.events_listener.execute_post_actions:
     class: MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions
+    public: true
     arguments:
       - '@event_dispatcher'
 
-  menatwork.multicolumnwizard.events_listener.initialize_system:
+  menatwork.multicolumnwizard-bundle.events_listener.initialize_system:
     class: MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem
+    public: true
 
-  menatwork.multicolumnwizard.events_listener.load_data_container:
+  menatwork.multicolumnwizard-bundle.events_listener.load_data_container:
     class: MenAtWork\MultiColumnWizardBundle\EventListener\Contao\LoadDataContainer
+    public: true
 
-  menatwork.multicolumnwizard.events_listener.parse_template:
+  menatwork.multicolumnwizard-bundle.events_listener.parse_template:
     class: MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ParseTemplate
+    public: true
