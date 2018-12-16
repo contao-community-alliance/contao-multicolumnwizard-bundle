@@ -651,10 +651,11 @@ class MultiColumnWizard extends Widget implements \uploadable
 
                     $strWidget = $objWidget->parse();
                 } else {
+                    $additionalCode = [];
                     $colorpicker = '';
 
                     // Get the datepicker.
-                    $datepicker = $this->getMcWDatePickerString(
+                    $additionalCode['datePicker'] = $this->getMcWDatePickerString(
                         $objWidget->id,
                         $strKey,
                         null,
@@ -683,12 +684,17 @@ class MultiColumnWizard extends Widget implements \uploadable
 			  </script>';
                     }
 
+                    $additionalCode['colorPicker'] = $colorpicker;
+
                     // Tiny MCE
                     if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
-                        $tinyMce                      = $this->getMcWTinyMCEString($objWidget->id, $arrField, $this->strTable);
+                        $additionalCode['tinyMce']    = $this->getMcWTinyMCEString
+                        (
+                            $objWidget->id,
+                            $arrField,
+                            $this->strTable
+                        );
                         $arrField['eval']['tl_class'] .= ' tinymce';
-                    } else {
-                        $tinyMce     = '';
                     }
 
                     // Add custom wizard
@@ -715,7 +721,20 @@ class MultiColumnWizard extends Widget implements \uploadable
                         $objWidget->wizard = $wizard;
                     }
 
-                    $strWidget = $objWidget->parse() . $datepicker . $colorpicker . $tinyMce;
+                    $additionalCode = array_filter
+                    (
+                        $additionalCode,
+                        function ($value) {
+                            return !empty($value);
+                        }
+                    );
+
+                    $strWidget = sprintf
+                    (
+                        '%s%s',
+                        $objWidget->parse(),
+                        implode('', $additionalCode)
+                    );
                 }
 
                 // Build array of items
