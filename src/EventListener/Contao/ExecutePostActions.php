@@ -27,6 +27,7 @@ use Contao\Input;
 use Contao\PageTree;
 use Contao\StringUtil;
 use Contao\System;
+use ContaoCommunityAlliance\DcGeneral\DC\General;
 use FilesModel;
 use FileTree;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
@@ -83,7 +84,10 @@ class ExecutePostActions extends BaseListener
         }
 
         // Get the field name, handel editAll as well.
-        $fieldName = $dc->inputName = Input::post('name');
+        $fieldName = Input::post('name');
+        if (!$dc instanceof General) {
+            $dc->inputName = $fieldName;
+        }
         if (Input::get('act') == 'editAll') {
             $fieldName = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $fieldName);
         }
