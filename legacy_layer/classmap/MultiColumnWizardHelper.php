@@ -52,7 +52,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
             E_USER_DEPRECATED
         );
 
-        /** @var \MenAtWork\MultiColumnWizardBundle\Contao\Events\ParseTemplate $helper */
+        /** @var MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ParseTemplate $helper */
         $helper = \System::getContainer()->get($serviceName);
         $helper->addScriptsAndStyles($objTemplate);
     }
@@ -78,7 +78,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
             E_USER_DEPRECATED
         );
 
-        /** @var \MenAtWork\MultiColumnWizardBundle\Contao\Events\LoadDataContainer $helper */
+        /** @var MenAtWork\MultiColumnWizardBundle\EventListener\Contao\LoadDataContainer $helper */
         $helper = \System::getContainer()->get($serviceName);
         $helper->supportModalSelector($strTable);
     }
@@ -102,7 +102,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
             E_USER_DEPRECATED
         );
 
-        /** @var \MenAtWork\MultiColumnWizardBundle\Contao\Events\InitializeSystem $helper */
+        /** @var MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem $helper */
         $helper = \System::getContainer()->get($serviceName);
         $helper->changeAjaxPostActions();
     }
@@ -115,6 +115,8 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      * @return void
      *
      * @deprecated Use the maw.mcw.events.listener.execute_post_actions
+     *
+     * @throws \Exception
      */
     public function executePostActions($action, DataContainer $dc)
     {
@@ -130,7 +132,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
             E_USER_DEPRECATED
         );
 
-        /** @var \MenAtWork\MultiColumnWizardBundle\Contao\Events\ExecutePostActions $helper */
+        /** @var MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions $helper */
         $helper = \System::getContainer()->get($serviceName);
         $helper->executePostActions($action, $dc);
     }

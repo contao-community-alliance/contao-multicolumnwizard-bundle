@@ -19,6 +19,8 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent as BundleGetOptionsE
  */
 class GetOptionsEvent extends BundleGetOptionsEvent
 {
+    const NAME = 'men-at-work.multi-column-wizard.get-options';
+
     /**
      * @inheritdoc
      */

@@ -16,7 +16,7 @@
  * @license    LGPL
  */
 
-namespace MenAtWork\MultiColumnWizardBundle\Contao\Events;
+namespace MenAtWork\MultiColumnWizardBundle\EventListener\Contao;
 
 use Contao\Config;
 use Contao\CoreBundle\Exception\ResponseException;
@@ -25,14 +25,15 @@ use Contao\DataContainer;
 use Contao\Dbafs;
 use Contao\Input;
 use Contao\PageTree;
-use Contao\Session;
 use Contao\StringUtil;
 use Contao\System;
-use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
-use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
+use ContaoCommunityAlliance\DcGeneral\DC\General;
 use FilesModel;
 use FileTree;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
+use MenAtWork\MultiColumnWizardBundle\Event\CreateWidgetEvent;
+use MenAtWork\MultiColumnWizardBundle\EventListener\BaseListener;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -43,13 +44,35 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class ExecutePostActions extends BaseListener
 {
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * ExecutePostActions constructor.
+     *
+     * @param EventDispatcherInterface $eventDispatcher
+     */
+    public function __construct(EventDispatcherInterface $eventDispatcher)
+    {
+        parent::__construct();
+
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
      * Create a new row.
+     * Will call the event men-at-work.multi-column-wizard-bundle.create-widget to get the widget.
      *
      * @param string        $action The action.
      *
      * @param DataContainer $dc     The current context.
      *
      * @return void
+     *
+     * @throws ResponseException For generating the output.
+     *
+     * @throws BadRequestHttpException Will be thrown if the widget is not from type MCW or the field is unknown.
      *
      * @throws \Exception
      */
@@ -60,80 +83,48 @@ class ExecutePostActions extends BaseListener
             return;
         }
 
-        if ($dc instanceof DcCompat) {
-            /** @var  DcCompat $dcGeneral */
-            $dcGeneral = $dc;
-
-            // Get the field name, handel editAll as well.
-            $fieldName = Input::post('name');
-            if (Input::get('act') == 'editAll') {
-                $fieldName = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $fieldName);
-            }
-
-            // Trigger the dcg to generate the data.
-            $env = $dcGeneral->getEnvironment();
-            $model = $dcGeneral
-                ->getEnvironment()
-                ->getDataProvider()
-                ->getEmptyModel();
-
-            $dcgContaoWidgetManager = new ContaoWidgetManager($env, $model);
-            /** @var MultiColumnWizard $widget */
-            $widget                 = $dcgContaoWidgetManager->getWidget($fieldName);
-
-            // The field does not exist
-            if (empty($widget)) {
-                $this->log('Field "' . $fieldName . '" does not exist in definition "' . $dc->table . '"',
-                    __METHOD__,
-                    TL_ERROR
-                );
-                throw new BadRequestHttpException('Bad request');
-            }
-
-            // Get the max row count or preset it.
-            $maxRowCount = Input::post('maxRowId');
-            if (empty($maxRowCount)) {
-                $maxRowCount = 0;
-            }
-
-            throw new ResponseException($this->convertToResponse($widget->generate(($maxRowCount + 1), true)));
-        } else {
-            // Get the field name, handel editAll as well.
-            $fieldName = $dc->inputName = Input::post('name');
-            if (Input::get('act') == 'editAll') {
-                $fieldName = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $fieldName);
-            }
-            $dc->field = $fieldName;
-
-            // The field does not exist
-            if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$fieldName])) {
-                $this->log('Field "' . $fieldName . '" does not exist in DCA "' . $dc->table . '"', __METHOD__, TL_ERROR);
-                throw new BadRequestHttpException('Bad request');
-            }
-
-            /** @var string $widgetClassName */
-            $widgetClassName = $GLOBALS['BE_FFL']['multiColumnWizard'];
-
-            // Get the max row count or preset it.
-            $maxRowCount = Input::post('maxRowId');
-            if (empty($maxRowCount)) {
-                $maxRowCount = 0;
-            }
-
-            /** @var MultiColumnWizard $widget */
-            $widget = new $widgetClassName(
-                $widgetClassName::getAttributesFromDca(
-                    $GLOBALS['TL_DCA'][$dc->table]['fields'][$fieldName],
-                    $dc->inputName,
-                    '',
-                    $fieldName,
-                    $dc->table,
-                    $dc
-                )
-            );
-
-            throw new ResponseException($this->convertToResponse($widget->generate(($maxRowCount + 1), true)));
+        // Get the field name, handel editAll as well.
+        $fieldName = Input::post('name');
+        if (!$dc instanceof General) {
+            $dc->inputName = $fieldName;
         }
+        if (Input::get('act') == 'editAll') {
+            $fieldName = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $fieldName);
+        }
+
+        // Create a new event and dispatch it. Hope that someone have a good solution.
+        $event = new CreateWidgetEvent($dc);
+        $this->eventDispatcher->dispatch($event::NAME, $event);
+        /** @var \Widget $widget */
+        $widget = $event->getWidget();
+
+        // Check the instance.
+        if (!($widget instanceof MultiColumnWizard)) {
+            System::log(
+                'Field "' . $fieldName . '" is not a mcw in "' . $dc->table . '"',
+                __METHOD__,
+                TL_ERROR
+            );
+            throw new BadRequestHttpException('Bad request');
+        }
+
+        // The field does not exist
+        if (empty($widget)) {
+            System::log(
+                'Field "' . $fieldName . '" does not exist in definition "' . $dc->table . '"',
+                __METHOD__,
+                TL_ERROR
+            );
+            throw new BadRequestHttpException('Bad request');
+        }
+
+        // Get the max row count or preset it.
+        $maxRowCount = Input::post('maxRowId');
+        if (empty($maxRowCount)) {
+            $maxRowCount = 0;
+        }
+
+        throw new ResponseException($this->convertToResponse($widget->generate(($maxRowCount + 1), true)));
     }
 
     /**
@@ -173,8 +164,8 @@ class ExecutePostActions extends BaseListener
 
         $dc->field = $mcwFieldName;
 
-        // Add the sub configuration into the DCA. We need this for contao. Without this it is not possible
-        // to get the data.
+        // Add the sub configuration into the DCA. We need this for contao. Without it is not possible
+        // to get the data for the picker.
         if ($GLOBALS['TL_DCA'][$dc->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard') {
             $GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field] =
                 $GLOBALS['TL_DCA'][$dc->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
@@ -197,8 +188,9 @@ class ExecutePostActions extends BaseListener
             if ($GLOBALS['TL_DCA'][$dc->table]['config']['dataContainer'] == 'File') {
                 $varValue = Config::get($strField);
             } elseif ($intId > 0 && Database::getInstance()->tableExists($dc->table)) {
-                $objRow = Database::getInstance()->prepare("SELECT * FROM " . $dc->table . " WHERE id=?")
-                    ->execute($intId);
+                $objRow = Database::getInstance()
+                                  ->prepare("SELECT * FROM " . $dc->table . " WHERE id=?")
+                                  ->execute($intId);
 
                 // The record does not exist
                 if ($objRow->numRows < 1) {

@@ -16,7 +16,7 @@
  * @license    LGPL
  */
 
-namespace MenAtWork\MultiColumnWizardBundle\Contao\Events;
+namespace MenAtWork\MultiColumnWizardBundle\EventListener\Contao;
 
 /**
  * Class LoadDataContainer

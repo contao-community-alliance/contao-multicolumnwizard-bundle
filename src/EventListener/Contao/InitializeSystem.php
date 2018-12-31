@@ -16,7 +16,7 @@
  * @license    LGPL
  */
 
-namespace MenAtWork\MultiColumnWizardBundle\Contao\Events;
+namespace MenAtWork\MultiColumnWizardBundle\EventListener\Contao;
 
 use Contao\Environment;
 use Contao\Input;

@@ -864,11 +864,11 @@ Object.append(MultiColumnWizard,
 /**
  * Register default callbacks
  */
-// MultiColumnWizard.addOperationUpdateCallback('new', MultiColumnWizard.newUpdate);
 // MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.newClick);
 // MultiColumnWizard.addOperationUpdateCallback('copy', MultiColumnWizard.copyUpdate);
 // MultiColumnWizard.addOperationClickCallback('copy', MultiColumnWizard.copyClick);
 
+MultiColumnWizard.addOperationUpdateCallback('new', MultiColumnWizard.newUpdate);
 MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.insertNewElement);
 MultiColumnWizard.addOperationUpdateCallback('delete', MultiColumnWizard.deleteUpdate);
 MultiColumnWizard.addOperationClickCallback('delete', MultiColumnWizard.deleteClick);
