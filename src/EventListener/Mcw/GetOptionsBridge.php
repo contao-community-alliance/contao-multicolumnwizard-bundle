@@ -29,20 +29,6 @@ class GetOptionsBridge
     }
 
     /**
-     * Check if we have any listeners for the old events.
-     *
-     * @return bool
-     */
-    private function hasListeners()
-    {
-        $listeners = $this
-            ->eventDispatcher
-            ->getListeners('men-at-work.multi-column-wizard.get-options');
-
-        return !empty($listeners);
-    }
-
-    /**
      * Listener for building the tiny mce.
      *
      * @param GetOptionEventBundle $event
@@ -52,7 +38,7 @@ class GetOptionsBridge
     public function executeEvent(GetOptionEventBundle $event)
     {
         // Check if we have some old events.
-        if (!$this->hasListeners()) {
+        if (!$this->eventDispatcher->hasListeners(GetOptionsEvent::NAME)) {
             return;
         }
 
