@@ -1,5 +1,23 @@
-Usage with columnFields
-=======================
+# MultiColumnWizard
+
+The MultiColumnWizard is a widget for mapping several fields of the same and/or different type (input type) in a DCA element. The individual fields of the MCW are listed column by column in the backend and can be extended row by row as a group. The arrangement corresponds to a multidimensional array of the form array[rows][fields], which is stored in the database as a serialized array. The widget is almost identical to MultiTextWizard or MultiSelectWizard. It extends the functionality of any widget.
+
+More information can be found in the contao wiki
+http://de.contaowiki.org/MultiColumnWizard
+
+## Install
+
+You can install the Multicolumnwizard via the Contao-Manager - search for `contao-multicolumnwizard-bundle` - or with the Composer via the call
+
+`composer require menatwork/contao-multicolumnwizard-bundle`
+or
+`web/contao-manager.phar.php composer require menatwork/contao-multicolumnwizard-bundle`
+
+Developers can add the Multicolumnwizard to their `composer.json` as a dependent package.
+
+## Usages
+
+### Usage with columnFields
 
 ```php
 <?php
@@ -38,8 +56,7 @@ $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
 ```
 
 
-Usage with callback
-===================
+### Usage with callback
 
 ```php
 <?php
@@ -59,8 +76,7 @@ $GLOBALS['TL_DCA']['tl_table']['fields']['anything'] = [
 ```
 
 
-Usage with Drag and Drop
-========================
+### Usage with Drag and Drop
 
 ```php
 <?php
@@ -86,10 +102,3 @@ $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
 
 ?>
 ```
-
-
-More information
-================
-
-More information can be found in the contao wiki
-http://de.contaowiki.org/MultiColumnWizard

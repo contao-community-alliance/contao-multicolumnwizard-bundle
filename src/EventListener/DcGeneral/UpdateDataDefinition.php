@@ -9,7 +9,7 @@
  * @filesource
  */
 
-namespace MenAtWork\MultiColumnWizardBundle\DcGeneral;
+namespace MenAtWork\MultiColumnWizardBundle\EventListener\DcGeneral;
 
 use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\DefaultProperty;
 use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\PropertyInterface;
@@ -23,8 +23,6 @@ use ContaoCommunityAlliance\DcGeneral\Factory\Event\BuildDataDefinitionEvent;
  */
 class UpdateDataDefinition
 {
-    const PRIORITY = -500000;
-
     /**
      * Add all fields from the MCW to the DCA. This is needed for some fields, because other components need this
      * to create the widget/view etc.

@@ -8,8 +8,7 @@
 
 namespace MenAtWork\MultiColumnWizard\DcGeneral;
 
-
-use MenAtWork\MultiColumnWizardBundle\DcGeneral\UpdateDataDefinition as BundleUpdateDataDefinition;
+use MenAtWork\MultiColumnWizardBundle\EventListener\DcGeneral\UpdateDataDefinition as BundleUpdateDataDefinition;
 
 /**
  * Class UpdateDataDefinition
