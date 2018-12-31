@@ -15,6 +15,9 @@ namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
 
 use Contao\BackendTemplate;
 use Contao\Date;
+use Contao\Image;
+use Contao\Input;
+use Contao\StringUtil;
 use Contao\Widget;
 use MenAtWork\MultiColumnWizardBundle\Event\GetColorPickerStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetDatePickerStringEvent;
@@ -417,7 +420,7 @@ class MultiColumnWizard extends Widget implements \uploadable
 
                 // Hack for Checkboxes.
                 if ($arrField['inputType'] == 'checkbox' && isset($varInput[$i][$strKey])) {
-                    \Input::setPost($objWidget->name, $varInput[$i][$strKey]);
+                    Input::setPost($objWidget->name, $varInput[$i][$strKey]);
                 }
 
                 $objWidget->validate();
@@ -452,7 +455,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                     // store the errors
                     $this->arrWidgetErrors[$strKey][$i] = $objWidget->getErrors();
 
-                    $blnHasError = \Input::post('SUBMIT_TYPE') != 'auto';
+                    $blnHasError = Input::post('SUBMIT_TYPE') != 'auto';
                 }
             }
         }
@@ -526,23 +529,23 @@ class MultiColumnWizard extends Widget implements \uploadable
         $this->strCommand = 'cmd_' . $this->strField;
 
         // Change the order
-        if ($this->Input->get($this->strCommand) && is_numeric($this->Input->get('cid')) && $this->Input->get('id') == $this->currentRecord) {
+        if (Input::get($this->strCommand) && is_numeric(Input::get('cid')) && Input::get('id') == $this->currentRecord) {
 
-            switch ($this->Input->get($this->strCommand)) {
+            switch (Input::get($this->strCommand)) {
                 case 'copy':
-                    $this->varValue = array_duplicate($this->varValue, $this->Input->get('cid'));
+                    $this->varValue = array_duplicate($this->varValue, Input::get('cid'));
                     break;
 
                 case 'up':
-                    $this->varValue = array_move_up($this->varValue, $this->Input->get('cid'));
+                    $this->varValue = array_move_up($this->varValue, Input::get('cid'));
                     break;
 
                 case 'down':
-                    $this->varValue = array_move_down($this->varValue, $this->Input->get('cid'));
+                    $this->varValue = array_move_down($this->varValue, Input::get('cid'));
                     break;
 
                 case 'delete':
-                    $this->varValue = array_delete($this->varValue, $this->Input->get('cid'));
+                    $this->varValue = array_delete($this->varValue, Input::get('cid'));
                     break;
             }
 
@@ -840,13 +843,13 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Toggle line wrap (textarea)
         if ($arrField['inputType'] == 'textarea' && $arrField['eval']['rte'] == '') {
-            $xlabel .= ' ' . $this->generateImage('wrap.gif', $GLOBALS['TL_LANG']['MSC']['wordWrap'],
-                    'title="' . specialchars($GLOBALS['TL_LANG']['MSC']['wordWrap']) . '" class="toggleWrap" onclick="Backend.toggleWrap(\'ctrl_' . $this->strId . '_row' . $intRow . '_' . $strKey . '\');"');
+            $xlabel .= ' ' . Image::getHtml('wrap.gif', $GLOBALS['TL_LANG']['MSC']['wordWrap'],
+                    'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['wordWrap']) . '" class="toggleWrap" onclick="Backend.toggleWrap(\'ctrl_' . $this->strId . '_row' . $intRow . '_' . $strKey . '\');"');
         }
 
         // Add the help wizard
         if ($arrField['eval']['helpwizard']) {
-            $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\'' . specialchars(str_replace("'",
+            $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\'' . StringUtil::specialchars(str_replace("'",
                     "\\'",
                     $arrField['label'][0])) . '\',\'url\':this.href});return false">' . \Image::getHtml('about.gif',
                     $GLOBALS['TL_LANG']['MSC']['helpWizard'], 'style="vertical-align:text-bottom"') . '</a>';
@@ -860,7 +863,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                 $path = '?node=' . $arrField['eval']['path'];
             }
 
-            $xlabel .= ' <a href="' . $strContaoPrefix . 'files.php' . $path . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" data-lightbox="files 765 80%">' . $this->generateImage('filemanager.gif',
+            $xlabel .= ' <a href="' . $strContaoPrefix . 'files.php' . $path . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" data-lightbox="files 765 80%">' . Image::getHtml('filemanager.gif',
                     $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a>';
 
             $arrField['strField'] = $this->strField . '__' . $strKey;
@@ -869,15 +872,15 @@ class MultiColumnWizard extends Widget implements \uploadable
             $GLOBALS['TL_DCA'][$this->strTable]['fields'][$arrField['strField']]['label'][0] = (is_array($arrField['label']) && $arrField['label'][0] != '') ? $arrField['label'][0] : $strKey;
         } // Add the table import wizard
         elseif ($arrField['inputType'] == 'tableWizard') {
-            $xlabel .= ' <a href="' . $this->addToUrl('key=table') . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['tw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . $this->generateImage('tablewizard.gif',
+            $xlabel .= ' <a href="' . $this->addToUrl('key=table') . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . Image::getHtml('tablewizard.gif',
                     $GLOBALS['TL_LANG']['MSC']['tw_import'][0], 'style="vertical-align:text-bottom;"') . '</a>';
-            $xlabel .= ' ' . $this->generateImage('demagnify.gif', '',
-                    'title="' . specialchars($GLOBALS['TL_LANG']['MSC']['tw_shrink']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(0.9);"') . $this->generateImage('magnify.gif',
+            $xlabel .= ' ' . Image::getHtml('demagnify.gif', '',
+                    'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_shrink']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(0.9);"') . Image::getHtml('magnify.gif',
                     '',
-                    'title="' . specialchars($GLOBALS['TL_LANG']['MSC']['tw_expand']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(1.1);"');
+                    'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_expand']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(1.1);"');
         } // Add the list import wizard
         elseif ($arrField['inputType'] == 'listWizard') {
-            $xlabel .= ' <a href="' . $this->addToUrl('key=list') . '" title="' . specialchars($GLOBALS['TL_LANG']['MSC']['lw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . $this->generateImage('tablewizard.gif',
+            $xlabel .= ' <a href="' . $this->addToUrl('key=list') . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['lw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . Image::getHtml('tablewizard.gif',
                     $GLOBALS['TL_LANG']['MSC']['tw_import'][0], 'style="vertical-align:text-bottom;"') . '</a>';
         }
 
@@ -893,7 +896,7 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         $strClass = $GLOBALS[(TL_MODE == 'BE' ? 'BE_FFL' : 'TL_FFL')][$arrField['inputType']];
 
-        if ($strClass == '' || !$this->classFileExists($strClass)) {
+        if ($strClass == '' || !class_exists($strClass)) {
             return null;
         }
 
@@ -1307,7 +1310,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                 continue;
             }
 
-            $btnName = \sprintf('tw_r%s', specialchars($button));
+            $btnName = \sprintf('tw_r%s', StringUtil::specialchars($button));
             $return  .=
                 \sprintf(
                     '<a data-operations="%s" href="%s" class="widgetImage" title="%s">%s</a> ',
@@ -1322,7 +1325,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                         )
                     ),
                     $GLOBALS['TL_LANG']['MSC'][$btnName],
-                    $this->generateImage(
+                    Image::getHtml(
                         $image,
                         $GLOBALS['TL_LANG']['MSC'][$btnName],
                         'class="tl_listwizard_img"'
