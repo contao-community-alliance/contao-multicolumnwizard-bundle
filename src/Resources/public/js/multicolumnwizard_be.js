@@ -157,6 +157,8 @@ var MultiColumnWizard = new Class(
          */
         updateRowAttributes: function(level, row)
                              {
+                                 return;
+
                                  var firstLevel = true;
                                  var intInnerMCW = 0;
                                  var intSubLevels = 0;
@@ -377,108 +379,6 @@ var MultiColumnWizard = new Class(
 
                                        this.operationClickCallbacks[key].include(func);
                                    },
-
-        killAllTinyMCE: function(el, row)
-                        {
-                            var parent = row.getParent('.multicolumnwizard');
-
-                            // skip if no tinymce class was found
-                            if(parent.getElements('.tinymce').length == 0)
-                            {
-                                return;
-                            }
-
-                            var mcwName = parent.get('id');
-                            var myRegex = new RegExp(mcwName);
-                            var tinyMCEEditors = new Array();
-                            var counter = 0;
-
-                            var editorId = 'editorId';
-                            if (tinymce.majorVersion > 3) {
-                                editorId = 'id';
-                            }
-
-                            // get a list with tinymces
-                            tinymce.editors.each(function(item, index){
-                                if(item[editorId].match(myRegex) != null)
-                                {
-                                    tinyMCEEditors[counter] = item[editorId];
-                                    counter++;
-                                }
-                            });
-
-                            // clear tinymces
-                            tinyMCEEditors.each(function(item, index){
-                                try {
-                                    var editor = tinymce.get(item);
-                                    $(editor[editorId]).set('text', editor.getContent());
-                                    editor.remove();
-                                } catch (e) {
-                                    console.log(e)
-                                }
-                            });
-
-                            // search for dmg tinymces
-                            parent.getElements('span.mceEditor').each(function(item, index){
-                                item.dispose();
-                            });
-
-                            // search for scripttags tinymces
-                            parent.getElements('.tinymce').each(function(item, index){
-                                item.getElements('script').each(function(item, index){
-                                    item.dispose();
-                                });
-                            });
-                        },
-
-        reinitTinyMCE: function(el, row, isParent)
-                       {
-                           var parent = null;
-
-                           if(isParent != true)
-                           {
-                               parent = row.getParent('.multicolumnwizard');
-                           }
-                           else
-                           {
-                               parent = row;
-                           }
-
-                           // skip if no tinymce class was found
-                           if(parent.getElements('.tinymce').length == 0)
-                           {
-                               return;
-                           }
-
-                           var varTinys = parent.getElements('.tinymce textarea');
-
-                           var addEditorCommand = 'mceAddControl';
-                           if (tinymce.majorVersion > 3) {
-                               addEditorCommand = 'mceAddEditor';
-                           }
-
-                           varTinys.each(function(item, index){
-
-                               tinymce.execCommand(addEditorCommand, false, item.get('id'));
-                               tinymce.get(item.get('id')).show();
-                               $(item.get('id')).erase('required');
-                               $(tinymce.get(item.get('id')).editorContainer).getElements('iframe')[0].set('title','MultiColumnWizard - TinyMCE');
-                           });
-                       },
-
-        reinitStylect: function()
-                       {
-
-                           if(window.Stylect)
-                           {
-                               if (versionCompare('3.2.3') >= 0) {
-                                   $$('.styled_select').each(function(item, index){
-                                       item.dispose();
-                                   });
-                                   Stylect.convertSelects();
-                               }
-                           }
-                       }
     });
 
 /**
@@ -617,134 +517,6 @@ Object.append(MultiColumnWizard,
                        }
                    },
 
-
-        /**
-         * Operation "new" - click
-         * @param Element the icon element
-         * @param Element the row
-         */
-        newClick: function(el, row)
-                  {
-                      this.killAllTinyMCE(el, row);
-
-                      var rowCount = row.getSiblings().length + 1;
-
-                      // check maxCount for an inject
-                      if (this.options.maxCount == 0 || (this.options.maxCount > 0 && rowCount < this.options.maxCount))
-                      {
-                          var copy = row.clone(true,true);
-
-                          // clear all elements
-                          copy.getElements('input,select,textarea').each(function(el){
-                              MultiColumnWizard.clearElementValue(el);
-                          });
-
-                          // get the current level of the row
-                          level = row.getAllPrevious().length;
-
-                          // update the row attributes
-                          copy = this.updateRowAttributes(++level, copy);
-                          copy.inject(row, 'after');
-
-                          // update tooltips
-                          copy.getElements('a[data-operations]').each(function(el) {
-                              $$(el).set('title', $$(el).getElement('img').get('alt'));
-                              new Tips.Contao($$(el).filter(function(i) {
-                                  return i.title != '';
-                              }), {
-                                  offset: {x:0, y:26}
-                              });
-                          });
-
-                          // exec script
-                          if (copy.getElements('script').length > 0)
-                          {
-                              copy.getElements('script').each(function(script){
-                                  Browser.exec(script.get('html'));
-                              });
-                          }
-
-                          // update the row attribute of the following rows
-                          var that = this;
-                          copy.getAllNext().each(function(row){
-                              that.updateRowAttributes(++level, row);
-                          });
-                      }
-
-                      this.reinitTinyMCE(el, row, false);
-                      this.reinitStylect();
-                  },
-
-        /**
-         * Operation "copy" - update
-         * @param Element the icon element
-         * @param Element the row
-         */
-        copyUpdate: function(el, row)
-                    {
-                        var rowCount = row.getSiblings().length + 1;
-
-                        // remove the copy possibility if we have already reached maxCount
-                        if (this.options.maxCount > 0 && rowCount >= this.options.maxCount)
-                        {
-                            el.setStyle('display', 'none');
-                        }else{
-                            el.setStyle('display', 'inline');
-                        }
-                    },
-
-        /**
-         * Operation "copy" - click
-         * @param Element the icon element
-         * @param Element the row
-         */
-        copyClick: function(el, row)
-                   {
-                       this.killAllTinyMCE(el, row);
-
-                       var rowCount = row.getSiblings().length + 1;
-
-                       // check maxCount for an inject
-                       if (this.options.maxCount == 0 || (this.options.maxCount > 0 && rowCount < this.options.maxCount))
-                       {
-                           var copy = row.clone(true,true);
-
-                           // get the current level of the row
-                           level = row.getAllPrevious().length;
-
-                           // update the row attributes
-                           copy = this.updateRowAttributes(++level, copy);
-                           copy.inject(row, 'after');
-
-                           // update tooltips
-                           copy.getElements('a[data-operations]').each(function(el) {
-                               $$(el).set('title', $$(el).getElement('img').get('alt'));
-                               new Tips.Contao($$(el).filter(function(i) {
-                                   return i.title != '';
-                               }), {
-                                   offset: {x:0, y:26}
-                               });
-                           });
-
-                           // exec script
-                           if (copy.getElements('script').length > 0)
-                           {
-                               copy.getElements('script').each(function(script){
-                                   Browser.exec(script.get('html'));
-                               });
-                           }
-
-                           // update the row attribute of the following rows
-                           var that = this;
-                           copy.getAllNext().each(function(row){
-                               that.updateRowAttributes(++level, row);
-                           });
-                       }
-
-                       this.reinitTinyMCE(el, row, false);
-                       this.reinitStylect();
-                   },
-
         /**
          * Operation "delete" - load
          * @param Element the icon element
@@ -793,26 +565,11 @@ Object.append(MultiColumnWizard,
          */
         upClick: function(el, row)
                  {
-                     this.killAllTinyMCE(el, row);
-
                      var previous = row.getPrevious();
                      if (previous)
                      {
-                         // update the attributes so the order remains as desired
-                         // we have to set it to a value that is not in the DOM first, otherwise the values will get lost!!
-                         var previousPosition = previous.getAllPrevious().length;
-
-                         // this is the dummy setting (guess no one will have more than 99999 entries ;-))
-                         previous = this.updateRowAttributes(99999, previous);
-
-                         // now set the correct values again
-                         row = this.updateRowAttributes(previousPosition, row);
-                         previous = this.updateRowAttributes(previousPosition+1, previous);
-
                          row.inject(previous, 'before');
                      }
-
-                     this.reinitTinyMCE(el, row, false);
                  },
 
         /**
@@ -822,26 +579,11 @@ Object.append(MultiColumnWizard,
          */
         downClick: function(el, row)
                    {
-                       this.killAllTinyMCE(el, row);
-
                        var next = row.getNext();
                        if (next)
                        {
-                           // update the attributes so the order remains as desired
-                           // we have to set it to a value that is not in the DOM first, otherwise the values will get lost!!
-                           var rowPosition = row.getAllPrevious().length;
-
-                           // this is the dummy setting (guess no one will have more than 99999 entries ;-))
-                           row = this.updateRowAttributes(99999, row);
-
-                           // now set the correct values again
-                           next = this.updateRowAttributes(rowPosition, next);
-                           row = this.updateRowAttributes(rowPosition+1, row);
-
                            row.inject(next, 'after');
                        }
-
-                       this.reinitTinyMCE(el, row, false);
                    },
 
         /**
@@ -864,12 +606,8 @@ Object.append(MultiColumnWizard,
 /**
  * Register default callbacks
  */
-// MultiColumnWizard.addOperationUpdateCallback('new', MultiColumnWizard.newUpdate);
-// MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.newClick);
-// MultiColumnWizard.addOperationUpdateCallback('copy', MultiColumnWizard.copyUpdate);
-// MultiColumnWizard.addOperationClickCallback('copy', MultiColumnWizard.copyClick);
-
 MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.insertNewElement);
+MultiColumnWizard.addOperationUpdateCallback('new', MultiColumnWizard.newUpdate);
 MultiColumnWizard.addOperationUpdateCallback('delete', MultiColumnWizard.deleteUpdate);
 MultiColumnWizard.addOperationClickCallback('delete', MultiColumnWizard.deleteClick);
 MultiColumnWizard.addOperationClickCallback('up', MultiColumnWizard.upClick);
