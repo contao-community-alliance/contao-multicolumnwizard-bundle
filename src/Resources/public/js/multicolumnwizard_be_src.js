@@ -558,9 +558,11 @@ Object.append(MultiColumnWizard,
 
             var self=this;
 
+            el.addClass('rotate');
             new Request.Contao({
                 evalScripts: false,
                 onSuccess:   function (txt, json) {
+                    el.removeClass('rotate');
                     // Text to html.
                     var newEl = new Element('div', {
                         html: json.content
