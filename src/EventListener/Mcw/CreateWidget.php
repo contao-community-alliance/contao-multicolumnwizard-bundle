@@ -86,7 +86,7 @@ class CreateWidget
 
         // Trigger the dcg to generate the data.
         $env   = $dcGeneral->getEnvironment();
-        $model = $dcGeneral
+        $model = $dcGeneral->getModel() ?: $dcGeneral
             ->getEnvironment()
             ->getDataProvider()
             ->getEmptyModel();
