@@ -20,6 +20,7 @@ var MultiColumnWizard = new Class(
                         minCount: 0,
                         uniqueFields: []
                     },
+        asyncBlock: false,
 
         // instance callbacks (use e.g. myMCWVar.addOperationCallback() to register a callback that is for ONE specific MCW only)
         operationLoadCallbacks: [],
@@ -547,6 +548,12 @@ Object.append(MultiColumnWizard,
          * @return void
          */
         insertNewElement: function (el, row) {
+            if(this.asyncBlock === true){
+                return;
+            }
+            this.asyncBlock = true;
+            el.addClass('rotate');
+
             var parentMcw = $(row).getParent('.tl_modulewizard.multicolumnwizard');
             var fieldName = $(parentMcw).getAttribute('data-name');
             var rows = $(parentMcw).getElements('tr');
@@ -557,10 +564,10 @@ Object.append(MultiColumnWizard,
             }
 
             var self=this;
-
             new Request.Contao({
                 evalScripts: false,
                 onSuccess:   function (txt, json) {
+                    el.removeClass('rotate');
                     // Text to html.
                     var newEl = new Element('div', {
                         html: json.content
@@ -590,6 +597,11 @@ Object.append(MultiColumnWizard,
                         }
                     });
                     self.updateOperations();
+                    self.asyncBlock = false;
+                },
+                onFailure: function(xhr){
+                    el.removeClass('rotate');
+                    self.asyncBlock = false;
                 }
             }).post({
                 "action":        "mcwCreateNewRow",
