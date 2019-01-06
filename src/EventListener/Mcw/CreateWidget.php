@@ -6,8 +6,8 @@ use Contao\Input;
 use Contao\System;
 use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
+use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
 use MenAtWork\MultiColumnWizardBundle\Event\CreateWidgetEvent;
-use MultiColumnWizard;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
