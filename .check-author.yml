@@ -1,7 +1,7 @@
 ignore:
 
 exclude:
-  languages
+  src/Resources/contao/languages
 
 mapping:
   "Andreas Isaak <info@andreas-isaak.de>": "Andreas Isaak <andy.jared@googlemail.com>"
@@ -13,6 +13,8 @@ mapping:
   "David Maack <david.maack@arcor.de>":
     - "David Maack <maack@men-at-work.de>"
     - "davidmaack <david.maack@arcor.de>"
+    - "unknown <David.Maack@pc024.men-at-work.de>"
+    - "unknown <David.Maack@.men-at-work.de>"
 
 copy-left:
  

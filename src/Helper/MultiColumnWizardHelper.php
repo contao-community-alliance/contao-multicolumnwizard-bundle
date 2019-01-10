@@ -1,13 +1,33 @@
 <?php
 
 /**
- * Contao Open Source CMS
+ * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * @copyright  Andreas Schempp 2011
- * @copyright  certo web & design GmbH 2011
- * @copyright  MEN AT WORK 2013
- * @package    MultiColumnWizard
- * @license    LGPL
+ * (c) 2012-2019 MEN AT WORK.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * This project is provided in good faith and hope to be usable by anyone.
+ *
+ * @package    menatwork/contao-multicolumnwizard-bundle
+ * @author     Alexander Menk <alex.menk@gmail.com>
+ * @author     Andreas Isaak <info@andreas-isaak.de>
+ * @author     Andreas Schempp <andreas.schempp@terminal42.ch>
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     David Maack <david.maack@arcor.de>
+ * @author     Dominik Tomasi <d.tomasi@upcom.ch>
+ * @author     fritzmg <email@spikx.net>
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @author     Martin Auswöger <martin@auswoeger.com>
+ * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @author     Sven Meierhans <s.meierhans@gmail.com>
+ * @author     Tristan Lins <tristan.lins@bit3.de>
+ * @copyright  2011 Andreas Schempp
+ * @copyright  2011 certo web & design GmbH
+ * @copyright  2013-2019 MEN AT WORK
+ * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -17,10 +37,6 @@ use Contao\DataContainer;
 
 /**
  * Class MultiColumnWizardHelper
- *
- * @copyright  terminal42 gmbh 2013
- * @author     Ingolf Steinhardt <info@e-spin.de> 2017
- * @package    MultiColumnWizard
  */
 class MultiColumnWizardHelper extends \Contao\System
 {

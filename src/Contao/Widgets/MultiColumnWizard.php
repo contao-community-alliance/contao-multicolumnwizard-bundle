@@ -1,13 +1,46 @@
 <?php
 
 /**
- * Contao Open Source CMS
+ * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * @copyright  Andreas Schempp 2011
- * @copyright  certo web & design GmbH 2011
- * @copyright  MEN AT WORK 2013
- * @package    MultiColumnWizard
- * @license    LGPL
+ * (c) 2012-2019 MEN AT WORK.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * This project is provided in good faith and hope to be usable by anyone.
+ *
+ * @package    menatwork/contao-multicolumnwizard-bundle
+ * @author     Andreas Burg <info@andreasburg.de>
+ * @author     Andreas Isaak <info@andreas-isaak.de>
+ * @author     Andreas Schempp <andreas.schempp@terminal42.ch>
+ * @author     André <simmert@users.noreply.github.com>
+ * @author     Antoine DAVID <adavid@addictic.fr>
+ * @author     Benny Born <benny@bennyborn.de>
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Christoph Wiechert <wio@psitrax.de>
+ * @author     civ23 <kai@kapalla.com>
+ * @author     David Maack <david.maack@arcor.de>
+ * @author     Dominik Tomasi <d.tomasi@upcom.ch>
+ * @author     Gerald Meier <garyee@gmx.de>
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @author     Jozef Dvorský <creatingo@users.noreply.github.com>
+ * @author     Kester Mielke <kester.mieke@gmx.net>
+ * @author     mediabakery <s.tilch@mediabakery.de>
+ * @author     Oliver Hoff <oliver@hofff.com>
+ * @author     Patrick Kahl <kahl.patrick@googlemail.com>
+ * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Stefan Lindecke <github.com@chektrion.de>
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @author     Tristan Lins <tristan.lins@bit3.de>
+ * @author     unknown <David.Maack@pc024.men-at-work.de>
+ * @author     w3scout <info@w3scouts.com>
+ * @author     Yanick Witschi <yanick.witschi@terminal42.ch>
+ * @copyright  2011 Andreas Schempp
+ * @copyright  2011 certo web & design GmbH
+ * @copyright  2013-2019 MEN AT WORK
+ * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -26,13 +59,6 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
 
 /**
  * Class MultiColumnWizard
- *
- * @copyright  Andreas Schempp 2011
- * @copyright  certo web & design GmbH 2011
- * @copyright  MEN AT WORK 2013
- * @author     Ingolf Steinhardt <info@e-spin.de> 2017
- * @author     Sven Baumann <baumann.sv@gmail.com> 2017
- * @package    MultiColumnWizard
  */
 class MultiColumnWizard extends Widget implements \uploadable
 {
