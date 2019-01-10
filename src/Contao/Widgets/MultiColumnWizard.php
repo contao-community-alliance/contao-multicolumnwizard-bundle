@@ -112,9 +112,8 @@ class MultiColumnWizard extends Widget implements \uploadable
     protected $arrButtons = [
         'new'    => 'new.gif',
         //        'copy'   => 'copy.gif', // Removed since we can't support dom manipulation anymore.
-        'up'     => 'up.gif',
-        'down'   => 'down.gif',
-        'delete' => 'delete.gif'
+        'delete' => 'delete.gif',
+        'move'   => 'drag.gif'
     ];
 
     /**
@@ -198,10 +197,12 @@ class MultiColumnWizard extends Widget implements \uploadable
                 break;
 
             case 'dragAndDrop':
-                if ($varValue === true) {
-                    $this->arrButtons['move'] = 'drag.gif';
-                    unset($this->arrButtons['up']);
-                    unset($this->arrButtons['down']);
+                if ($varValue === false) {
+                    unset($this->arrButtons['move']);
+                    unset($this->arrButtons['delete']);
+                    $this->arrButtons['up']     = 'up.gif';
+                    $this->arrButtons['down']   = 'down.gif';
+                    $this->arrButtons['delete'] = 'delete.gif';
                 }
                 break;
 
