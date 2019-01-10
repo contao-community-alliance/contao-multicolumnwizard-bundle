@@ -30,14 +30,18 @@ class GetColorPickerStringEvent extends GetStringEvent
     /**
      * Name of the event.
      */
-    const NAME = 'men-at-work.multi-column-wizard-bundle.get-color-picker';
+    public const NAME = 'men-at-work.multi-column-wizard-bundle.get-color-picker';
 
     /**
+     * The color picker.
+     *
      * @var string
      */
     private $colorPicker;
 
     /**
+     * The field name.
+     *
      * @var string
      */
     private $fieldName;
@@ -46,17 +50,11 @@ class GetColorPickerStringEvent extends GetStringEvent
      * GetDatePickerEvent constructor.
      *
      * @param string $version            The version of Contao.
-     *
      * @param string $build              The build of Contao.
-     *
      * @param string $fieldId            The field id.
-     *
      * @param string $tableName          The name of the table.
-     *
      * @param array  $fieldConfiguration The configuration of the field.
-     *
      * @param string $fieldName          TODO: What is this?
-     *
      */
     public function __construct(
         string $version,
@@ -96,6 +94,8 @@ class GetColorPickerStringEvent extends GetStringEvent
     }
 
     /**
+     * Get the field name.
+     *
      * @return string
      */
     public function getFieldName(): string

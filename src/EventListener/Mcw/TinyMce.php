@@ -33,7 +33,7 @@ class TinyMce
     /**
      * Listener for building the tiny mce.
      *
-     * @param GetTinyMceStringEvent $event
+     * @param GetTinyMceStringEvent $event The event.
      *
      * @return void
      */
@@ -48,16 +48,16 @@ class TinyMce
     /**
      * Generate the TinyMce Script.
      *
-     * @param GetTinyMceStringEvent $event
+     * @param GetTinyMceStringEvent $event The event.
      *
      * @return void
      */
     private function contao44x(GetTinyMceStringEvent $event)
     {
         // Get some vars.
-        $field = $event->getFieldConfiguration();
-        $table = $event->getTableName();
-        $id    = $event->getFieldId();
+        $field   = $event->getFieldConfiguration();
+        $table   = $event->getTableName();
+        $fieldId = $event->getFieldId();
 
         list ($file, $type) = explode('|', $field['eval']['rte'], 2);
 
@@ -74,10 +74,10 @@ class TinyMce
 
         /** @var BackendTemplate|object $objTemplate */
         $objTemplate                   = new BackendTemplate('be_' . $file);
-        $objTemplate->selector         = 'ctrl_' . $id;
+        $objTemplate->selector         = 'ctrl_' . $fieldId;
         $objTemplate->type             = $type;
         $objTemplate->fileBrowserTypes = $fileBrowserTypes;
-        $objTemplate->source           = $table . '.' . $id;
+        $objTemplate->source           = $table . '.' . $fieldId;
 
         // Deprecated since Contao 4.0, to be removed in Contao 5.0
         $objTemplate->language = \Backend::getTinyMceLanguage();

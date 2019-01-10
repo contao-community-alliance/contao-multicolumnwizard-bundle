@@ -35,19 +35,19 @@ class DatePicker
     /**
      * Get Time/Date-format from global config (BE) or Page settings (FE)
      *
-     * @param $rgxp
+     * @param string $rgxp The rgxp for the date.
      *
      * @return mixed
      */
     private function getNumericDateFormat($rgxp)
     {
-        return call_user_func(array("\Contao\Date", "getNumeric" . ucfirst($rgxp) . "Format"));
+        return call_user_func(array('\Contao\Date', 'getNumeric' . ucfirst($rgxp) . 'Format'));
     }
 
     /**
      * Listener for building the tiny mce.
      *
-     * @param GetDatePickerStringEvent $event
+     * @param GetDatePickerStringEvent $event The event.
      *
      * @return void
      */
@@ -60,11 +60,14 @@ class DatePicker
     }
 
     /**
-     * Generate the TinyMce Script.
+     * Generate the date picker Script.
      *
-     * @param GetDatePickerStringEvent $event
+     * @param GetDatePickerStringEvent $event The event.
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
     private function contao44x(GetDatePickerStringEvent $event)
     {
@@ -93,7 +96,7 @@ class DatePicker
 
         // Trigger the auto-submit function (see #8603)
         if ($fieldConfiguration['eval']['submitOnChange']) {
-            $strOnSelect = ",\n        onSelect: function() { Backend.autoSubmit(\"" . $table . "\"); }";
+            $strOnSelect = ",\n        onSelect: function() { Backend.autoSubmit(\"" . $table . '"); }';
         }
 
         // Crate the placeholder string.
@@ -123,7 +126,6 @@ HTML;
                 'title="%s" id="toggle_%s" style="cursor:pointer"',
                 \StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['datepicker']),
                 $fieldId
-
             )
         );
 

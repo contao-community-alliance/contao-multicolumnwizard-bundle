@@ -36,9 +36,16 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class CreateWidget
 {
     /**
-     * @param CreateWidgetEvent $event
+     * Create a widget for Contao context.
+     *
+     * @param CreateWidgetEvent $event The event.
      *
      * @return void
+     *
+     * @throws BadRequestHttpException When the field does not exist in the DCA.
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
     public function createWidgetContao(CreateWidgetEvent $event)
     {
@@ -59,7 +66,11 @@ class CreateWidget
 
         // The field does not exist
         if (!isset($GLOBALS['TL_DCA'][$dcDriver->table]['fields'][$fieldName])) {
-            System::log('Field "' . $fieldName . '" does not exist in DCA "' . $dcDriver->table . '"', __METHOD__, TL_ERROR);
+            System::log(
+                'Field "' . $fieldName . '" does not exist in DCA "' . $dcDriver->table . '"',
+                __METHOD__,
+                TL_ERROR
+            );
             throw new BadRequestHttpException('Bad request');
         }
 
@@ -82,7 +93,9 @@ class CreateWidget
     }
 
     /**
-     * @param CreateWidgetEvent $event
+     * Create a widget for dc-general context.
+     *
+     * @param CreateWidgetEvent $event The event.
      *
      * @return void
      */

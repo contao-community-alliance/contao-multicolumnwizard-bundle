@@ -46,6 +46,8 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 class ExecutePostActions extends BaseListener
 {
     /**
+     * The event dispatcher.
+     *
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
@@ -53,7 +55,7 @@ class ExecutePostActions extends BaseListener
     /**
      * ExecutePostActions constructor.
      *
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param EventDispatcherInterface $eventDispatcher The event dispatcher.
      */
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {
@@ -66,19 +68,15 @@ class ExecutePostActions extends BaseListener
      * Create a new row.
      * Will call the event men-at-work.multi-column-wizard-bundle.create-widget to get the widget.
      *
-     * @param string        $action The action.
-     *
-     * @param DataContainer $dc     The current context.
+     * @param string        $action    The action.
+     * @param DataContainer $container The current context.
      *
      * @return void
      *
-     * @throws ResponseException For generating the output.
-     *
+     * @throws ResponseException       For generating the output.
      * @throws BadRequestHttpException Will be thrown if the widget is not from type MCW or the field is unknown.
-     *
-     * @throws \Exception
      */
-    public function handleRowCreation($action, $dc)
+    public function handleRowCreation($action, $container)
     {
         // Check the context.
         if ('mcwCreateNewRow' != $action) {
@@ -87,15 +85,15 @@ class ExecutePostActions extends BaseListener
 
         // Get the field name, handel editAll as well.
         $fieldName = Input::post('name');
-        if (!$dc instanceof General) {
-            $dc->inputName = $fieldName;
+        if (!$container instanceof General) {
+            $container->inputName = $fieldName;
         }
         if (Input::get('act') == 'editAll') {
             $fieldName = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $fieldName);
         }
 
         // Create a new event and dispatch it. Hope that someone have a good solution.
-        $event = new CreateWidgetEvent($dc);
+        $event = new CreateWidgetEvent($container);
         $this->eventDispatcher->dispatch($event::NAME, $event);
         /** @var \Widget $widget */
         $widget = $event->getWidget();
@@ -103,7 +101,7 @@ class ExecutePostActions extends BaseListener
         // Check the instance.
         if (!($widget instanceof MultiColumnWizard)) {
             System::log(
-                'Field "' . $fieldName . '" is not a mcw in "' . $dc->table . '"',
+                'Field "' . $fieldName . '" is not a mcw in "' . $container->table . '"',
                 __METHOD__,
                 TL_ERROR
             );
@@ -113,7 +111,7 @@ class ExecutePostActions extends BaseListener
         // The field does not exist
         if (empty($widget)) {
             System::log(
-                'Field "' . $fieldName . '" does not exist in definition "' . $dc->table . '"',
+                'Field "' . $fieldName . '" does not exist in definition "' . $container->table . '"',
                 __METHOD__,
                 TL_ERROR
             );
@@ -132,13 +130,18 @@ class ExecutePostActions extends BaseListener
     /**
      * Try to rewrite the reload event. We have a tiny huge problem with the field names of the mcw and contao.
      *
-     * @param string        $action
+     * @param string        $action    The action to execute.
+     * @param DataContainer $container The data container.
      *
-     * @param DataContainer $dc
+     * @return void
      *
-     * @throws \Exception
+     * @throws BadRequestHttpException When The field does not exist in the DCA or the requested row could not be found.
+     * @throws ResponseException       In all successful cases.
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
-    public function executePostActions($action, DataContainer $dc)
+    public function executePostActions($action, DataContainer $container)
     {
         // Kick out if the context isn't the right one.
         if ($action != 'reloadFiletree_mcw' && $action != 'reloadPagetree_mcw') {
@@ -146,7 +149,7 @@ class ExecutePostActions extends BaseListener
         }
 
         $intId    = \Input::get('id');
-        $strField = $dc->inputName = \Input::post('name');
+        $strField = $container->inputName = \Input::post('name');
 
         // Get the field name parts.
         $fieldParts = preg_split('/_row[0-9]*_/i', $strField);
@@ -164,21 +167,25 @@ class ExecutePostActions extends BaseListener
             $strField = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $strField);
         }
 
-        $dc->field = $mcwFieldName;
+        $container->field = $mcwFieldName;
 
         // Add the sub configuration into the DCA. We need this for contao. Without it is not possible
         // to get the data for the picker.
-        if ($GLOBALS['TL_DCA'][$dc->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard') {
-            $GLOBALS['TL_DCA'][$dc->table]['fields'][$dc->field] =
-                $GLOBALS['TL_DCA'][$dc->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
+        if ($GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard') {
+            $GLOBALS['TL_DCA'][$container->table]['fields'][$container->field] =
+                $GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
 
-            $GLOBALS['TL_DCA'][$dc->table]['fields'][$strField] =
-                $GLOBALS['TL_DCA'][$dc->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
+            $GLOBALS['TL_DCA'][$container->table]['fields'][$strField] =
+                $GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
         }
 
         // The field does not exist
-        if (!isset($GLOBALS['TL_DCA'][$dc->table]['fields'][$strField])) {
-            System::log('Field "' . $strField . '" does not exist in DCA "' . $dc->table . '"', __METHOD__, TL_ERROR);
+        if (!isset($GLOBALS['TL_DCA'][$container->table]['fields'][$strField])) {
+            System::log(
+                'Field "' . $strField . '" does not exist in DCA "' . $container->table . '"',
+                __METHOD__,
+                TL_ERROR
+            );
             throw new BadRequestHttpException('Bad request');
         }
 
@@ -187,33 +194,36 @@ class ExecutePostActions extends BaseListener
 
         // Load the value
         if (Input::get('act') != 'overrideAll') {
-            if ($GLOBALS['TL_DCA'][$dc->table]['config']['dataContainer'] == 'File') {
+            if ($GLOBALS['TL_DCA'][$container->table]['config']['dataContainer'] == 'File') {
                 $varValue = Config::get($strField);
-            } elseif ($intId > 0 && Database::getInstance()->tableExists($dc->table)) {
+            } elseif ($intId > 0 && Database::getInstance()->tableExists($container->table)) {
                 $objRow = Database::getInstance()
-                                  ->prepare("SELECT * FROM " . $dc->table . " WHERE id=?")
+                                  ->prepare('SELECT * FROM ' . $container->table . ' WHERE id=?')
                                   ->execute($intId);
 
                 // The record does not exist
                 if ($objRow->numRows < 1) {
-                    System::log('A record with the ID "' . $intId . '" does not exist in table "' . $dc->table . '"',
-                        __METHOD__, TL_ERROR);
+                    System::log(
+                        'A record with the ID "' . $intId . '" does not exist in table "' . $container->table . '"',
+                        __METHOD__,
+                        TL_ERROR
+                    );
                     throw new BadRequestHttpException('Bad request');
                 }
 
-                $varValue         = $objRow->$strField;
-                $dc->activeRecord = $objRow;
+                $varValue                = $objRow->$strField;
+                $container->activeRecord = $objRow;
             }
         }
 
         // Call the load_callback
-        if (\is_array($GLOBALS['TL_DCA'][$dc->table]['fields'][$strField]['load_callback'])) {
-            foreach ($GLOBALS['TL_DCA'][$dc->table]['fields'][$strField]['load_callback'] as $callback) {
+        if (\is_array($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]['load_callback'])) {
+            foreach ($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]['load_callback'] as $callback) {
                 if (\is_array($callback)) {
                     $this->import($callback[0]);
-                    $varValue = $this->{$callback[0]}->{$callback[1]}($varValue, $dc);
+                    $varValue = $this->{$callback[0]}->{$callback[1]}($varValue, $container);
                 } elseif (\is_callable($callback)) {
-                    $varValue = $callback($varValue, $dc);
+                    $varValue = $callback($varValue, $container);
                 }
             }
         }
@@ -249,18 +259,18 @@ class ExecutePostActions extends BaseListener
         /** @var FileTree|PageTree $strClass */
         $strClass        = $GLOBALS['BE_FFL'][$strKey];
         $fieldAttributes = $strClass::getAttributesFromDca(
-            $GLOBALS['TL_DCA'][$dc->table]['fields'][$strField],
-            $dc->inputName,
+            $GLOBALS['TL_DCA'][$container->table]['fields'][$strField],
+            $container->inputName,
             $varValue,
             $strField,
-            $dc->table,
-            $dc
+            $container->table,
+            $container
         );
 
         $fieldAttributes['id']       = \Input::post('name');
         $fieldAttributes['name']     = $mcwFieldName;
         $fieldAttributes['value']    = $varValue;
-        $fieldAttributes['strTable'] = $dc->table;
+        $fieldAttributes['strTable'] = $container->table;
         $fieldAttributes['strField'] = $strField;
 
         /** @var FileTree|PageTree $objWidget */

@@ -10,7 +10,7 @@
   "homepage": "http://www.men-at-work.de",
   "license": "LGPL-3.0-or-later",
   "authors": [
-	{
+    {
       "name": "Stefan Heimes",
       "email": "stefan_heimes@hotmail.com",
       "homepage": "http://www.men-at-work.de",
@@ -81,7 +81,7 @@
     "branch-alias": {
       "dev-master": "3.4.x-dev",
       "dev-develop": "3.5.x-dev",
-	  "dev-support/contao3": "3.3.x-dev"
+      "dev-support/contao3": "3.3.x-dev"
     }
   }
 }

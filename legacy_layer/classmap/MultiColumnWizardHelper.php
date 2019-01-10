@@ -30,7 +30,9 @@ use MenAtWork\MultiColumnWizardBundle\Helper\MultiColumnWizardHelper as BundleMu
  * @deprecated Deprecated and will be removed in version 4. Use
  *             MenAtWork\MultiColumnWizardBundle\Helper\MultiColumnWizardHelper or the services.
  */
+// @codingStandardsIgnoreStart
 class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
+// @codingStandardsIgnoreEnd
 {
     /**
      * Just here to make the constructor public.
@@ -50,13 +52,15 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
     }
 
     /**
-     * @param Template $objTemplate
+     * Add the scripts and css files to the template.
+     *
+     * @param Template $objTemplate The template.
      *
      * @return void
      *
      * @deprecated Use the service maw.mcw.events.listener.parse_template
      */
-    public function addScriptsAndStyles(Template &$objTemplate)
+    public function addScriptsAndStyles(Template $objTemplate)
     {
         $serviceName = 'maw.mcw.events.listener.parse_template';
         trigger_error(
@@ -76,7 +80,9 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
     }
 
     /**
-     * @param $strTable
+     * Support the modal selector.
+     *
+     * @param string $strTable The table name.
      *
      * @return void
      *
@@ -102,6 +108,8 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
     }
 
     /**
+     * Delegate fixing of ajax post actions to the service.
+     *
      * @return void
      *
      * @deprecated Use the maw.mcw.events.listener.initialize_system
@@ -126,17 +134,16 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
     }
 
     /**
-     * @param                       $action
+     * Delegate execution of ajax post actions to the service.
      *
-     * @param DataContainer         $dc
+     * @param string        $action    The action to execute.
+     * @param DataContainer $container The data container.
      *
      * @return void
      *
      * @deprecated Use the maw.mcw.events.listener.execute_post_actions
-     *
-     * @throws \Exception
      */
-    public function executePostActions($action, DataContainer $dc)
+    public function executePostActions($action, DataContainer $container)
     {
         $serviceName = 'maw.mcw.events.listener.execute_post_actions';
         trigger_error(
@@ -152,17 +159,19 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
 
         /** @var MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions $helper */
         $helper = \System::getContainer()->get($serviceName);
-        $helper->executePostActions($action, $dc);
+        $helper->executePostActions($action, $container);
     }
 
     /**
-     * @param DataContainer $dc
+     * Generates a filePicker icon.
+     *
+     * @param DataContainer $container The data container.
      *
      * @return string
      *
      * @deprecated Use the \MenAtWork\MultiColumnWizardBundle\Helper\MultiColumnWizardHelper::mcwFilePicker
      */
-    public function mcwFilePicker(DataContainer $dc)
+    public function mcwFilePicker(DataContainer $container)
     {
         trigger_error(
             sprintf(
@@ -175,6 +184,6 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
             E_USER_DEPRECATED
         );
 
-        return parent::mcwFilePicker($dc);
+        return parent::mcwFilePicker($container);
     }
 }

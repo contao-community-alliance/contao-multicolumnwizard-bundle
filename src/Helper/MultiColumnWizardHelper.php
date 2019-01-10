@@ -43,30 +43,38 @@ class MultiColumnWizardHelper extends \Contao\System
     /**
      * Just here to make the constructor public.
      */
+    // @codingStandardsIgnoreStart - not useless, we change the visibility.
     public function __construct()
     {
         parent::__construct();
     }
+    // @codingStandardsIgnoreEnd
 
     /**
-     * Generates a filePicker icon for Contao Version > 3.1
+     * Generates a filePicker icon.
      *
-     * @param DataContainer $dc
+     * @param DataContainer $container The data container.
      *
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
-    public function mcwFilePicker(DataContainer $dc)
+    public function mcwFilePicker(DataContainer $container)
     {
-        return ' <a href="contao/file.php?do=' . \Input::get('do') . '&amp;table=' . $dc->table . '&amp;field='
-               . preg_replace('/_row[0-9]*_/i', '__', $dc->field) . '&amp;value=' . $dc->value . '" title="'
+        return ' <a href="contao/file.php?do=' . \Input::get('do') . '&amp;table=' . $container->table . '&amp;field='
+               . preg_replace('/_row[0-9]*_/i', '__', $container->field) . '&amp;value=' . $container->value . '" title="'
                . specialchars(str_replace("'", "\\'", $GLOBALS['TL_LANG']['MSC']['filepicker']))
                . '" onclick="Backend.getScrollOffset();Backend.openModalSelector({\'width\':765,\'title\':\''
-               . specialchars($GLOBALS['TL_LANG']['MOD']['files'][0]) . '\',\'url\':this.href,\'id\':\'' . $dc->field
-               . '\',\'tag\':\'ctrl_' . $dc->field
-               . ((\Input::get('act') == 'editAll') ? '_' . $dc->id : '')
+               . specialchars($GLOBALS['TL_LANG']['MOD']['files'][0]) . '\',\'url\':this.href,\'id\':\'' . $container->field
+               . '\',\'tag\':\'ctrl_' . $container->field
+               . ((\Input::get('act') == 'editAll') ? '_' . $container->id : '')
                . '\',\'self\':this});return false">'
-               . \Image::getHtml('pickfile.gif', $GLOBALS['TL_LANG']['MSC']['filepicker'],
-                'style="vertical-align:top;cursor:pointer"')
+               . \Image::getHtml(
+                   'pickfile.gif',
+                   $GLOBALS['TL_LANG']['MSC']['filepicker'],
+                   'style="vertical-align:top;cursor:pointer"'
+               )
                . '</a>';
     }
 }

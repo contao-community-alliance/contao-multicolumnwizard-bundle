@@ -29,5 +29,4 @@ namespace MenAtWork\MultiColumnWizard\Event;
  */
 class GetOptionsEvent extends \MultiColumnWizard\Event\GetOptionsEvent
 {
-
 }

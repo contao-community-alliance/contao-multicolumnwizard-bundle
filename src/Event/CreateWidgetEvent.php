@@ -37,11 +37,15 @@ class CreateWidgetEvent extends Event
     const NAME = 'men-at-work.multi-column-wizard-bundle.create-widget';
 
     /**
+     * The data container.
+     *
      * @var DataContainer
      */
     private $dcDriver;
 
     /**
+     * The widget.
+     *
      * @var Widget
      */
     private $widget;
@@ -49,7 +53,7 @@ class CreateWidgetEvent extends Event
     /**
      * CreateNewRow constructor.
      *
-     * @param DataContainer $dcDriver
+     * @param DataContainer $dcDriver The data container.
      */
     public function __construct($dcDriver)
     {
@@ -57,6 +61,8 @@ class CreateWidgetEvent extends Event
     }
 
     /**
+     * Get the data container.
+     *
      * @return DataContainer
      */
     public function getDcDriver()
@@ -65,6 +71,8 @@ class CreateWidgetEvent extends Event
     }
 
     /**
+     * Get the widget.
+     *
      * @return Widget
      */
     public function getWidget()
@@ -73,9 +81,11 @@ class CreateWidgetEvent extends Event
     }
 
     /**
-     * @param Widget $widget
+     * Set the widget.
      *
-     * @return CreateWidget
+     * @param Widget $widget The widget to use.
+     *
+     * @return self
      */
     public function setWidget($widget)
     {

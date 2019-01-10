@@ -37,14 +37,14 @@ class UpdateDataDefinition
      * Add all fields from the MCW to the DCA. This is needed for some fields, because other components need this
      * to create the widget/view etc.
      *
-     * @param BuildDataDefinitionEvent $event
+     * @param BuildDataDefinitionEvent $event The event to process.
      *
      * @return void
      */
     public function addMcwFields(BuildDataDefinitionEvent $event)
     {
         // Get the container and all properties.
-        $container = $event->getContainer();
+        $container  = $event->getContainer();
         $properties = $container->getPropertiesDefinition();
 
         /** @var DefaultProperty $property */
@@ -58,7 +58,7 @@ class UpdateDataDefinition
             $extra = $property->getExtra();
 
             // If we have no data here, go to the next.
-            if(empty($extra['columnFields']) || !is_array($extra['columnFields'])){
+            if (empty($extra['columnFields']) || !is_array($extra['columnFields'])) {
                 continue;
             }
 
@@ -66,6 +66,15 @@ class UpdateDataDefinition
         }
     }
 
+    /**
+     * Add a property to the definition.
+     *
+     * @param array                         $extra      The extra data for the property.
+     * @param PropertyInterface             $property   The property to add.
+     * @param PropertiesDefinitionInterface $properties The definition the property shall be added to.
+     *
+     * @return void
+     */
     private function addPropertyToDefinition(
         array $extra,
         PropertyInterface $property,
@@ -147,6 +156,14 @@ class UpdateDataDefinition
         }
     }
 
+    /**
+     * Add a multi column wizard property.
+     *
+     * @param PropertyInterface             $property   The property.
+     * @param PropertiesDefinitionInterface $properties The properties.
+     *
+     * @return void
+     */
     private function addSubMultiColumnWizardProperty(
         PropertyInterface $property,
         PropertiesDefinitionInterface $properties

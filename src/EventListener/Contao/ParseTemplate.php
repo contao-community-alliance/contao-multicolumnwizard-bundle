@@ -30,13 +30,19 @@ use Contao\Template;
 class ParseTemplate
 {
     /**
-     * @param Template $objTemplate
+     * Add the scripts and stylesheet to the passed template.
+     *
+     * @param Template $objTemplate The template to add to.
+     *
+     * @return void
+     *
+     * @@SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
     public function addScriptsAndStyles(&$objTemplate)
     {
-        //do not allow version information to be leaked in the backend login and install tool (#184)
+        // do not allow version information to be leaked in the backend login and install tool (#184)
         if ($objTemplate->getName() != 'be_login' && $objTemplate->getName() != 'be_install') {
-
             $GLOBALS['TL_JAVASCRIPT'][] = $GLOBALS['TL_CONFIG']['debugMode']
                 ? 'bundles/multicolumnwizard/js/multicolumnwizard_be_src.js'
                 : 'bundles/multicolumnwizard/js/multicolumnwizard_be.js';
@@ -46,10 +52,10 @@ class ParseTemplate
                 : 'bundles/multicolumnwizard/css/multicolumnwizard.css';
 
             $objTemplate->ua .= ' version_' . str_replace('.', '-', VERSION) . '-' . str_replace(
-                    '.',
-                    '-',
-                    BUILD
-                );
+                '.',
+                '-',
+                BUILD
+            );
         }
     }
 }

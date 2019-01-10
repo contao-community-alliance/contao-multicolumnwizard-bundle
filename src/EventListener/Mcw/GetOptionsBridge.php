@@ -32,6 +32,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class GetOptionsBridge
 {
     /**
+     * The event dispatcher.
+     *
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
@@ -39,7 +41,7 @@ class GetOptionsBridge
     /**
      * ExecutePostActions constructor.
      *
-     * @param EventDispatcherInterface $eventDispatcher
+     * @param EventDispatcherInterface $eventDispatcher The event dispatcher.
      */
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {
@@ -49,7 +51,7 @@ class GetOptionsBridge
     /**
      * Listener for building the tiny mce.
      *
-     * @param GetOptionEventBundle $event
+     * @param GetOptionEventBundle $event The event.
      *
      * @return void
      */

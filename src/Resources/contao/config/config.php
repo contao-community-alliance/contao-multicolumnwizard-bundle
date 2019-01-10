@@ -26,14 +26,8 @@
  * @filesource
  */
 
-/**
- * Widget
- */
 $GLOBALS['BE_FFL']['multiColumnWizard'] = '\MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard';
 
-/**
- * Hooks
- */
 $GLOBALS['TL_HOOKS']['loadDataContainer'][]  = array(
     'menatwork.multicolumnwizard-bundle.events_listener.load_data_container',
     'supportModalSelector'

@@ -34,15 +34,17 @@ class BaseListener extends Controller
     /**
      * BaseListener constructor.
      */
+    // @codingStandardsIgnoreStart - This override is not useless, we change visibility.
     public function __construct()
     {
         parent::__construct();
     }
+    // @codingStandardsIgnoreEnd
 
     /**
      * Import a library and make it accessible by its name or an optional key
      *
-     * @param string $strClass The class name
+     * @param string $strClass The class name.
      *
      * @return mixed|object|string
      */
@@ -65,7 +67,7 @@ class BaseListener extends Controller
      * Convert a string to a response object
      * Copy from ajax.
      *
-     * @param string $str
+     * @param string $str The string to convert.
      *
      * @return Response
      */

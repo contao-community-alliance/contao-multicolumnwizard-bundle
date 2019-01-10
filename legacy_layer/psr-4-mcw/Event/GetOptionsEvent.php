@@ -31,10 +31,13 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent as BundleGetOptionsE
  */
 class GetOptionsEvent extends BundleGetOptionsEvent
 {
+    /**
+     * Name of this event.
+     */
     const NAME = 'men-at-work.multi-column-wizard.get-options';
 
     /**
-     * @inheritdoc
+     * {@inheritDoc}
      */
     public function __construct(
         $propertyName,

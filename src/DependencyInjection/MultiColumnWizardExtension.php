@@ -35,10 +35,11 @@ use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 class MultiColumnWizardExtension extends ConfigurableExtension
 {
     /**
+     * The config files.
+     *
      * @var array
      */
     private $files = [
-//        'commands.yml',
         'listener.yml',
         'services.yml',
     ];

@@ -24,7 +24,6 @@ namespace MenAtWork\MultiColumnWizardBundle\EventListener\Mcw;
 
 use Contao\Image;
 use MenAtWork\MultiColumnWizardBundle\Event\GetColorPickerStringEvent;
-use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
 
 /**
  * Class ColorPicker
@@ -34,7 +33,7 @@ class ColorPicker
     /**
      * Listener for building the tiny mce.
      *
-     * @param GetColorPickerStringEvent $event
+     * @param GetColorPickerStringEvent $event The event.
      *
      * @return void
      */
@@ -49,9 +48,12 @@ class ColorPicker
     /**
      * Generate the TinyMce Script.
      *
-     * @param GetColorPickerStringEvent $event
+     * @param GetColorPickerStringEvent $event The event.
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
     private function contao44x(GetColorPickerStringEvent $event)
     {

@@ -24,29 +24,42 @@ namespace MenAtWork\MultiColumnWizardBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * This is the abstract base for events returning a string.
+ */
 abstract class GetStringEvent extends Event
 {
     /**
+     * The version of Contao.
+     *
      * @var string
      */
     private $version;
 
     /**
+     * The build number of Contao.
+     *
      * @var string
      */
     private $build;
 
-
     /**
+     * The field configuration.
+     *
      * @var array
      */
     private $fieldConfiguration;
 
     /**
+     * The id of the field.
+     *
      * @var string
      */
     private $fieldId;
+
     /**
+     * The table name.
+     *
      * @var string
      */
     private $tableName;
@@ -70,7 +83,6 @@ abstract class GetStringEvent extends Event
         string $fieldId,
         string $tableName,
         array $fieldConfiguration
-
     ) {
         $this->version            = $version;
         $this->build              = $build;

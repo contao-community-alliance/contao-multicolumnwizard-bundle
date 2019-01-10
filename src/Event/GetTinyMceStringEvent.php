@@ -22,9 +22,6 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\Event;
 
-use Contao\DataContainer;
-use Symfony\Component\EventDispatcher\Event;
-
 /**
  * Class GetTinyMceEvent
  */
@@ -33,15 +30,17 @@ class GetTinyMceStringEvent extends GetStringEvent
     /**
      * Name of the event.
      */
-    const NAME = 'men-at-work.multi-column-wizard-bundle.get-tiny-mce';
+    public const NAME = 'men-at-work.multi-column-wizard-bundle.get-tiny-mce';
 
     /**
+     * The tiny MCE initialization string.
+     *
      * @var string
      */
     private $tinyMce;
 
     /**
-     * The TinyMce string.
+     * Set the TinyMce string.
      *
      * @param string $string The TinyMce string.
      *

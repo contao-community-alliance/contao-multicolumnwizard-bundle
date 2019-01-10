@@ -32,7 +32,11 @@ class LoadDataContainer
      *
      * @param string $strTable Name of the table.
      *
+     * @return void
+     *
      * @deprecated Removed in version 4 of mcw. There is no replacement.
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function supportModalSelector($strTable)
     {
