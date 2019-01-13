@@ -39,7 +39,7 @@ class ParseTemplate
      * @@SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
-    public function addScriptsAndStyles(&$objTemplate)
+    public function addVersion(&$objTemplate)
     {
         // do not allow version information to be leaked in the backend login and install tool (#184)
         if ($objTemplate->getName() != 'be_login' && $objTemplate->getName() != 'be_install') {

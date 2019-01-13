@@ -48,7 +48,7 @@ $GLOBALS['TL_HOOKS']['executePostActions'][] = array(
 if (TL_MODE == 'BE') {
     $GLOBALS['TL_HOOKS']['parseTemplate'][] = array(
         'menatwork.multicolumnwizard-bundle.events_listener.parse_template',
-        'addScriptsAndStyles'
+        'addVersion'
     );
 
     // Add the JS.
