@@ -1,38 +1,65 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: Stefan Heimes
- * Date: 09.12.2018
- * Time: 18:58
+ * This file is part of menatwork/contao-multicolumnwizard-bundle.
+ *
+ * (c) 2012-2019 MEN AT WORK.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * This project is provided in good faith and hope to be usable by anyone.
+ *
+ * @package    menatwork/contao-multicolumnwizard-bundle
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @copyright  2011 Andreas Schempp
+ * @copyright  2011 certo web & design GmbH
+ * @copyright  2013-2019 MEN AT WORK
+ * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
+ * @filesource
  */
 
 namespace MenAtWork\MultiColumnWizardBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 
+/**
+ * This is the abstract base for events returning a string.
+ */
 abstract class GetStringEvent extends Event
 {
     /**
+     * The version of Contao.
+     *
      * @var string
      */
     private $version;
 
     /**
+     * The build number of Contao.
+     *
      * @var string
      */
     private $build;
 
-
     /**
+     * The field configuration.
+     *
      * @var array
      */
     private $fieldConfiguration;
 
     /**
+     * The id of the field.
+     *
      * @var string
      */
     private $fieldId;
+
     /**
+     * The table name.
+     *
      * @var string
      */
     private $tableName;
@@ -56,7 +83,6 @@ abstract class GetStringEvent extends Event
         string $fieldId,
         string $tableName,
         array $fieldConfiguration
-
     ) {
         $this->version            = $version;
         $this->build              = $build;

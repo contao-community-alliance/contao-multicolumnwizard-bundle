@@ -1,13 +1,45 @@
 <?php
 
 /**
- * Contao Open Source CMS
+ * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * @copyright  Andreas Schempp 2011
- * @copyright  certo web & design GmbH 2011
- * @copyright  MEN AT WORK 2013
- * @package    MultiColumnWizard
- * @license    LGPL
+ * (c) 2012-2019 MEN AT WORK.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * This project is provided in good faith and hope to be usable by anyone.
+ *
+ * @package    menatwork/contao-multicolumnwizard-bundle
+ * @author     Andreas Burg <info@andreasburg.de>
+ * @author     Andreas Isaak <info@andreas-isaak.de>
+ * @author     Andreas Schempp <andreas.schempp@terminal42.ch>
+ * @author     André <simmert@users.noreply.github.com>
+ * @author     Antoine DAVID <adavid@addictic.fr>
+ * @author     Benny Born <benny@bennyborn.de>
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Christoph Wiechert <wio@psitrax.de>
+ * @author     civ23 <kai@kapalla.com>
+ * @author     David Maack <david.maack@arcor.de>
+ * @author     Dominik Tomasi <d.tomasi@upcom.ch>
+ * @author     Gerald Meier <garyee@gmx.de>
+ * @author     Ingolf Steinhardt <info@e-spin.de>
+ * @author     Jozef Dvorský <creatingo@users.noreply.github.com>
+ * @author     Kester Mielke <kester.mieke@gmx.net>
+ * @author     mediabakery <s.tilch@mediabakery.de>
+ * @author     Oliver Hoff <oliver@hofff.com>
+ * @author     Patrick Kahl <kahl.patrick@googlemail.com>
+ * @author     Richard Henkenjohann <richardhenkenjohann@googlemail.com>
+ * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Stefan Lindecke <github.com@chektrion.de>
+ * @author     Sven Baumann <baumann.sv@gmail.com>
+ * @author     Tristan Lins <tristan.lins@bit3.de>
+ * @author     w3scout <info@w3scouts.com>
+ * @author     Yanick Witschi <yanick.witschi@terminal42.ch>
+ * @copyright  2011 Andreas Schempp
+ * @copyright  2011 certo web & design GmbH
+ * @copyright  2013-2019 MEN AT WORK
+ * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
@@ -26,13 +58,6 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
 
 /**
  * Class MultiColumnWizard
- *
- * @copyright  Andreas Schempp 2011
- * @copyright  certo web & design GmbH 2011
- * @copyright  MEN AT WORK 2013
- * @author     Ingolf Steinhardt <info@e-spin.de> 2017
- * @author     Sven Baumann <baumann.sv@gmail.com> 2017
- * @package    MultiColumnWizard
  */
 class MultiColumnWizard extends Widget implements \uploadable
 {
@@ -42,76 +67,75 @@ class MultiColumnWizard extends Widget implements \uploadable
     protected $eventDispatcher;
 
     /**
-     * Submit user input
+     * Submit user input.
      *
      * @var boolean
      */
     protected $blnSubmitInput = true;
 
     /**
-     * Template
+     * Template.
      *
      * @var string
      */
     protected $strTemplate = 'be_widget';
 
     /**
-     * Value
+     * Value.
      *
      * @var mixed
      */
     protected $varValue = array();
 
     /**
-     * Widget errors to store
+     * Widget errors to store.
      *
      * @var array
      */
     protected $arrWidgetErrors = array();
 
     /**
-     * Callback data
+     * Callback data.
      *
      * @var array
      */
     protected $arrCallback = false;
 
     /**
-     * Min count
+     * Min count.
      *
      * @var int
      */
     protected $minCount = 0;
 
     /**
-     * Max count
+     * Max count.
      *
      * @var int
      */
     protected $maxCount = 0;
 
     /**
-     * Tableless
+     * Tableless.
      *
      * @var boolean
      */
     protected $blnTableless = false;
 
     /**
-     * Row specific data
+     * Row specific data.
      *
      * @var array
      */
     protected $arrRowSpecificData = array();
 
     /**
-     * Buttons
+     * Buttons.
      *
      * @var array
      */
     protected $arrButtons = [
         'new'    => 'new.gif',
-        //        'copy'   => 'copy.gif', // Removed since we can't support dom manipulation anymore.
         'delete' => 'delete.gif',
         'move'   => 'drag.gif'
     ];
@@ -149,11 +173,12 @@ class MultiColumnWizard extends Widget implements \uploadable
             case 'value':
                 $this->varValue = deserialize($varValue, true);
 
-                /**
+                /*
                  * reformat array if we have only one field
                  * from array[] = value
                  * to array[]['fieldname'] = value
                  */
+
                 if ($this->flatArray) {
                     $arrNew = array();
 
@@ -187,7 +212,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                 if ($varValue === true) {
                     $this->arrButtons = array();
                 }
-
+                // No break here.
             case 'disableSorting':
                 if ($varValue == true) {
                     unset($this->arrButtons['up']);
@@ -227,7 +252,7 @@ class MultiColumnWizard extends Widget implements \uploadable
     /**
      * Get specific attributes
      *
-     * @param string $strKey
+     * @param string $strKey The key to get.
      *
      * @return array|string
      */
@@ -235,12 +260,13 @@ class MultiColumnWizard extends Widget implements \uploadable
     {
         switch ($strKey) {
             case 'value':
-                /**
+                /*
                  * reformat array if we have only one field
                  * from array[]['fieldname'] = value
                  * to array[] = value
                  * so we have the same behavoir like multiple-checkbox fields
                  */
+
                 if ($this->flatArray) {
                     $arrNew = array();
 
@@ -256,7 +282,6 @@ class MultiColumnWizard extends Widget implements \uploadable
 
             default:
                 return parent::__get($strKey);
-                break;
         }
     }
 
@@ -531,7 +556,6 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Change the order
         if (Input::get($this->strCommand) && is_numeric(Input::get('cid')) && Input::get('id') == $this->currentRecord) {
-
             switch (Input::get($this->strCommand)) {
                 case 'copy':
                     $this->varValue = array_duplicate($this->varValue, Input::get('cid'));
@@ -552,13 +576,21 @@ class MultiColumnWizard extends Widget implements \uploadable
 
             // Save in File
             if ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'File') {
-                $this->Config->update(sprintf("\$GLOBALS['TL_CONFIG']['%s']", $this->strField),
-                    serialize($this->varValue));
+                $this->Config->update(
+                    sprintf("\$GLOBALS['TL_CONFIG']['%s']", $this->strField),
+                    serialize($this->varValue)
+                );
 
                 // Reload the page
-                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '',
-                    preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '',
-                        \Environment::get('request'))));
+                $this->redirect(preg_replace(
+                    '/&(amp;)?cid=[^&]*/i',
+                    '',
+                    preg_replace(
+                        '/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i',
+                        '',
+                        \Environment::get('request')
+                    )
+                ));
             } // Save in table
             elseif ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'Table') {
                 if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'])) {
@@ -569,19 +601,25 @@ class MultiColumnWizard extends Widget implements \uploadable
                     $dc->inputName    = $this->strField;
                     $dc->strInputName = $this->strField;
 
-                    foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'] AS $callback) {
+                    foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'] as $callback) {
                         $this->import($callback[0]);
                         $this->{$callback[0]}->{$callback[1]}(serialize($this->varValue), $dc);
                     }
                 } else {
-                    $this->Database->prepare("UPDATE " . $this->strTable . " SET " . $this->strField . "=? WHERE id=?")
+                    $this->Database->prepare('UPDATE ' . $this->strTable . ' SET ' . $this->strField . '=? WHERE id=?')
                                    ->execute(serialize($this->varValue), $this->currentRecord);
                 }
 
                 // Reload the page
-                $this->redirect(preg_replace('/&(amp;)?cid=[^&]*/i', '',
-                    preg_replace('/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i', '',
-                        \Environment::get('request'))));
+                $this->redirect(preg_replace(
+                    '/&(amp;)?cid=[^&]*/i',
+                    '',
+                    preg_replace(
+                        '/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i',
+                        '',
+                        \Environment::get('request')
+                    )
+                ));
             } // Unknow
             else {
                 // What to do here?
@@ -644,7 +682,7 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         if ($overwriteRowCurrentRow !== null) {
             $i               = \intval($overwriteRowCurrentRow);
-            $intNumberOfRows = $i + 1;
+            $intNumberOfRows = ($i + 1);
         } else {
             $i = 0;
         }
@@ -694,8 +732,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                     $additionalCode = [];
 
                     // Date picker.
-                    $additionalCode['datePicker'] = $this->getMcWDatePickerString
-                    (
+                    $additionalCode['datePicker'] = $this->getMcWDatePickerString(
                         $objWidget->id,
                         $strKey,
                         null,
@@ -704,8 +741,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                     );
 
                     // Color picker.
-                    $additionalCode['colorPicker'] = $this->getMcWColorPicker
-                    (
+                    $additionalCode['colorPicker'] = $this->getMcWColorPicker(
                         $objWidget->id,
                         $strKey,
                         $arrField,
@@ -714,8 +750,7 @@ class MultiColumnWizard extends Widget implements \uploadable
 
                     // Tiny MCE.
                     if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
-                        $additionalCode['tinyMce']    = $this->getMcWTinyMCEString
-                        (
+                        $additionalCode['tinyMce']     = $this->getMcWTinyMCEString(
                             $objWidget->id,
                             $arrField,
                             $this->strTable
@@ -748,16 +783,14 @@ class MultiColumnWizard extends Widget implements \uploadable
                     }
 
                     // Remove empty elements.
-                    $additionalCode = array_filter
-                    (
+                    $additionalCode = array_filter(
                         $additionalCode,
                         function ($value) {
                             return !empty($value);
                         }
                     );
 
-                    $strWidget = sprintf
-                    (
+                    $strWidget = sprintf(
                         '%s%s',
                         $objWidget->parse(),
                         implode('', $additionalCode)
@@ -766,7 +799,7 @@ class MultiColumnWizard extends Widget implements \uploadable
 
                 // Build array of items
                 if ($arrField['eval']['columnPos'] != '') {
-                    $arrItems[$i][$objWidget->columnPos]['entry']    .= $strWidget;
+                    $arrItems[$i][$objWidget->columnPos]['entry']   .= $strWidget;
                     $arrItems[$i][$objWidget->columnPos]['valign']   = $arrField['eval']['valign'];
                     $arrItems[$i][$objWidget->columnPos]['tl_class'] = $arrField['eval']['tl_class'];
                     $arrItems[$i][$objWidget->columnPos]['hide']     = $blnHiddenBody;
@@ -822,12 +855,12 @@ class MultiColumnWizard extends Widget implements \uploadable
      *
      * Based on DataContainer::row() from Contao 2.10.1
      *
-     * @param   array
-     * @param   int
-     * @param   string
-     * @param   mixed
+     * @param array
+     * @param int
+     * @param string
+     * @param mixed
      *
-     * @return  Widget|null
+     * @return Widget|null
      */
     protected function initializeWidget(&$arrField, $intRow, $strKey, $varValue)
     {
@@ -839,21 +872,29 @@ class MultiColumnWizard extends Widget implements \uploadable
             $strContaoPrefix = '';
         }
 
-        //pass activeRecord to widget
+        // pass activeRecord to widget
         $arrField['activeRecord'] = $this->activeRecord;
 
         // Toggle line wrap (textarea)
         if ($arrField['inputType'] == 'textarea' && $arrField['eval']['rte'] == '') {
-            $xlabel .= ' ' . Image::getHtml('wrap.gif', $GLOBALS['TL_LANG']['MSC']['wordWrap'],
-                    'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['wordWrap']) . '" class="toggleWrap" onclick="Backend.toggleWrap(\'ctrl_' . $this->strId . '_row' . $intRow . '_' . $strKey . '\');"');
+            $xlabel .= ' ' . Image::getHtml(
+                'wrap.gif',
+                $GLOBALS['TL_LANG']['MSC']['wordWrap'],
+                'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['wordWrap']) . '" class="toggleWrap" onclick="Backend.toggleWrap(\'ctrl_' . $this->strId . '_row' . $intRow . '_' . $strKey . '\');"'
+            );
         }
 
         // Add the help wizard
         if ($arrField['eval']['helpwizard']) {
-            $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\'' . StringUtil::specialchars(str_replace("'",
-                    "\\'",
-                    $arrField['label'][0])) . '\',\'url\':this.href});return false">' . \Image::getHtml('about.gif',
-                    $GLOBALS['TL_LANG']['MSC']['helpWizard'], 'style="vertical-align:text-bottom"') . '</a>';
+            $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\'' . StringUtil::specialchars(str_replace(
+                "'",
+                "\\'",
+                $arrField['label'][0]
+            )) . '\',\'url\':this.href});return false">' . \Image::getHtml(
+                'about.gif',
+                $GLOBALS['TL_LANG']['MSC']['helpWizard'],
+                'style="vertical-align:text-bottom"'
+            ) . '</a>';
         }
 
         // Add the popup file manager
@@ -864,8 +905,11 @@ class MultiColumnWizard extends Widget implements \uploadable
                 $path = '?node=' . $arrField['eval']['path'];
             }
 
-            $xlabel .= ' <a href="' . $strContaoPrefix . 'files.php' . $path . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" data-lightbox="files 765 80%">' . Image::getHtml('filemanager.gif',
-                    $GLOBALS['TL_LANG']['MSC']['fileManager'], 'style="vertical-align:text-bottom;"') . '</a>';
+            $xlabel .= ' <a href="' . $strContaoPrefix . 'files.php' . $path . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" data-lightbox="files 765 80%">' . Image::getHtml(
+                'filemanager.gif',
+                $GLOBALS['TL_LANG']['MSC']['fileManager'],
+                'style="vertical-align:text-bottom;"'
+            ) . '</a>';
 
             $arrField['strField'] = $this->strField . '__' . $strKey;
 
@@ -873,16 +917,27 @@ class MultiColumnWizard extends Widget implements \uploadable
             $GLOBALS['TL_DCA'][$this->strTable]['fields'][$arrField['strField']]['label'][0] = (is_array($arrField['label']) && $arrField['label'][0] != '') ? $arrField['label'][0] : $strKey;
         } // Add the table import wizard
         elseif ($arrField['inputType'] == 'tableWizard') {
-            $xlabel .= ' <a href="' . $this->addToUrl('key=table') . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . Image::getHtml('tablewizard.gif',
-                    $GLOBALS['TL_LANG']['MSC']['tw_import'][0], 'style="vertical-align:text-bottom;"') . '</a>';
-            $xlabel .= ' ' . Image::getHtml('demagnify.gif', '',
-                    'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_shrink']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(0.9);"') . Image::getHtml('magnify.gif',
-                    '',
-                    'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_expand']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(1.1);"');
+            $xlabel .= ' <a href="' . $this->addToUrl('key=table') . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . Image::getHtml(
+                'tablewizard.gif',
+                $GLOBALS['TL_LANG']['MSC']['tw_import'][0],
+                'style="vertical-align:text-bottom;"'
+            ) . '</a>';
+            $xlabel .= ' ' . Image::getHtml(
+                'demagnify.gif',
+                '',
+                'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_shrink']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(0.9);"'
+            ) . Image::getHtml(
+                'magnify.gif',
+                '',
+                'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_expand']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(1.1);"'
+            );
         } // Add the list import wizard
         elseif ($arrField['inputType'] == 'listWizard') {
-            $xlabel .= ' <a href="' . $this->addToUrl('key=list') . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['lw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . Image::getHtml('tablewizard.gif',
-                    $GLOBALS['TL_LANG']['MSC']['tw_import'][0], 'style="vertical-align:text-bottom;"') . '</a>';
+            $xlabel .= ' <a href="' . $this->addToUrl('key=list') . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['lw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . Image::getHtml(
+                'tablewizard.gif',
+                $GLOBALS['TL_LANG']['MSC']['tw_import'][0],
+                'style="vertical-align:text-bottom;"'
+            ) . '</a>';
         }
 
         // Input field callback
@@ -941,7 +996,7 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Convert date formats into timestamps (check the eval setting first -> #3063)
         $rgxp               = $arrField['eval']['rgxp'];
-        $dateFormatErrorMsg = "";
+        $dateFormatErrorMsg = '';
         if (($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '') {
             try {
                 $objDate = new Date($varValue, $this->getNumericDateFormat($rgxp));
@@ -991,8 +1046,14 @@ class MultiColumnWizard extends Widget implements \uploadable
             return $this->buildWidgetForDcGeneral($arrData, $arrField);
         }
 
-        return new $strClass(MultiColumnWizard::getAttributesFromDca($arrData, $arrField['name'], $arrField['value'],
-            $arrField['strField'], $this->strTable, $this));
+        return new $strClass(self::getAttributesFromDca(
+            $arrData,
+            $arrField['name'],
+            $arrField['value'],
+            $arrField['strField'],
+            $this->strTable,
+            $this
+        ));
     }
 
     /**
@@ -1037,7 +1098,7 @@ class MultiColumnWizard extends Widget implements \uploadable
         if (isset($arrField['reference'])) {
             $property->setExtra(
                 array_merge(
-                    (array)$property->getExtra(),
+                    (array) $property->getExtra(),
                     array('reference' => $arrField['reference'])
                 )
             );
@@ -1087,7 +1148,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                 unset($arrData['options_callback']);
             }
 
-            /* @var \ContaoCommunityAlliance\DcGeneral\EnvironmentInterface $environment */
+            // @var \ContaoCommunityAlliance\DcGeneral\EnvironmentInterface $environment
             $environment = $this->objDca->getEnvironment();
 
             $event = new GetOptionsEvent(
@@ -1263,14 +1324,21 @@ class MultiColumnWizard extends Widget implements \uploadable
                 $strKey = $strKey . ' invisible';
             }
 
-            $arrHeaderItems[] = sprintf('<div class="%s">%s</div>', $strKey,
-                ($arrField['label'][0] ? $arrField['label'][0] : $strKey));
+            $arrHeaderItems[] = sprintf(
+                '<div class="%s">%s</div>',
+                $strKey,
+                ($arrField['label'][0] ? $arrField['label'][0] : $strKey)
+            );
         }
 
 
-        $return = '<div' . (($this->style) ? (' style="' . $this->style . '"') : '') . ' data-operations="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(',',
-                $arrUnique) . '] datepicker[' . implode(',', $arrDatepicker) . '] colorpicker[' . implode(',',
-                $arrColorpicker) . ']" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard">';
+        $return  = '<div' . (($this->style) ? (' style="' . $this->style . '"') : '') . ' data-operations="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(
+            ',',
+            $arrUnique
+        ) . '] datepicker[' . implode(',', $arrDatepicker) . '] colorpicker[' . implode(
+            ',',
+            $arrColorpicker
+        ) . ']" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard">';
         $return .= '<div class="header_fields">' . implode('', $arrHeaderItems) . '</div>';
 
 
@@ -1312,7 +1380,7 @@ class MultiColumnWizard extends Widget implements \uploadable
             }
 
             $btnName = \sprintf('tw_r%s', StringUtil::specialchars($button));
-            $return  .=
+            $return .=
                 \sprintf(
                     '<a data-operations="%s" href="%s" class="widgetImage" title="%s">%s</a> ',
                     $button,
@@ -1346,8 +1414,6 @@ class MultiColumnWizard extends Widget implements \uploadable
      */
     private function getNumericDateFormat($rgxp)
     {
-        return call_user_func(array("\Contao\Date", "getNumeric" . ucfirst($rgxp) . "Format"));
+        return call_user_func(array('\Contao\Date', 'getNumeric' . ucfirst($rgxp) . 'Format'));
     }
-
-
 }

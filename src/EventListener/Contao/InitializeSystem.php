@@ -1,31 +1,32 @@
 <?php
 
 /**
- * This file is part of MultiColumnWizard.
+ * This file is part of menatwork/contao-multicolumnwizard-bundle.
+ *
+ * (c) 2012-2019 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * This project is provided in good faith and hope to be usable by anyone.
  *
- * @package    MultiColumnWizard
+ * @package    menatwork/contao-multicolumnwizard-bundle
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
- * @copyright  Andreas Schempp 2011
- * @copyright  certo web & design GmbH 2011
- * @copyright  MEN AT WORK 2013
- * @license    LGPL
+ * @copyright  2011 Andreas Schempp
+ * @copyright  2011 certo web & design GmbH
+ * @copyright  2013-2019 MEN AT WORK
+ * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
+ * @filesource
  */
 
 namespace MenAtWork\MultiColumnWizardBundle\EventListener\Contao;
 
 use Contao\Environment;
 use Contao\Input;
-use Contao\Session;
 
 /**
  * Class InitializeSystem
- *
- * @package MenAtWork\MultiColumnWizardBundle\Contao\Events
  */
 class InitializeSystem
 {
@@ -34,6 +35,8 @@ class InitializeSystem
      * Contao will rewrite the [rowId][fieldname]. This will cause a problem in the validate function
      * of the MCW, 'cause it is not able to find the data. So we have to replace the call, rewrite some elements.
      * And return the "right" mcw context.
+     *
+     * @return void
      */
     public function changeAjaxPostActions()
     {
@@ -58,6 +61,7 @@ class InitializeSystem
             case 'reloadPagetreeDMA':
                 Input::setPost('action', \str_replace('DMA', '_mcw', Input::post('action')));
                 break;
+            default:
         }
     }
 }

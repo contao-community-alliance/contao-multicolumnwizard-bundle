@@ -1,5 +1,25 @@
 <?php
 
+/**
+ * This file is part of menatwork/contao-multicolumnwizard-bundle.
+ *
+ * (c) 2012-2019 MEN AT WORK.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * This project is provided in good faith and hope to be usable by anyone.
+ *
+ * @package    menatwork/contao-multicolumnwizard-bundle
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @copyright  2011 Andreas Schempp
+ * @copyright  2011 certo web & design GmbH
+ * @copyright  2013-2019 MEN AT WORK
+ * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
+ * @filesource
+ */
+
 namespace MenAtWork\MultiColumnWizardBundle\EventListener\Mcw;
 
 use Contao\Input;
@@ -12,15 +32,20 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class CreateWidgetContao
- *
- * @package MenAtWork\MultiColumnWizardBundle\EventListener\Mcw
  */
 class CreateWidget
 {
     /**
-     * @param CreateWidgetEvent $event
+     * Create a widget for Contao context.
+     *
+     * @param CreateWidgetEvent $event The event.
      *
      * @return void
+     *
+     * @throws BadRequestHttpException When the field does not exist in the DCA.
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
     public function createWidgetContao(CreateWidgetEvent $event)
     {
@@ -41,7 +66,11 @@ class CreateWidget
 
         // The field does not exist
         if (!isset($GLOBALS['TL_DCA'][$dcDriver->table]['fields'][$fieldName])) {
-            System::log('Field "' . $fieldName . '" does not exist in DCA "' . $dcDriver->table . '"', __METHOD__, TL_ERROR);
+            System::log(
+                'Field "' . $fieldName . '" does not exist in DCA "' . $dcDriver->table . '"',
+                __METHOD__,
+                TL_ERROR
+            );
             throw new BadRequestHttpException('Bad request');
         }
 
@@ -64,7 +93,9 @@ class CreateWidget
     }
 
     /**
-     * @param CreateWidgetEvent $event
+     * Create a widget for dc-general context.
+     *
+     * @param CreateWidgetEvent $event The event.
      *
      * @return void
      */

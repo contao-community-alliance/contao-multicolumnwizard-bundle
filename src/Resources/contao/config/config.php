@@ -1,41 +1,33 @@
 <?php
 
 /**
- * Contao Open Source CMS
- * Copyright (C) 2005-2010 Leo Feyer
+ * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * Formerly known as TYPOlight Open Source CMS.
+ * (c) 2012-2019 MEN AT WORK.
  *
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation, either
- * version 3 of the License, or (at your option) any later version.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * This project is provided in good faith and hope to be usable by anyone.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this program. If not, please visit the Free
- * Software Foundation website at <http://www.gnu.org/licenses/>.
- *
- * PHP version 5
- *
- * @copyright  MEN AT WORK 2012, certo web & design GmbH 2012
- * @package    MultiColumnWizard
- * @license    LGPL
+ * @package    menatwork/contao-multicolumnwizard-bundle
+ * @author     Andreas Isaak <info@andreas-isaak.de>
+ * @author     Andreas Schempp <andreas.schempp@terminal42.ch>
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     David Maack <david.maack@arcor.de>
+ * @author     fritzmg <email@spikx.net>
+ * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Tristan Lins <tristan.lins@bit3.de>
+ * @author     Yanick Witschi <yanick.witschi@certo-net.ch>
+ * @copyright  2011 Andreas Schempp
+ * @copyright  2011 certo web & design GmbH
+ * @copyright  2013-2019 MEN AT WORK
+ * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
-/**
- * Widget
- */
 $GLOBALS['BE_FFL']['multiColumnWizard'] = '\MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard';
 
-/**
- * Hooks
- */
 $GLOBALS['TL_HOOKS']['loadDataContainer'][]  = array(
     'menatwork.multicolumnwizard-bundle.events_listener.load_data_container',
     'supportModalSelector'
