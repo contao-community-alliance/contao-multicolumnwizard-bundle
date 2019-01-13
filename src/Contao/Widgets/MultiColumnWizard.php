@@ -543,15 +543,6 @@ class MultiColumnWizard extends Widget implements \uploadable
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
         }
 
-        // Use BE script in FE for now. For the BE we are using the
-        // \MenAtWork\MultiColumnWizardBundle\Contao\Events\ParseTemplate::addScriptsAndStyles
-        $GLOBALS['TL_JAVASCRIPT']['mcw'] = $GLOBALS['TL_CONFIG']['debugMode']
-            ? 'bundles/multicolumnwizard/js/multicolumnwizard_be_src.js'
-            : 'bundles/multicolumnwizard/js/multicolumnwizard_be.js';
-        $GLOBALS['TL_CSS']['mcw']        = $GLOBALS['TL_CONFIG']['debugMode']
-            ? 'bundles/multicolumnwizard/css/multicolumnwizard_src.css'
-            : 'bundles/multicolumnwizard/css/multicolumnwizard.css';
-
         $this->strCommand = 'cmd_' . $this->strField;
 
         // Change the order

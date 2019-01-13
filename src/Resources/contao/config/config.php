@@ -50,4 +50,15 @@ if (TL_MODE == 'BE') {
         'menatwork.multicolumnwizard-bundle.events_listener.parse_template',
         'addScriptsAndStyles'
     );
+
+    // Add the JS.
+    $GLOBALS['TL_JAVASCRIPT']['multicolumnwizard'] = $GLOBALS['TL_CONFIG']['debugMode']
+        ? 'bundles/multicolumnwizard/js/multicolumnwizard_be_src.js'
+        : 'bundles/multicolumnwizard/js/multicolumnwizard_be.js';
+
+    // Add the css.
+    $GLOBALS['TL_CSS']['multicolumnwizard'] = $GLOBALS['TL_CONFIG']['debugMode']
+        ? 'bundles/multicolumnwizard/css/multicolumnwizard_src.css'
+        : 'bundles/multicolumnwizard/css/multicolumnwizard.css';
 }
+
