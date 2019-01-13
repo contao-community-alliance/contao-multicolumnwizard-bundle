@@ -1260,16 +1260,25 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         if ($onlyRows == false) {
             $return .= '</tbody></table>';
-            $return .= '<script>
-        window.addEvent("load", function() {
-            window["MCW_" + ' . json_encode($this->strId) . '] = new MultiColumnWizard({
-                table: "ctrl_" + ' . json_encode($this->strId) . ',
-                maxCount: ' . intval($this->maxCount) . ',
-                minCount: ' . intval($this->minCount) . ',
-                uniqueFields: [] // TODO: implement
-            });
-        });
-        </script>';
+            $script = <<<SCRIPT
+<script>
+window.addEvent("domready", function() {
+    window["MCW_" + %s] = new MultiColumnWizard({
+        table: "ctrl_" + %s,
+        maxCount: %s,
+        minCount: %s,
+        uniqueFields: []
+    });
+});
+</script>
+SCRIPT;
+            $return .= sprintf(
+                $script,
+                json_encode($this->strId),
+                json_encode($this->strId),
+                intval($this->maxCount),
+                intval($this->minCount)
+            );
         } else {
             $return .= '</table>';
         }
@@ -1373,7 +1382,7 @@ class MultiColumnWizard extends Widget implements \uploadable
             $btnName = \sprintf('tw_r%s', StringUtil::specialchars($button));
             $return .=
                 \sprintf(
-                    '<a data-operations="%s" href="%s" class="widgetImage" title="%s">%s</a> ',
+                    '<a data-operations="%s" href="%s" class="widgetImage" title="%s" onclick="return false;">%s</a> ',
                     $button,
                     $this->addToUrl(
                         \sprintf(
