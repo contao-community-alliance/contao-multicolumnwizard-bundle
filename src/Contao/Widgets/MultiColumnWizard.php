@@ -34,7 +34,6 @@
  * @author     Stefan Lindecke <github.com@chektrion.de>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Tristan Lins <tristan.lins@bit3.de>
- * @author     unknown <David.Maack@pc024.men-at-work.de>
  * @author     w3scout <info@w3scouts.com>
  * @author     Yanick Witschi <yanick.witschi@terminal42.ch>
  * @copyright  2011 Andreas Schempp
