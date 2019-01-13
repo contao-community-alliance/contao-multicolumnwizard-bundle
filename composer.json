@@ -58,7 +58,6 @@
     "contao/core-bundle": "^4.4.8"
   },
   "require-dev": {
-    "cyberspectrum/contao-toolbox": "~0.7",
     "phpcq/all-tasks": "~1.2",
     "contao/manager-bundle": "~4.4"
   },
