@@ -41,7 +41,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
     {
         trigger_error(
             sprintf(
-                'Use of deprecated class %s. Use instead %s',
+                'Use of deprecated class "%s". Use instead "%s"',
                 __CLASS__,
                 BundleMultiColumnWizardHelper::class
             ),
@@ -65,7 +65,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
         $serviceName = 'maw.mcw.events.listener.parse_template';
         trigger_error(
             sprintf(
-                'Use of deprecated function %s::%s. Use instead the service %s::%s',
+                'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
                 __CLASS__,
                 __FUNCTION__,
                 $serviceName,
@@ -93,7 +93,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
         $serviceName = 'maw.mcw.events.listener.load_data_container';
         trigger_error(
             sprintf(
-                'Use of deprecated function %s::%s. Use instead the service %s::%s',
+                'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
                 __CLASS__,
                 __FUNCTION__,
                 $serviceName,
@@ -119,7 +119,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
         $serviceName = 'maw.mcw.events.listener.initialize_system';
         trigger_error(
             sprintf(
-                'Use of deprecated function %s::%s. Use instead the service %s::%s',
+                'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
                 __CLASS__,
                 __FUNCTION__,
                 $serviceName,
@@ -137,18 +137,21 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      * Delegate execution of ajax post actions to the service.
      *
      * @param string        $action    The action to execute.
+     *
      * @param DataContainer $container The data container.
      *
      * @return void
      *
      * @deprecated Use the maw.mcw.events.listener.execute_post_actions
+     *
+     * @throws \Exception
      */
     public function executePostActions($action, DataContainer $container)
     {
         $serviceName = 'maw.mcw.events.listener.execute_post_actions';
         trigger_error(
             sprintf(
-                'Use of deprecated function %s::%s. Use instead the service %s::%s',
+                'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
                 __CLASS__,
                 __FUNCTION__,
                 $serviceName,
@@ -175,7 +178,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
     {
         trigger_error(
             sprintf(
-                'Use of deprecated function %s::%s. Use instead the service %s::%s',
+                'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
                 __CLASS__,
                 __FUNCTION__,
                 BundleMultiColumnWizardHelper::class,

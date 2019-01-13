@@ -39,7 +39,7 @@ class UpdateDataDefinition extends BundleUpdateDataDefinition
     {
         trigger_error(
             sprintf(
-                'Use of deprecated class %s. Use instead %s',
+                'Use of deprecated class "%s". Use instead "%s"',
                 __CLASS__,
                 BundleUpdateDataDefinition::class
             ),
