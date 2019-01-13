@@ -1,19 +1,23 @@
 <?php
 
 /**
- * This file is part of MultiColumnWizard.
+ * This file is part of menatwork/contao-multicolumnwizard-bundle.
+ *
+ * (c) 2012-2019 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  * This project is provided in good faith and hope to be usable by anyone.
  *
- * @package    MultiColumnWizard
+ * @package    menatwork/contao-multicolumnwizard-bundle
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
- * @copyright  Andreas Schempp 2011
- * @copyright  certo web & design GmbH 2011
- * @copyright  MEN AT WORK 2013
- * @license    LGPL
+ * @copyright  2011 Andreas Schempp
+ * @copyright  2011 certo web & design GmbH
+ * @copyright  2013-2019 MEN AT WORK
+ * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
+ * @filesource
  */
 
 namespace MenAtWork\MultiColumnWizardBundle\EventListener\Mcw;
@@ -29,7 +33,7 @@ class TinyMce
     /**
      * Listener for building the tiny mce.
      *
-     * @param GetTinyMceStringEvent $event
+     * @param GetTinyMceStringEvent $event The event.
      *
      * @return void
      */
@@ -44,16 +48,16 @@ class TinyMce
     /**
      * Generate the TinyMce Script.
      *
-     * @param GetTinyMceStringEvent $event
+     * @param GetTinyMceStringEvent $event The event.
      *
      * @return void
      */
     private function contao44x(GetTinyMceStringEvent $event)
     {
         // Get some vars.
-        $field = $event->getFieldConfiguration();
-        $table = $event->getTableName();
-        $id    = $event->getFieldId();
+        $field   = $event->getFieldConfiguration();
+        $table   = $event->getTableName();
+        $fieldId = $event->getFieldId();
 
         list ($file, $type) = explode('|', $field['eval']['rte'], 2);
 
@@ -70,10 +74,10 @@ class TinyMce
 
         /** @var BackendTemplate|object $objTemplate */
         $objTemplate                   = new BackendTemplate('be_' . $file);
-        $objTemplate->selector         = 'ctrl_' . $id;
+        $objTemplate->selector         = 'ctrl_' . $fieldId;
         $objTemplate->type             = $type;
         $objTemplate->fileBrowserTypes = $fileBrowserTypes;
-        $objTemplate->source           = $table . '.' . $id;
+        $objTemplate->source           = $table . '.' . $fieldId;
 
         // Deprecated since Contao 4.0, to be removed in Contao 5.0
         $objTemplate->language = \Backend::getTinyMceLanguage();

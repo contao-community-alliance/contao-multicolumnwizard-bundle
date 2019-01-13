@@ -76,7 +76,7 @@ $GLOBALS['TL_DCA']['tl_table']['fields']['anything'] = [
 ```
 
 
-### Usage with Drag and Drop
+### Disable Drag and Drop
 
 ```php
 <?php
@@ -86,8 +86,8 @@ $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
     'exclude'   => true,
     'inputType' => 'multiColumnWizard',
     'eval'      => [
-        // add this line for a new button
-        'dragAndDrop'  => true,
+        // add this line for use the up and down arrows
+        'dragAndDrop'  => false,
         'columnFields' => [
             'ts_client_browser' => [
                 'label'     => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_browser'],

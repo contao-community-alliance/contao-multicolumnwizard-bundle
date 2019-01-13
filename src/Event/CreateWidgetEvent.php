@@ -1,9 +1,23 @@
 <?php
+
 /**
- * Created by PhpStorm.
- * User: Stefan Heimes
- * Date: 02.12.2018
- * Time: 10:57
+ * This file is part of menatwork/contao-multicolumnwizard-bundle.
+ *
+ * (c) 2012-2019 MEN AT WORK.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * This project is provided in good faith and hope to be usable by anyone.
+ *
+ * @package    menatwork/contao-multicolumnwizard-bundle
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @copyright  2011 Andreas Schempp
+ * @copyright  2011 certo web & design GmbH
+ * @copyright  2013-2019 MEN AT WORK
+ * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
+ * @filesource
  */
 
 namespace MenAtWork\MultiColumnWizardBundle\Event;
@@ -14,8 +28,6 @@ use Symfony\Component\EventDispatcher\Event;
 
 /**
  * Class CreateWidgetEvent
- *
- * @package MenAtWork\MultiColumnWizardBundle\Event
  */
 class CreateWidgetEvent extends Event
 {
@@ -25,11 +37,15 @@ class CreateWidgetEvent extends Event
     const NAME = 'men-at-work.multi-column-wizard-bundle.create-widget';
 
     /**
+     * The data container.
+     *
      * @var DataContainer
      */
     private $dcDriver;
 
     /**
+     * The widget.
+     *
      * @var Widget
      */
     private $widget;
@@ -37,7 +53,7 @@ class CreateWidgetEvent extends Event
     /**
      * CreateNewRow constructor.
      *
-     * @param DataContainer $dcDriver
+     * @param DataContainer $dcDriver The data container.
      */
     public function __construct($dcDriver)
     {
@@ -45,6 +61,8 @@ class CreateWidgetEvent extends Event
     }
 
     /**
+     * Get the data container.
+     *
      * @return DataContainer
      */
     public function getDcDriver()
@@ -53,6 +71,8 @@ class CreateWidgetEvent extends Event
     }
 
     /**
+     * Get the widget.
+     *
      * @return Widget
      */
     public function getWidget()
@@ -61,9 +81,11 @@ class CreateWidgetEvent extends Event
     }
 
     /**
-     * @param Widget $widget
+     * Set the widget.
      *
-     * @return CreateWidget
+     * @param Widget $widget The widget to use.
+     *
+     * @return self
      */
     public function setWidget($widget)
     {
