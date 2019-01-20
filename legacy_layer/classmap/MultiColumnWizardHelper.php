@@ -62,7 +62,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      */
     public function addScriptsAndStyles(Template $objTemplate)
     {
-        $serviceName = 'maw.mcw.events.listener.parse_template';
+        $serviceName = 'menatwork.multicolumnwizard-bundle.events_listener.parse_template';
         trigger_error(
             sprintf(
                 'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
@@ -90,7 +90,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      */
     public function supportModalSelector($strTable)
     {
-        $serviceName = 'maw.mcw.events.listener.load_data_container';
+        $serviceName = 'menatwork.multicolumnwizard-bundle.events_listener.load_data_container';
         trigger_error(
             sprintf(
                 'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
@@ -116,7 +116,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      */
     public function changeAjaxPostActions()
     {
-        $serviceName = 'maw.mcw.events.listener.initialize_system';
+        $serviceName = 'menatwork.multicolumnwizard-bundle.events_listener.initialize_system';
         trigger_error(
             sprintf(
                 'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
@@ -148,7 +148,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      */
     public function executePostActions($action, DataContainer $container)
     {
-        $serviceName = 'maw.mcw.events.listener.execute_post_actions';
+        $serviceName = 'menatwork.multicolumnwizard-bundle.events_listener.execute_post_actions';
         trigger_error(
             sprintf(
                 'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
