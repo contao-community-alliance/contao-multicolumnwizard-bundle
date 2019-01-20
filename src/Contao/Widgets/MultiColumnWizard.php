@@ -998,6 +998,12 @@ class MultiColumnWizard extends Widget implements \uploadable
             $varValue = $objDate->tstamp;
         }
 
+        // Set the translation
+        if (!isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey]['label'])) {
+            $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey]['label'] = $arrField['label'];
+        }
+
+        // Setup the settings.
         $arrField['activeRow']         = $intRow;
         $arrField['name']              = $this->strName . '[' . $intRow . '][' . $strKey . ']';
         $arrField['id']                = $this->strId . '_row' . $intRow . '_' . $strKey;
