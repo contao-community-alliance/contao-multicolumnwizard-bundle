@@ -176,17 +176,6 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      */
     public function mcwFilePicker(DataContainer $container)
     {
-        trigger_error(
-            sprintf(
-                'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
-                __CLASS__,
-                __FUNCTION__,
-                BundleMultiColumnWizardHelper::class,
-                __FUNCTION__
-            ),
-            E_USER_DEPRECATED
-        );
-
         return parent::mcwFilePicker($container);
     }
 }
