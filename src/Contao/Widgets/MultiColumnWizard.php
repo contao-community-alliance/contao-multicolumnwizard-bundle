@@ -55,6 +55,7 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetColorPickerStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetDatePickerStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
+use MenAtWork\MultiColumnWizardBundle\Event\GetDcaPickerWizardStringEvent;
 
 /**
  * Class MultiColumnWizard
@@ -413,6 +414,47 @@ class MultiColumnWizard extends Widget implements \uploadable
     }
 
     /**
+     * Trigger the event men-at-work.multi-column-wizard-bundle.get-dca-picker-wizard
+     *
+     * @param string $fieldId            The id of the field.
+     *
+     * @param string $fieldName          The name of the field.
+     *
+     * @param array  $fieldConfiguration The filed configuration.
+     *
+     * @param string $tableName          The name of the table.
+     *
+     * @return string
+     */
+    protected function getMcWDcaPickerWizard(
+        $fieldId,
+        $fieldName,
+        $fieldConfiguration = null,
+        $tableName = null
+    ) {
+        // Check if we have an configuration.
+        if (!isset($fieldConfiguration['eval']['dcaPicker'])
+            || (!\is_array($fieldConfiguration['eval']['dcaPicker'])
+                && !$fieldConfiguration['eval']['dcaPicker'] === true)) {
+            return '';
+        }
+
+        // Create a new event and dispatch it. Hope that someone have a good solution.
+        $event = new GetDcaPickerWizardStringEvent(
+            VERSION,
+            BUILD,
+            $fieldId,
+            $tableName,
+            $fieldConfiguration,
+            $fieldName
+        );
+        $this->eventDispatcher->dispatch($event::NAME, $event);
+
+        // Return the result.
+        return $event->getWizard();
+    }
+
+    /**
      * @param mixed $varInput
      *
      * @return array|mixed
@@ -750,6 +792,13 @@ class MultiColumnWizard extends Widget implements \uploadable
                     }
 
                     // Add custom wizard
+                    $additionalCode['dcaPicker'] = $this->getMcWDcaPickerWizard(
+                        $objWidget->id,
+                        $strKey,
+                        $arrField,
+                        $this->strTable
+                    );
+
                     if ($arrField['wizard']) {
                         $wizard = '';
 

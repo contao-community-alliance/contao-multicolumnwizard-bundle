@@ -37,6 +37,13 @@ services:
         event: men-at-work.multi-column-wizard-bundle.get-color-picker
         method: executeEvent
 
+  menatwork.multicolumnwizard-bundle.events_listener.build-dca-picker-wizard:
+    class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\DcaPickerWizard
+    tags:
+      - name: kernel.event_listener
+        event: men-at-work.multi-column-wizard-bundle.get-dca-picker-wizard
+        method: executeEvent
+
   menatwork.multicolumnwizard-bundle.events_listener.create-widget:
     class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\CreateWidget
     tags:
