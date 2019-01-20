@@ -30,7 +30,7 @@ class GetColorPickerStringEvent extends GetStringEvent
     /**
      * Name of the event.
      */
-    public const NAME = 'men-at-work.multi-column-wizard-bundle.get-color-picker';
+    const NAME = 'men-at-work.multi-column-wizard-bundle.get-color-picker';
 
     /**
      * The color picker.
