@@ -75,6 +75,7 @@ class ExecutePostActions extends BaseListener
      *
      * @throws ResponseException       For generating the output.
      * @throws BadRequestHttpException Will be thrown if the widget is not from type MCW or the field is unknown.
+     * @throws \Exception
      */
     public function handleRowCreation($action, $container)
     {
@@ -137,6 +138,7 @@ class ExecutePostActions extends BaseListener
      *
      * @throws BadRequestHttpException When The field does not exist in the DCA or the requested row could not be found.
      * @throws ResponseException       In all successful cases.
+     * @throws \Exception
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
