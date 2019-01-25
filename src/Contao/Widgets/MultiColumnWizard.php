@@ -419,6 +419,8 @@ class MultiColumnWizard extends Widget implements \uploadable
      */
     protected function validator($varInput)
     {
+        $varInput = (array) $varInput;
+        
         // The order of the data are in the right order. So just catch it and save it.
         $sortOrder = [];
         $sortId    = 0;
