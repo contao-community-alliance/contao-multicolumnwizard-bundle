@@ -232,7 +232,7 @@ class ExecutePostActions extends BaseListener
 
         // Set the new value
         $varValue = Input::post('value', true);
-        $strKey   = ($this->strAction == 'reloadPagetree') ? 'pageTree' : 'fileTree';
+        $strKey   = (($action == 'reloadPagetree_mcw') ? 'pageTree' : 'fileTree');
 
         // Convert the selected values
         if ($varValue != '') {
