@@ -307,8 +307,6 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Create a new event and dispatch it. Hope that someone have a good solution.
         $event = new GetTinyMceStringEvent(
-            VERSION,
-            BUILD,
             $fieldId,
             $tableName,
             $fieldConfiguration
@@ -362,8 +360,6 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Create a new event and dispatch it. Hope that someone have a good solution.
         $event = new GetDatePickerStringEvent(
-            VERSION,
-            BUILD,
             $fieldId,
             $tableName,
             $fieldConfiguration,
@@ -400,8 +396,6 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Create a new event and dispatch it. Hope that someone have a good solution.
         $event = new GetColorPickerStringEvent(
-            VERSION,
-            BUILD,
             $fieldId,
             $tableName,
             $fieldConfiguration,
@@ -441,8 +435,6 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Create a new event and dispatch it. Hope that someone have a good solution.
         $event = new GetDcaPickerWizardStringEvent(
-            VERSION,
-            BUILD,
             $fieldId,
             $tableName,
             $fieldConfiguration,

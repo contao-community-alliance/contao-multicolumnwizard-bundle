@@ -57,14 +57,12 @@ class GetDcaPickerWizardStringEvent extends GetStringEvent
      * @param string $fieldName          TODO: What is this?
      */
     public function __construct(
-        string $version,
-        string $build,
         string $fieldId,
         string $tableName,
         array $fieldConfiguration,
         string $fieldName
     ) {
-        parent::__construct($version, $build, $fieldId, $tableName, $fieldConfiguration);
+        parent::__construct($fieldId, $tableName, $fieldConfiguration);
 
         $this->fieldName = $fieldName;
     }

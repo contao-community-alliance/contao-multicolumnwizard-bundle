@@ -49,22 +49,21 @@ class GetColorPickerStringEvent extends GetStringEvent
     /**
      * GetDatePickerEvent constructor.
      *
-     * @param string $version            The version of Contao.
-     * @param string $build              The build of Contao.
      * @param string $fieldId            The field id.
+     *
      * @param string $tableName          The name of the table.
+     *
      * @param array  $fieldConfiguration The configuration of the field.
+     *
      * @param string $fieldName          TODO: What is this?
      */
     public function __construct(
-        string $version,
-        string $build,
         string $fieldId,
         string $tableName,
         array $fieldConfiguration,
         string $fieldName
     ) {
-        parent::__construct($version, $build, $fieldId, $tableName, $fieldConfiguration);
+        parent::__construct($fieldId, $tableName, $fieldConfiguration);
 
         $this->fieldName = $fieldName;
     }

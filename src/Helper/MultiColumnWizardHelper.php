@@ -92,8 +92,6 @@ class MultiColumnWizardHelper extends \Contao\System
             ]
         ];
         $event              = new GetDcaPickerWizardStringEvent(
-            VERSION,
-            BUILD,
             $container->inputName,
             $container->table,
             $fieldConfiguration,
