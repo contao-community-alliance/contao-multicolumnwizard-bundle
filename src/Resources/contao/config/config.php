@@ -29,25 +29,25 @@
 $GLOBALS['BE_FFL']['multiColumnWizard'] = '\MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard';
 
 $GLOBALS['TL_HOOKS']['loadDataContainer'][]  = array(
-    'menatwork.multicolumnwizard-bundle.events_listener.load_data_container',
+    'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\LoadDataContainer',
     'supportModalSelector'
 );
 $GLOBALS['TL_HOOKS']['initializeSystem'][]   = array(
-    'menatwork.multicolumnwizard-bundle.events_listener.initialize_system',
+    'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem',
     'changeAjaxPostActions'
 );
 $GLOBALS['TL_HOOKS']['executePostActions'][] = array(
-    'menatwork.multicolumnwizard-bundle.events_listener.execute_post_actions',
+    'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions',
     'executePostActions'
 );
 $GLOBALS['TL_HOOKS']['executePostActions'][] = array(
-    'menatwork.multicolumnwizard-bundle.events_listener.execute_post_actions',
+    'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions',
     'handleRowCreation'
 );
 
 if (TL_MODE == 'BE') {
     $GLOBALS['TL_HOOKS']['parseTemplate'][] = array(
-        'menatwork.multicolumnwizard-bundle.events_listener.parse_template',
+        'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ParseTemplate',
         'addVersion'
     );
 
