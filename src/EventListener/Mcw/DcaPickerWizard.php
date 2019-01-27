@@ -29,28 +29,13 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetDcaPickerWizardStringEvent;
 class DcaPickerWizard
 {
     /**
-     * Listener for building the tiny mce.
-     *
-     * @param GetDcaPickerWizardStringEvent $event The event.
-     *
-     * @return void
-     */
-    public function executeEvent(GetDcaPickerWizardStringEvent $event)
-    {
-        $version = $event->getVersion();
-        if (version_compare($version, '4.4', '>=')) {
-            $this->contao44x($event);
-        }
-    }
-
-    /**
      * Generate the TinyMce Script.
      *
      * @param GetDcaPickerWizardStringEvent $event The event.
      *
      * @return void
      */
-    private function contao44x(GetDcaPickerWizardStringEvent $event)
+    public function executeEvent(GetDcaPickerWizardStringEvent $event)
     {
         // Get some vars.
         $field     = $event->getFieldConfiguration();
