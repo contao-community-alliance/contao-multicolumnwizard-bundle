@@ -581,84 +581,11 @@ class MultiColumnWizard extends Widget implements \uploadable
         }
 
         $this->strCommand = 'cmd_' . $this->strField;
-
-        // Change the order
-        if (Input::get($this->strCommand) && is_numeric(Input::get('cid')) && Input::get('id') == $this->currentRecord) {
-            switch (Input::get($this->strCommand)) {
-                case 'copy':
-                    $this->varValue = array_duplicate($this->varValue, Input::get('cid'));
-                    break;
-
-                case 'up':
-                    $this->varValue = array_move_up($this->varValue, Input::get('cid'));
-                    break;
-
-                case 'down':
-                    $this->varValue = array_move_down($this->varValue, Input::get('cid'));
-                    break;
-
-                case 'delete':
-                    $this->varValue = array_delete($this->varValue, Input::get('cid'));
-                    break;
-            }
-
-            // Save in File
-            if ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'File') {
-                $this->Config->update(
-                    sprintf("\$GLOBALS['TL_CONFIG']['%s']", $this->strField),
-                    serialize($this->varValue)
-                );
-
-                // Reload the page
-                $this->redirect(preg_replace(
-                    '/&(amp;)?cid=[^&]*/i',
-                    '',
-                    preg_replace(
-                        '/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i',
-                        '',
-                        \Environment::get('request')
-                    )
-                ));
-            } // Save in table
-            elseif ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'Table') {
-                if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'])) {
-                    $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
-
-                    $dc               = new $dataContainer($this->strTable);
-                    $dc->field        = $this->strField;
-                    $dc->inputName    = $this->strField;
-                    $dc->strInputName = $this->strField;
-
-                    foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'] as $callback) {
-                        $this->import($callback[0]);
-                        $this->{$callback[0]}->{$callback[1]}(serialize($this->varValue), $dc);
-                    }
-                } else {
-                    $this->Database->prepare('UPDATE ' . $this->strTable . ' SET ' . $this->strField . '=? WHERE id=?')
-                                   ->execute(serialize($this->varValue), $this->currentRecord);
-                }
-
-                // Reload the page
-                $this->redirect(preg_replace(
-                    '/&(amp;)?cid=[^&]*/i',
-                    '',
-                    preg_replace(
-                        '/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i',
-                        '',
-                        \Environment::get('request')
-                    )
-                ));
-            } // Unknow
-            else {
-                // What to do here?
-            }
-        }
-
-        $arrUnique      = array();
-        $arrDatepicker  = array();
-        $arrColorpicker = array();
-        $arrTinyMCE     = array();
-        $arrHeaderItems = array();
+        $arrUnique        = array();
+        $arrDatepicker    = array();
+        $arrColorpicker   = array();
+        $arrTinyMCE       = array();
+        $arrHeaderItems   = array();
 
         foreach ($this->columnFields as $strKey => $arrField) {
             $fullName = $this->strName . '__' . $strKey;
