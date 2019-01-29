@@ -22,6 +22,10 @@
 
 use Contao\DataContainer;
 use Contao\Template;
+use MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions;
+use MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem;
+use MenAtWork\MultiColumnWizardBundle\EventListener\Contao\LoadDataContainer;
+use MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ParseTemplate;
 use MenAtWork\MultiColumnWizardBundle\Helper\MultiColumnWizardHelper as BundleMultiColumnWizardHelper;
 
 /**
@@ -58,11 +62,11 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      *
      * @return void
      *
-     * @deprecated Use the service maw.mcw.events.listener.parse_template
+     * @deprecated Use the service MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ParseTemplate
      */
     public function addScriptsAndStyles(Template $objTemplate)
     {
-        $serviceName = 'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ParseTemplate';
+        $serviceName = ParseTemplate::class;
         trigger_error(
             sprintf(
                 'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
@@ -86,11 +90,11 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      *
      * @return void
      *
-     * @deprecated Use the service maw.mcw.events.listener.load_data_container
+     * @deprecated Use the service MenAtWork\MultiColumnWizardBundle\EventListener\Contao\LoadDataContainer
      */
     public function supportModalSelector($strTable)
     {
-        $serviceName = 'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\LoadDataContainer';
+        $serviceName = LoadDataContainer::class;
         trigger_error(
             sprintf(
                 'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
@@ -112,11 +116,11 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      *
      * @return void
      *
-     * @deprecated Use the maw.mcw.events.listener.initialize_system
+     * @deprecated Use the service MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem
      */
     public function changeAjaxPostActions()
     {
-        $serviceName = 'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem';
+        $serviceName = InitializeSystem::class;
         trigger_error(
             sprintf(
                 'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
@@ -142,13 +146,13 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
      *
      * @return void
      *
-     * @deprecated Use the maw.mcw.events.listener.execute_post_actions
+     * @deprecated Use the service MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions
      *
      * @throws \Exception
      */
     public function executePostActions($action, DataContainer $container)
     {
-        $serviceName = 'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions';
+        $serviceName = ExecutePostActions::class;
         trigger_error(
             sprintf(
                 'Use of deprecated function "%s::%s". Use instead the service "%s::%s"',
