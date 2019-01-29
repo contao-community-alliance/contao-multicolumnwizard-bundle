@@ -38,9 +38,9 @@ class DcaPickerWizard
     public function executeEvent(GetDcaPickerWizardStringEvent $event)
     {
         // Get some vars.
-        $field     = $event->getFieldConfiguration();
-        $table     = $event->getTableName();
-        $fieldId   = $event->getFieldId();
+        $field   = $event->getFieldConfiguration();
+        $table   = $event->getTableName();
+        $fieldId = $event->getFieldId();
 
         // Set the translation.
         if (!isset($GLOBALS['TL_DCA'][$table]['fields'][$fieldId]['label'])) {

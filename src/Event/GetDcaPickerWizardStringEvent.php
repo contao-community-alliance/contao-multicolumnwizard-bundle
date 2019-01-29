@@ -11,7 +11,6 @@
  * This project is provided in good faith and hope to be usable by anyone.
  *
  * @package    menatwork/contao-multicolumnwizard-bundle
- * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
@@ -49,12 +48,13 @@ class GetDcaPickerWizardStringEvent extends GetStringEvent
     /**
      * GetDatePickerEvent constructor.
      *
-     * @param string $version            The version of Contao.
-     * @param string $build              The build of Contao.
      * @param string $fieldId            The field id.
+     *
      * @param string $tableName          The name of the table.
+     *
      * @param array  $fieldConfiguration The configuration of the field.
-     * @param string $fieldName          TODO: What is this?
+     *
+     * @param string $fieldName          The name of the field.
      */
     public function __construct(
         string $fieldId,

@@ -62,7 +62,7 @@ class GetDatePickerStringEvent extends GetStringEvent
      *
      * @param array  $fieldConfiguration The configuration of the field.
      *
-     * @param string $fieldName          TODO: What is this?
+     * @param string $fieldName          The name of the field.
      *
      * @param string $rgxp               The rgxp for the date.
      */
