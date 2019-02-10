@@ -132,6 +132,7 @@ class ExecutePostActions extends BaseListener
      * Try to rewrite the reload event. We have a tiny huge problem with the field names of the mcw and contao.
      *
      * @param string        $action    The action to execute.
+     *
      * @param DataContainer $container The data container.
      *
      * @return void
@@ -171,30 +172,13 @@ class ExecutePostActions extends BaseListener
 
         $container->field = $mcwFieldName;
 
-        // Add the sub configuration into the DCA. We need this for contao. Without it is not possible
-        // to get the data for the picker.
-        if ($GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard') {
-            $GLOBALS['TL_DCA'][$container->table]['fields'][$container->field] =
-                $GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
-
-            $GLOBALS['TL_DCA'][$container->table]['fields'][$strField] =
-                $GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
-        }
-
-        // The field does not exist
-        if (!isset($GLOBALS['TL_DCA'][$container->table]['fields'][$strField])) {
-            System::log(
-                'Field "' . $strField . '" does not exist in DCA "' . $container->table . '"',
-                __METHOD__,
-                TL_ERROR
-            );
-            throw new BadRequestHttpException('Bad request');
-        }
-
-        $objRow   = null;
-        $varValue = null;
+        $this->injectDcaConfiguration($container, $mcwBaseName, $mcwSupFieldName, $strField);
 
         // Load the value
+        $strKey   = (($action == 'reloadPagetree_mcw') ? 'pageTree' : 'fileTree');
+        $varValue = Input::post('value', true);
+        $objRow   = null;
+
         if (Input::get('act') != 'overrideAll') {
             if ($GLOBALS['TL_DCA'][$container->table]['config']['dataContainer'] == 'File') {
                 $varValue = Config::get($strField);
@@ -218,44 +202,11 @@ class ExecutePostActions extends BaseListener
             }
         }
 
-        // Call the load_callback
-        if (\is_array($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]['load_callback'])) {
-            foreach ($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]['load_callback'] as $callback) {
-                if (\is_array($callback)) {
-                    $this->import($callback[0]);
-                    $varValue = $this->{$callback[0]}->{$callback[1]}($varValue, $container);
-                } elseif (\is_callable($callback)) {
-                    $varValue = $callback($varValue, $container);
-                }
-            }
-        }
-
-        // Set the new value
-        $varValue = Input::post('value', true);
-        $strKey   = (($action == 'reloadPagetree_mcw') ? 'pageTree' : 'fileTree');
+        $varValue = $this->executeCallback($container, $strField, $varValue);
 
         // Convert the selected values
         if ($varValue != '') {
-            $varValue = StringUtil::trimsplit("\t", $varValue);
-
-            // Automatically add resources to the DBAFS
-            if ($strKey == 'fileTree') {
-                foreach ($varValue as $k => $v) {
-                    $v = rawurldecode($v);
-
-                    if (Dbafs::shouldBeSynchronized($v)) {
-                        $objFile = FilesModel::findByPath($v);
-
-                        if ($objFile === null) {
-                            $objFile = Dbafs::addResource($v);
-                        }
-
-                        $varValue[$k] = $objFile->uuid;
-                    }
-                }
-            }
-
-            $varValue = serialize($varValue);
+            $varValue = $this->updateDbafs($varValue, $strKey);
         }
 
         /** @var FileTree|PageTree $strClass */
@@ -279,5 +230,124 @@ class ExecutePostActions extends BaseListener
         $objWidget = new $strClass($fieldAttributes);
 
         throw new ResponseException($this->convertToResponse($objWidget->generate()));
+    }
+
+    /**
+     * Add the sub configuration into the DCA. We need this for contao.
+     * Without it is not possible to get the data for the picker.
+     *
+     * @param \Contao\DataContainer $container       The current container.
+     *
+     * @param string                $mcwBaseName     The basic name of the mcw. In the root of fields.
+     *
+     * @param string                $mcwSupFieldName The name of the internal field configuration.
+     *
+     * @param string                $strField        The target name of the field in the root of field definition.
+     *
+     * @throws BadRequestHttpException If the config was not found.
+     *
+     * @return void
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
+     */
+    protected function injectDcaConfiguration(
+        DataContainer $container,
+        $mcwBaseName,
+        $mcwSupFieldName,
+        $strField
+    ) {
+        if ($GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard') {
+            $GLOBALS['TL_DCA'][$container->table]['fields'][$container->field] =
+                $GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
+
+            $GLOBALS['TL_DCA'][$container->table]['fields'][$strField] =
+                $GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
+        }
+
+        // The field does not exist
+        if (!isset($GLOBALS['TL_DCA'][$container->table]['fields'][$strField])) {
+            System::log(
+                'Field "' . $strField . '" does not exist in DCA "' . $container->table . '"',
+                __METHOD__,
+                TL_ERROR
+            );
+            throw new BadRequestHttpException('Bad request');
+        }
+    }
+
+    /**
+     * Call the load_callback
+     *
+     * @param \Contao\DataContainer $container The current container.
+     *
+     * @param string                $strField  Name of the field.
+     *
+     * @param mixed                 $varValue  The current value.
+     *
+     * @return mixed
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CamelCaseVariableName)
+     */
+    protected function executeCallback(DataContainer $container, $strField, $varValue)
+    {
+        if (\is_array($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]['load_callback'])) {
+            foreach ($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]['load_callback'] as $callback) {
+                if (\is_array($callback)) {
+                    $this->import($callback[0]);
+                    $varValue = $this->{$callback[0]}->{$callback[1]}($varValue, $container);
+                } elseif (\is_callable($callback)) {
+                    $varValue = $callback($varValue, $container);
+                }
+            }
+        }
+
+        return $varValue;
+    }
+
+    /**
+     * Automatically add resources to the DBAFS
+     *
+     * @param string $varValue The values.
+     *
+     * @param string $strKey   The current mode.
+     *
+     * @throws BadRequestHttpException If one of the files could not be added.
+     *
+     * @return array|string
+     */
+    protected function updateDbafs($varValue, $strKey)
+    {
+        if ($strKey != 'fileTree') {
+            return $varValue;
+        }
+
+        try {
+            $varValueSplit = StringUtil::trimsplit("\t", $varValue);
+            foreach ($varValueSplit as $k => $v) {
+                $v = rawurldecode($v);
+
+                // Check if we are allowed to add files from here.
+                if (!Dbafs::shouldBeSynchronized($v)) {
+                    continue;
+                }
+
+                // Check if we know this one already, if not add.
+                $objFile = FilesModel::findByPath($v);
+                if ($objFile === null) {
+                    $objFile = Dbafs::addResource($v);
+                }
+
+                // Rewrite the data.
+                $varValue[$k] = $objFile->uuid;
+            }
+
+            $varValue = serialize($varValue);
+        } catch (\Exception $e) {
+            throw new BadRequestHttpException('Bad request');
+        }
+
+        return $varValue;
     }
 }
