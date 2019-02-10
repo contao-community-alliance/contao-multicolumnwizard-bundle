@@ -45,21 +45,6 @@ class DatePicker
     }
 
     /**
-     * Listener for building the tiny mce.
-     *
-     * @param GetDatePickerStringEvent $event The event.
-     *
-     * @return void
-     */
-    public function executeEvent(GetDatePickerStringEvent $event)
-    {
-        $version = $event->getVersion();
-        if (version_compare($version, '4.4', '>=')) {
-            $this->contao44x($event);
-        }
-    }
-
-    /**
      * Generate the date picker Script.
      *
      * @param GetDatePickerStringEvent $event The event.
@@ -69,7 +54,7 @@ class DatePicker
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
-    private function contao44x(GetDatePickerStringEvent $event)
+    public function executeEvent(GetDatePickerStringEvent $event)
     {
         // Get some vars.
         $fieldConfiguration = $event->getFieldConfiguration();

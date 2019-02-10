@@ -55,6 +55,7 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetColorPickerStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetDatePickerStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
+use MenAtWork\MultiColumnWizardBundle\Event\GetDcaPickerWizardStringEvent;
 
 /**
  * Class MultiColumnWizard
@@ -306,8 +307,6 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Create a new event and dispatch it. Hope that someone have a good solution.
         $event = new GetTinyMceStringEvent(
-            VERSION,
-            BUILD,
             $fieldId,
             $tableName,
             $fieldConfiguration
@@ -361,8 +360,6 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Create a new event and dispatch it. Hope that someone have a good solution.
         $event = new GetDatePickerStringEvent(
-            VERSION,
-            BUILD,
             $fieldId,
             $tableName,
             $fieldConfiguration,
@@ -399,8 +396,6 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Create a new event and dispatch it. Hope that someone have a good solution.
         $event = new GetColorPickerStringEvent(
-            VERSION,
-            BUILD,
             $fieldId,
             $tableName,
             $fieldConfiguration,
@@ -413,12 +408,54 @@ class MultiColumnWizard extends Widget implements \uploadable
     }
 
     /**
+     * Trigger the event men-at-work.multi-column-wizard-bundle.get-dca-picker-wizard
+     *
+     * @param string $fieldId            The id of the field.
+     *
+     * @param string $fieldName          The name of the field.
+     *
+     * @param array  $fieldConfiguration The filed configuration.
+     *
+     * @param string $tableName          The name of the table.
+     *
+     * @return string
+     */
+    protected function getMcWDcaPickerWizard(
+        $fieldId,
+        $fieldName,
+        $fieldConfiguration = null,
+        $tableName = null
+    ) {
+        // Check if we have an configuration.
+        if (!isset($fieldConfiguration['eval']['dcaPicker'])
+            || (!\is_array($fieldConfiguration['eval']['dcaPicker'])
+                && !$fieldConfiguration['eval']['dcaPicker'] === true)) {
+            return '';
+        }
+
+        // Create a new event and dispatch it. Hope that someone have a good solution.
+        $event = new GetDcaPickerWizardStringEvent(
+            $fieldId,
+            $tableName,
+            $fieldConfiguration,
+            $fieldName
+        );
+        $this->eventDispatcher->dispatch($event::NAME, $event);
+
+        // Return the result.
+        return $event->getWizard();
+    }
+
+    /**
      * @param mixed $varInput
      *
      * @return array|mixed
      */
     protected function validator($varInput)
     {
+        // Cast all to an array. This should prevent us for some errors. See #35
+        $varInput = (array) $varInput;
+
         // The order of the data are in the right order. So just catch it and save it.
         $sortOrder = [];
         $sortId    = 0;
@@ -544,84 +581,11 @@ class MultiColumnWizard extends Widget implements \uploadable
         }
 
         $this->strCommand = 'cmd_' . $this->strField;
-
-        // Change the order
-        if (Input::get($this->strCommand) && is_numeric(Input::get('cid')) && Input::get('id') == $this->currentRecord) {
-            switch (Input::get($this->strCommand)) {
-                case 'copy':
-                    $this->varValue = array_duplicate($this->varValue, Input::get('cid'));
-                    break;
-
-                case 'up':
-                    $this->varValue = array_move_up($this->varValue, Input::get('cid'));
-                    break;
-
-                case 'down':
-                    $this->varValue = array_move_down($this->varValue, Input::get('cid'));
-                    break;
-
-                case 'delete':
-                    $this->varValue = array_delete($this->varValue, Input::get('cid'));
-                    break;
-            }
-
-            // Save in File
-            if ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'File') {
-                $this->Config->update(
-                    sprintf("\$GLOBALS['TL_CONFIG']['%s']", $this->strField),
-                    serialize($this->varValue)
-                );
-
-                // Reload the page
-                $this->redirect(preg_replace(
-                    '/&(amp;)?cid=[^&]*/i',
-                    '',
-                    preg_replace(
-                        '/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i',
-                        '',
-                        \Environment::get('request')
-                    )
-                ));
-            } // Save in table
-            elseif ($GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] == 'Table') {
-                if (is_array($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'])) {
-                    $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
-
-                    $dc               = new $dataContainer($this->strTable);
-                    $dc->field        = $this->strField;
-                    $dc->inputName    = $this->strField;
-                    $dc->strInputName = $this->strField;
-
-                    foreach ($GLOBALS['TL_DCA'][$this->strTable]['fields'][$this->strField]['save_callback'] as $callback) {
-                        $this->import($callback[0]);
-                        $this->{$callback[0]}->{$callback[1]}(serialize($this->varValue), $dc);
-                    }
-                } else {
-                    $this->Database->prepare('UPDATE ' . $this->strTable . ' SET ' . $this->strField . '=? WHERE id=?')
-                                   ->execute(serialize($this->varValue), $this->currentRecord);
-                }
-
-                // Reload the page
-                $this->redirect(preg_replace(
-                    '/&(amp;)?cid=[^&]*/i',
-                    '',
-                    preg_replace(
-                        '/&(amp;)?' . preg_quote($this->strCommand, '/') . '=[^&]*/i',
-                        '',
-                        \Environment::get('request')
-                    )
-                ));
-            } // Unknow
-            else {
-                // What to do here?
-            }
-        }
-
-        $arrUnique      = array();
-        $arrDatepicker  = array();
-        $arrColorpicker = array();
-        $arrTinyMCE     = array();
-        $arrHeaderItems = array();
+        $arrUnique        = array();
+        $arrDatepicker    = array();
+        $arrColorpicker   = array();
+        $arrTinyMCE       = array();
+        $arrHeaderItems   = array();
 
         foreach ($this->columnFields as $strKey => $arrField) {
             $fullName = $this->strName . '__' . $strKey;
@@ -750,6 +714,13 @@ class MultiColumnWizard extends Widget implements \uploadable
                     }
 
                     // Add custom wizard
+                    $additionalCode['dcaPicker'] = $this->getMcWDcaPickerWizard(
+                        $objWidget->id,
+                        $strKey,
+                        $arrField,
+                        $this->strTable
+                    );
+
                     if ($arrField['wizard']) {
                         $wizard = '';
 
@@ -998,6 +969,12 @@ class MultiColumnWizard extends Widget implements \uploadable
             $varValue = $objDate->tstamp;
         }
 
+        // Set the translation
+        if (!isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey]['label'])) {
+            $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey]['label'] = $arrField['label'];
+        }
+
+        // Setup the settings.
         $arrField['activeRow']         = $intRow;
         $arrField['name']              = $this->strName . '[' . $intRow . '][' . $strKey . ']';
         $arrField['id']                = $this->strId . '_row' . $intRow . '_' . $strKey;

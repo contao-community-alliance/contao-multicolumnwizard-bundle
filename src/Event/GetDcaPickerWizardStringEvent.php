@@ -11,7 +11,6 @@
  * This project is provided in good faith and hope to be usable by anyone.
  *
  * @package    menatwork/contao-multicolumnwizard-bundle
- * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
@@ -22,80 +21,83 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
-
 /**
- * This is the abstract base for events returning a string.
+ * Class GetColorPickerStringEvent
  */
-abstract class GetStringEvent extends Event
+class GetDcaPickerWizardStringEvent extends GetStringEvent
 {
     /**
-     * The field configuration.
-     *
-     * @var array
+     * Name of the event.
      */
-    private $fieldConfiguration;
+    const NAME = 'men-at-work.multi-column-wizard-bundle.get-dca-picker-wizard';
 
     /**
-     * The id of the field.
+     * The color picker.
      *
      * @var string
      */
-    private $fieldId;
+    private $wizard;
 
     /**
-     * The table name.
+     * The field name.
      *
      * @var string
      */
-    private $tableName;
+    private $fieldName;
 
     /**
-     * GetTinyMceEvent constructor.
+     * GetDatePickerEvent constructor.
      *
      * @param string $fieldId            The field id.
      *
      * @param string $tableName          The name of the table.
      *
      * @param array  $fieldConfiguration The configuration of the field.
+     *
+     * @param string $fieldName          The name of the field.
      */
     public function __construct(
         string $fieldId,
         string $tableName,
-        array $fieldConfiguration
+        array $fieldConfiguration,
+        string $fieldName
     ) {
-        $this->fieldId            = $fieldId;
-        $this->fieldConfiguration = $fieldConfiguration;
-        $this->tableName          = $tableName;
+        parent::__construct($fieldId, $tableName, $fieldConfiguration);
+
+        $this->fieldName = $fieldName;
     }
 
     /**
-     * The field id.
+     * The Wizard string.
+     *
+     * @param string $string The ColorPicker string.
+     *
+     * @return $this
+     */
+    public function setWizard($string)
+    {
+        $this->wizard = $string;
+
+        return $this;
+    }
+
+    /**
+     * Get the Wizard string.
      *
      * @return string
      */
-    public function getFieldId()
+    public function getWizard()
     {
-        return $this->fieldId;
+        return $this->wizard;
     }
 
     /**
-     * The configuration of the field.
-     *
-     * @return array
-     */
-    public function getFieldConfiguration()
-    {
-        return $this->fieldConfiguration;
-    }
-
-    /**
-     * Get the table name.
+     * Get the field name.
      *
      * @return string
      */
-    public function getTableName()
+    public function getFieldName(): string
     {
-        return $this->tableName;
+        return $this->fieldName;
     }
 }

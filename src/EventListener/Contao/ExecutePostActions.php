@@ -74,6 +74,7 @@ class ExecutePostActions extends BaseListener
      * @return void
      *
      * @throws ResponseException       For generating the output.
+     *
      * @throws BadRequestHttpException Will be thrown if the widget is not from type MCW or the field is unknown.
      */
     public function handleRowCreation($action, $container)
@@ -136,6 +137,7 @@ class ExecutePostActions extends BaseListener
      * @return void
      *
      * @throws BadRequestHttpException When The field does not exist in the DCA or the requested row could not be found.
+     *
      * @throws ResponseException       In all successful cases.
      *
      * @SuppressWarnings(PHPMD.Superglobals)
@@ -230,7 +232,7 @@ class ExecutePostActions extends BaseListener
 
         // Set the new value
         $varValue = Input::post('value', true);
-        $strKey   = ($this->strAction == 'reloadPagetree') ? 'pageTree' : 'fileTree';
+        $strKey   = (($action == 'reloadPagetree_mcw') ? 'pageTree' : 'fileTree');
 
         // Convert the selected values
         if ($varValue != '') {
