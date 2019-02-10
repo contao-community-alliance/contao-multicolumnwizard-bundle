@@ -34,6 +34,7 @@
 namespace MenAtWork\MultiColumnWizardBundle\Helper;
 
 use Contao\DataContainer;
+use MenAtWork\MultiColumnWizardBundle\Event\GetDcaPickerWizardStringEvent;
 
 /**
  * Class MultiColumnWizardHelper
@@ -62,19 +63,42 @@ class MultiColumnWizardHelper extends \Contao\System
      */
     public function mcwFilePicker(DataContainer $container)
     {
-        return ' <a href="contao/file.php?do=' . \Input::get('do') . '&amp;table=' . $container->table . '&amp;field='
-               . preg_replace('/_row[0-9]*_/i', '__', $container->field) . '&amp;value=' . $container->value . '" title="'
-               . specialchars(str_replace("'", "\\'", $GLOBALS['TL_LANG']['MSC']['filepicker']))
-               . '" onclick="Backend.getScrollOffset();Backend.openModalSelector({\'width\':765,\'title\':\''
-               . specialchars($GLOBALS['TL_LANG']['MOD']['files'][0]) . '\',\'url\':this.href,\'id\':\'' . $container->field
-               . '\',\'tag\':\'ctrl_' . $container->field
-               . ((\Input::get('act') == 'editAll') ? '_' . $container->id : '')
-               . '\',\'self\':this});return false">'
-               . \Image::getHtml(
-                   'pickfile.gif',
-                   $GLOBALS['TL_LANG']['MSC']['filepicker'],
-                   'style="vertical-align:top;cursor:pointer"'
-               )
-               . '</a>';
+        trigger_error(
+            sprintf(
+                'Use of deprecated function "%s::%s" or "%s::%s". Use instead the event "%s"',
+                'MultiColumnWizardHelper',
+                __FUNCTION__,
+                __CLASS__,
+                __FUNCTION__,
+                GetDcaPickerWizardStringEvent::NAME
+            ),
+            E_USER_DEPRECATED
+        );
+
+        // Create a new event and dispatch it. Hope that someone have a good solution.
+        $eventDispatcher    = \Contao\System::getContainer()->get('event_dispatcher');
+        $fieldConfiguration = [
+            'label'     => ['MCW - Picker', ''],
+            'exclude'   => true,
+            'inputType' => 'text',
+            'eval'      => [
+                'dcaPicker' => [
+                    'do'         => 'files',
+                    'context'    => 'file',
+                    'icon'       => 'pickfile.svg',
+                    'fieldType'  => 'checkbox',
+                    'filesOnly'  => true
+                ]
+            ]
+        ];
+        $event              = new GetDcaPickerWizardStringEvent(
+            $container->inputName,
+            $container->table,
+            $fieldConfiguration,
+            $container->inputName
+        );
+        $eventDispatcher->dispatch($event::NAME, $event);
+
+        return $event->getWizard();
     }
 }

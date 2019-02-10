@@ -30,7 +30,7 @@ class GetDatePickerStringEvent extends GetStringEvent
     /**
      * Name of the event.
      */
-    public const NAME = 'men-at-work.multi-column-wizard-bundle.get-date-picker';
+    const NAME = 'men-at-work.multi-column-wizard-bundle.get-date-picker';
 
     /**
      * The date picker string.
@@ -56,24 +56,24 @@ class GetDatePickerStringEvent extends GetStringEvent
     /**
      * GetDatePickerEvent constructor.
      *
-     * @param string $version            The version of Contao.
-     * @param string $build              The build of Contao.
      * @param string $fieldId            The field id.
+     *
      * @param string $tableName          The name of the table.
+     *
      * @param array  $fieldConfiguration The configuration of the field.
-     * @param string $fieldName          TODO: What is this?
+     *
+     * @param string $fieldName          The name of the field.
+     *
      * @param string $rgxp               The rgxp for the date.
      */
     public function __construct(
-        string $version,
-        string $build,
         string $fieldId,
         string $tableName,
         array $fieldConfiguration,
         string $fieldName,
         string $rgxp
     ) {
-        parent::__construct($version, $build, $fieldId, $tableName, $fieldConfiguration);
+        parent::__construct($fieldId, $tableName, $fieldConfiguration);
 
         $this->fieldName = $fieldName;
         $this->rgxp      = $rgxp;

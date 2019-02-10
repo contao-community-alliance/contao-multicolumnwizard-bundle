@@ -31,21 +31,6 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetColorPickerStringEvent;
 class ColorPicker
 {
     /**
-     * Listener for building the tiny mce.
-     *
-     * @param GetColorPickerStringEvent $event The event.
-     *
-     * @return void
-     */
-    public function executeEvent(GetColorPickerStringEvent $event)
-    {
-        $version = $event->getVersion();
-        if (version_compare($version, '4.4', '>=')) {
-            $this->contao44x($event);
-        }
-    }
-
-    /**
      * Generate the TinyMce Script.
      *
      * @param GetColorPickerStringEvent $event The event.
@@ -55,7 +40,7 @@ class ColorPicker
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
-    private function contao44x(GetColorPickerStringEvent $event)
+    public function executeEvent(GetColorPickerStringEvent $event)
     {
         // Get some vars.
         $fieldConfiguration = $event->getFieldConfiguration();

@@ -1,14 +1,12 @@
 services:
-  menatwork.multicolumnwizard-bundle.events_listener.build-data-definition:
-    class: MenAtWork\MultiColumnWizardBundle\EventListener\DcGeneral\UpdateDataDefinition
+  MenAtWork\MultiColumnWizardBundle\EventListener\DcGeneral\UpdateDataDefinition:
     tags:
       - name: kernel.event_listener
         event: dc-general.factory.build-data-definition
         method: addMcwFields
         priority: -5000
 
-  menatwork.multicolumnwizard-bundle.events_listener.get-options:
-    class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\GetOptionsBridge
+  MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\GetOptionsBridge:
     arguments:
       - '@event_dispatcher'
     tags:
@@ -16,29 +14,31 @@ services:
         event: men-at-work.multi-column-wizard-bundle.get-options
         method: executeEvent
 
-  menatwork.multicolumnwizard-bundle.events_listener.build-tiny-mce:
-    class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\TinyMce
+  MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\TinyMce:
     tags:
       - name: kernel.event_listener
         event: men-at-work.multi-column-wizard-bundle.get-tiny-mce
         method: executeEvent
 
-  menatwork.multicolumnwizard-bundle.events_listener.build-date-picker:
-    class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\DatePicker
+  MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\DatePicker:
     tags:
       - name: kernel.event_listener
         event: men-at-work.multi-column-wizard-bundle.get-date-picker
         method: executeEvent
 
-  menatwork.multicolumnwizard-bundle.events_listener.build-color-picker:
-    class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\ColorPicker
+  MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\ColorPicker:
     tags:
       - name: kernel.event_listener
         event: men-at-work.multi-column-wizard-bundle.get-color-picker
         method: executeEvent
 
-  menatwork.multicolumnwizard-bundle.events_listener.create-widget:
-    class: MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\CreateWidget
+  MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\DcaPickerWizard:
+    tags:
+      - name: kernel.event_listener
+        event: men-at-work.multi-column-wizard-bundle.get-dca-picker-wizard
+        method: executeEvent
+
+  MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\CreateWidget:
     tags:
       - name: kernel.event_listener
         event: men-at-work.multi-column-wizard-bundle.create-widget

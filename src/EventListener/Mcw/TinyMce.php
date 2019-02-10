@@ -31,28 +31,13 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
 class TinyMce
 {
     /**
-     * Listener for building the tiny mce.
-     *
-     * @param GetTinyMceStringEvent $event The event.
-     *
-     * @return void
-     */
-    public function executeEvent(GetTinyMceStringEvent $event)
-    {
-        $version = $event->getVersion();
-        if (version_compare($version, '4.4', '>=')) {
-            $this->contao44x($event);
-        }
-    }
-
-    /**
      * Generate the TinyMce Script.
      *
      * @param GetTinyMceStringEvent $event The event.
      *
      * @return void
      */
-    private function contao44x(GetTinyMceStringEvent $event)
+    public function executeEvent(GetTinyMceStringEvent $event)
     {
         // Get some vars.
         $field   = $event->getFieldConfiguration();
