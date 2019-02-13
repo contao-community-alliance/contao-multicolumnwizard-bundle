@@ -36,6 +36,7 @@
  * @author     Tristan Lins <tristan.lins@bit3.de>
  * @author     w3scout <info@w3scouts.com>
  * @author     Yanick Witschi <yanick.witschi@terminal42.ch>
+ * @author     Andreas Dziemba <adziemba@web.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2019 MEN AT WORK
@@ -445,6 +446,30 @@ class MultiColumnWizard extends Widget implements \uploadable
         // Return the result.
         return $event->getWizard();
     }
+    
+    /**
+     * Try to get the DC Drive.
+     * For the DCG we have to handel the HTTP_X_REQUESTED_WITH, to cancel an endless loop.
+     *
+     * @return mixed
+     */
+    public function getDcDriver()
+    {
+        $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
+
+        if ($dataContainer == \DC_General::class) {
+            $dcgXRequestTemp                  = $_SERVER['HTTP_X_REQUESTED_WITH'];
+            $_SERVER['HTTP_X_REQUESTED_WITH'] = null;
+        }
+
+        $dc = new $dataContainer($this->strTable);
+
+        if ($dataContainer == \DC_General::class) {
+            $_SERVER['HTTP_X_REQUESTED_WITH'] = $dcgXRequestTemp;
+        }
+
+        return $dc;
+    }
 
     /**
      * @param mixed $varInput
@@ -724,9 +749,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                     if ($arrField['wizard']) {
                         $wizard = '';
 
-                        $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
-
-                        $dc               = new $dataContainer($this->strTable);
+                        $dc               = $this->getDcDriver();
                         $dc->field        = $strKey;
                         $dc->inputName    = $objWidget->id;
                         $dc->strInputName = $objWidget->id;
