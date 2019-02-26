@@ -132,6 +132,7 @@ class ExecutePostActions extends BaseListener
      * Try to rewrite the reload event. We have a tiny huge problem with the field names of the mcw and contao.
      *
      * @param string        $action    The action to execute.
+
      * @param DataContainer $container The data container.
      *
      * @return void
@@ -139,6 +140,8 @@ class ExecutePostActions extends BaseListener
      * @throws BadRequestHttpException When The field does not exist in the DCA or the requested row could not be found.
      *
      * @throws ResponseException       In all successful cases.
+     *
+     * @throws \Exception              If something goes wrong with the dbafs.
      *
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
