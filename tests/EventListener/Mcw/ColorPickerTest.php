@@ -11,7 +11,6 @@
  * This project is provided in good faith and hope to be usable by anyone.
  *
  * @package    menatwork/contao-multicolumnwizard-bundle
- * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
