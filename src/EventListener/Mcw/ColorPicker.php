@@ -57,8 +57,11 @@ class ColorPicker
     /**
      * ColorPicker constructor.
      *
-     * @param Adapter|Image      $imageAdapter      Adapter to the image class.
-     * @param Adapter|StringUtil $stringUtilAdapter Adapter to the StringUtil class.
+     * @param Adapter|Image       $imageAdapter      Adapter to the image class.
+     *
+     * @param Adapter|StringUtil  $stringUtilAdapter Adapter to the StringUtil class.
+     *
+     * @param TranslatorInterface $translator        Translator class.
      */
     public function __construct($imageAdapter, $stringUtilAdapter, $translator)
     {

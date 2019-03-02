@@ -34,6 +34,8 @@ class DcaPickerWizard
      * @param GetDcaPickerWizardStringEvent $event The event.
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function executeEvent(GetDcaPickerWizardStringEvent $event)
     {

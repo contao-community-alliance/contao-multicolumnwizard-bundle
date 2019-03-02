@@ -132,7 +132,7 @@ class ExecutePostActions extends BaseListener
      * Try to rewrite the reload event. We have a tiny huge problem with the field names of the mcw and contao.
      *
      * @param string        $action    The action to execute.
-
+     *
      * @param DataContainer $container The data container.
      *
      * @return void
@@ -141,10 +141,11 @@ class ExecutePostActions extends BaseListener
      *
      * @throws ResponseException       In all successful cases.
      *
-     * @throws \Exception              If something goes wrong with the dbafs.
-     *
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function executePostActions($action, DataContainer $container)
     {

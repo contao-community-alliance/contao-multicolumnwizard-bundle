@@ -52,19 +52,29 @@ use Contao\Image;
 use Contao\Input;
 use Contao\StringUtil;
 use Contao\Widget;
+use ContaoCommunityAlliance\DcGeneral\EnvironmentInterface;
 use MenAtWork\MultiColumnWizardBundle\Event\GetColorPickerStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetDatePickerStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetDcaPickerWizardStringEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class MultiColumnWizard
+ *
+ * @property string columnTemplate The custom template.
+ * @property array  columnFields   List fo fields.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class MultiColumnWizard extends Widget implements \uploadable
 {
     /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     * The event Dispatcher.
+     *
+     * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
 
@@ -145,7 +155,7 @@ class MultiColumnWizard extends Widget implements \uploadable
     /**
      * Initialize the object
      *
-     * @param array
+     * @param bool $arrAttributes The attributes for the widget.
      */
     public function __construct($arrAttributes = false)
     {
@@ -163,11 +173,15 @@ class MultiColumnWizard extends Widget implements \uploadable
     /**
      * Add specific attributes
      *
-     * @param string $strKey
+     * @param string $strKey   The key to search for.
      *
-     * @param mixed  $varValue
+     * @param mixed  $varValue The value to set.
      *
-     * @throws \Exception
+     * @return void
+     *
+     * @throws \Exception Throws a exception if something went wrong.
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function __set($strKey, $varValue)
     {
@@ -378,6 +392,8 @@ class MultiColumnWizard extends Widget implements \uploadable
      *
      * @param string $fieldId            The id of the field.
      *
+     * @param string $fieldName          The name of the field.
+     *
      * @param array  $fieldConfiguration The filed configuration.
      *
      * @param string $tableName          The name of the table.
@@ -452,6 +468,8 @@ class MultiColumnWizard extends Widget implements \uploadable
      * For the DCG we have to handel the HTTP_X_REQUESTED_WITH, to cancel an endless loop.
      *
      * @return mixed
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function getDcDriver()
     {
@@ -462,19 +480,26 @@ class MultiColumnWizard extends Widget implements \uploadable
             $_SERVER['HTTP_X_REQUESTED_WITH'] = null;
         }
 
-        $dc = new $dataContainer($this->strTable);
+        $dcDriver = new $dataContainer($this->strTable);
 
         if ($dataContainer == \DC_General::class) {
             $_SERVER['HTTP_X_REQUESTED_WITH'] = $dcgXRequestTemp;
         }
 
-        return $dc;
+        return $dcDriver;
     }
 
     /**
-     * @param mixed $varInput
+     * Validate the data and rebuild the data.
      *
-     * @return array|mixed
+     * @param mixed $varInput The Input to check and manipulate.
+     *
+     * @return array The new array with the valid data.
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function validator($varInput)
     {
@@ -489,8 +514,9 @@ class MultiColumnWizard extends Widget implements \uploadable
             $sortId++;
         }
 
-        $blnHasError = false;
-        for ($i = 0; $i < count($varInput); $i++) {
+        $blnHasError   = false;
+        $varInputCount = count($varInput);
+        for ($i = 0; $i < $varInputCount; $i++) {
             $this->activeRow = $i;
 
             if (!$this->columnFields) {
@@ -517,7 +543,10 @@ class MultiColumnWizard extends Widget implements \uploadable
 
                 // Convert date formats into timestamps (check the eval setting first -> #3063)
                 $rgxp = $arrField['eval']['rgxp'];
-                if (!$objWidget->hasErrors() && ($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '') {
+                if (!$objWidget->hasErrors()
+                    && ($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim')
+                    && $varValue != ''
+                ) {
                     $objDate  = new Date($varValue, $this->getNumericDateFormat($rgxp));
                     $varValue = $objDate->tstamp;
                 }
@@ -595,11 +624,21 @@ class MultiColumnWizard extends Widget implements \uploadable
      *
      * @return string The HTML code of the widget.
      *
-     * @throws \Exception
+     * @throws \Exception If something went wrong.
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.Superglobals)
+     * @SuppressWarnings(PHPMD.ShortVariable)
      */
     public function generate($overwriteRowCurrentRow = null, $onlyRows = false)
     {
-        // load the callback data if there's any (do not do this in __set() already because then we don't have access to currentRecord)
+        /*
+         * Load the callback data if there's any
+         * (do not do this in __set() already because then we don't have access to currentRecord)
+         */
+
         if (is_array($this->arrCallback)) {
             $this->import($this->arrCallback[0]);
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
@@ -610,11 +649,8 @@ class MultiColumnWizard extends Widget implements \uploadable
         $arrDatepicker    = array();
         $arrColorpicker   = array();
         $arrTinyMCE       = array();
-        $arrHeaderItems   = array();
 
         foreach ($this->columnFields as $strKey => $arrField) {
-            $fullName = $this->strName . '__' . $strKey;
-
             // Store unique fields
             if ($arrField['eval']['unique']) {
                 $arrUnique[] = $strKey;
@@ -840,12 +876,20 @@ class MultiColumnWizard extends Widget implements \uploadable
      *
      * Based on DataContainer::row() from Contao 2.10.1
      *
-     * @param array
-     * @param int
-     * @param string
-     * @param mixed
+     * @param array  $arrField Field configuration.
      *
-     * @return Widget|null
+     * @param int    $intRow   Number of the current row.
+     *
+     * @param string $strKey   Key of the filed.
+     *
+     * @param mixed  $varValue The value of the field.
+     *
+     * @return Widget|null The widget or null.
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
     protected function initializeWidget(&$arrField, $intRow, $strKey, $varValue)
     {
@@ -862,24 +906,37 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // Toggle line wrap (textarea)
         if ($arrField['inputType'] == 'textarea' && $arrField['eval']['rte'] == '') {
-            $xlabel .= ' ' . Image::getHtml(
-                'wrap.gif',
-                $GLOBALS['TL_LANG']['MSC']['wordWrap'],
-                'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['wordWrap']) . '" class="toggleWrap" onclick="Backend.toggleWrap(\'ctrl_' . $this->strId . '_row' . $intRow . '_' . $strKey . '\');"'
-            );
+            $xlabel .= ' '
+                . Image::getHtml(
+                    'wrap.gif',
+                    $GLOBALS['TL_LANG']['MSC']['wordWrap'],
+                    'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['wordWrap'])
+                    . '" class="toggleWrap" onclick="Backend.toggleWrap(\'ctrl_'
+                    . $this->strId
+                    . '_row'
+                    . $intRow
+                    . '_'
+                    . $strKey
+                    . '\');"'
+                );
         }
 
         // Add the help wizard
         if ($arrField['eval']['helpwizard']) {
-            $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard']) . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\'' . StringUtil::specialchars(str_replace(
-                "'",
-                "\\'",
-                $arrField['label'][0]
-            )) . '\',\'url\':this.href});return false">' . \Image::getHtml(
-                'about.gif',
-                $GLOBALS['TL_LANG']['MSC']['helpWizard'],
-                'style="vertical-align:text-bottom"'
-            ) . '</a>';
+            $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField
+                . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard'])
+                . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\''
+                . StringUtil::specialchars(str_replace(
+                    "'",
+                    "\\'",
+                    $arrField['label'][0]
+                ))
+                . '\',\'url\':this.href});return false">'
+                . \Image::getHtml(
+                    'about.gif',
+                    $GLOBALS['TL_LANG']['MSC']['helpWizard'],
+                    'style="vertical-align:text-bottom"'
+                ) . '</a>';
         }
 
         // Add the popup file manager
@@ -890,39 +947,62 @@ class MultiColumnWizard extends Widget implements \uploadable
                 $path = '?node=' . $arrField['eval']['path'];
             }
 
-            $xlabel .= ' <a href="' . $strContaoPrefix . 'files.php' . $path . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['fileManager']) . '" data-lightbox="files 765 80%">' . Image::getHtml(
-                'filemanager.gif',
-                $GLOBALS['TL_LANG']['MSC']['fileManager'],
-                'style="vertical-align:text-bottom;"'
-            ) . '</a>';
-
+            $xlabel              .= ' <a href="'
+                . $strContaoPrefix . 'files.php' . $path
+                . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['fileManager'])
+                . '" data-lightbox="files 765 80%">'
+                . Image::getHtml(
+                    'filemanager.gif',
+                    $GLOBALS['TL_LANG']['MSC']['fileManager'],
+                    'style="vertical-align:text-bottom;"'
+                )
+                . '</a>';
             $arrField['strField'] = $this->strField . '__' . $strKey;
 
             // Add title at modal window.
-            $GLOBALS['TL_DCA'][$this->strTable]['fields'][$arrField['strField']]['label'][0] = (is_array($arrField['label']) && $arrField['label'][0] != '') ? $arrField['label'][0] : $strKey;
-        } // Add the table import wizard
-        elseif ($arrField['inputType'] == 'tableWizard') {
-            $xlabel .= ' <a href="' . $this->addToUrl('key=table') . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . Image::getHtml(
-                'tablewizard.gif',
-                $GLOBALS['TL_LANG']['MSC']['tw_import'][0],
-                'style="vertical-align:text-bottom;"'
-            ) . '</a>';
-            $xlabel .= ' ' . Image::getHtml(
-                'demagnify.gif',
-                '',
-                'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_shrink']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(0.9);"'
-            ) . Image::getHtml(
-                'magnify.gif',
-                '',
-                'title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_expand']) . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(1.1);"'
-            );
-        } // Add the list import wizard
-        elseif ($arrField['inputType'] == 'listWizard') {
-            $xlabel .= ' <a href="' . $this->addToUrl('key=list') . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['lw_import'][1]) . '" onclick="Backend.getScrollOffset();">' . Image::getHtml(
-                'tablewizard.gif',
-                $GLOBALS['TL_LANG']['MSC']['tw_import'][0],
-                'style="vertical-align:text-bottom;"'
-            ) . '</a>';
+            $GLOBALS['TL_DCA'][$this->strTable]['fields'][$arrField['strField']]['label'][0] =
+                (is_array($arrField['label']) && $arrField['label'][0] != '') ? $arrField['label'][0] : $strKey;
+        } elseif ($arrField['inputType'] == 'tableWizard') {
+            // Add the table import wizard
+            $xlabel .= ' <a href="'
+                . $this->addToUrl('key=table')
+                . '" title="'
+                . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_import'][1])
+                . '" onclick="Backend.getScrollOffset();">'
+                . Image::getHtml(
+                    'tablewizard.gif',
+                    $GLOBALS['TL_LANG']['MSC']['tw_import'][0],
+                    'style="vertical-align:text-bottom;"'
+                )
+                . '</a>';
+
+            $xlabel .= ' '
+                . Image::getHtml(
+                    'demagnify.gif',
+                    '',
+                    'title="'
+                    . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_shrink'])
+                    . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(0.9);"'
+                )
+                . Image::getHtml(
+                    'magnify.gif',
+                    '',
+                    'title="'
+                    . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_expand'])
+                    . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(1.1);"'
+                );
+        } elseif ($arrField['inputType'] == 'listWizard') {
+            // Add the list import wizard
+            $xlabel .= ' <a href="'
+                . $this->addToUrl('key=list')
+                . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['lw_import'][1])
+                . '" onclick="Backend.getScrollOffset();">'
+                . Image::getHtml(
+                    'tablewizard.gif',
+                    $GLOBALS['TL_LANG']['MSC']['tw_import'][0],
+                    'style="vertical-align:text-bottom;"'
+                )
+                . '</a>';
         }
 
         // Input field callback
@@ -966,7 +1046,9 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         // if we have a row class, add that one aswell.
         if (isset($arrField['eval']['rowClasses'][$intRow])) {
-            $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' ' . $arrField['eval']['rowClasses'][$intRow]);
+            $arrField['eval']['tl_class'] = trim(
+                $arrField['eval']['tl_class'] . ' ' . $arrField['eval']['rowClasses'][$intRow]
+            );
         }
 
         // load callback
@@ -1119,8 +1201,9 @@ class MultiColumnWizard extends Widget implements \uploadable
     /**
      * Check if DcGeneral version 2+ is calling us and if so, handle GetPropertyOptionsEvent accordingly.
      *
-     * @param array  $arrData The field configuration array
-     * @param string $strName The field name in the form
+     * @param array  $arrData The field configuration array.
+     *
+     * @param string $strName The field name in the form.
      *
      * @return array The processed field configuration array.
      */
@@ -1139,7 +1222,7 @@ class MultiColumnWizard extends Widget implements \uploadable
                 unset($arrData['options_callback']);
             }
 
-            // @var \ContaoCommunityAlliance\DcGeneral\EnvironmentInterface $environment
+            /** @var EnvironmentInterface $environment */
             $environment = $this->objDca->getEnvironment();
 
             $event = new GetOptionsEvent(
@@ -1163,9 +1246,13 @@ class MultiColumnWizard extends Widget implements \uploadable
     /**
      * Add specific field data to a certain field in a certain row
      *
-     * @param integer row index
-     * @param string field name
-     * @param array field data
+     * @param int    $intIndex Row index.
+     *
+     * @param string $strField Field name.
+     *
+     * @param array  $arrData  Field data.
+     *
+     * @return void
      */
     public function addDataToFieldAtIndex($intIndex, $strField, $arrData)
     {
@@ -1175,21 +1262,25 @@ class MultiColumnWizard extends Widget implements \uploadable
     /**
      * Generates a table formatted MCW
      *
-     * @param array  $arrUnique
+     * @param array  $arrUnique       The array of unique fields.
      *
-     * @param array  $arrDatepicker
+     * @param array  $arrDatepicker   Datapicker information.
      *
-     * @param array  $arrColorpicker
+     * @param array  $arrColorpicker  Colorpicker information.
      *
-     * @param string $strHidden
+     * @param string $strHidden       Hidden information.
      *
-     * @param array  $arrItems
+     * @param array  $arrItems        List of items.
      *
-     * @param array  $arrHiddenHeader
+     * @param array  $arrHiddenHeader List of hidden headers.
      *
-     * @param bool   $onlyRows
+     * @param bool   $onlyRows        Flag if the only want some rows.
      *
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function generateTable(
         $arrUnique,
@@ -1212,8 +1303,22 @@ class MultiColumnWizard extends Widget implements \uploadable
                     $strHeaderItem = '<th>';
 
                     $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="invisible">' : '';
-                    $strHeaderItem .= (is_array($arrField['label'])) ? $arrField['label'][0] : ($arrField['label'] != null ? $arrField['label'] : $strKey);
-                    $strHeaderItem .= ((is_array($arrField['label']) && $arrField['label'][1] != '') ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>' : '');
+                    $strHeaderItem .=
+                    (
+                        (is_array($arrField['label']))
+                            ? $arrField['label'][0]
+                            : (
+                                ($arrField['label'] != null)
+                                    ? $arrField['label']
+                                    : $strKey
+                              )
+                    );
+                    $strHeaderItem .=
+                    (
+                        (is_array($arrField['label']) && $arrField['label'][1] != '')
+                            ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>'
+                            : ''
+                    );
                     $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
 
                     $arrHeaderItems[] = $strHeaderItem . '</th>';
@@ -1221,7 +1326,12 @@ class MultiColumnWizard extends Widget implements \uploadable
             }
 
             $return = \sprintf(
-                '<table %s data-operations="maxCount[%s] minCount[%s] unique[%s] datepicker[%s] colorpicker[%s]" data-name="%s" id="ctrl_%s" class="tl_modulewizard multicolumnwizard">',
+                '<table %s' .
+                ' data-operations="maxCount[%s] minCount[%s] unique[%s] datepicker[%s]' .
+                ' colorpicker[%s]"' .
+                ' data-name="%s"' .
+                ' id="ctrl_%s"' .
+                ' class="tl_modulewizard multicolumnwizard">',
                 (($this->style) ? (\sprintf('style="%s"', $this->style)) : ('')),
                 ($this->maxCount ? $this->maxCount : '0'),
                 ($this->minCount ? $this->minCount : '0'),
@@ -1243,16 +1353,24 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         foreach ($arrItems as $k => $arrValue) {
             $return .= \sprintf('<tr data-rowId="%s">', $k);
-            foreach ($arrValue as $itemKey => $itemValue) {
+            foreach ($arrValue as $itemValue) {
                 if ($itemValue['hide'] == true) {
                     $itemValue['tl_class'] .= ' invisible';
                 }
 
-                $return .= '<td' . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '') . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</td>';
+                $return .= '<td'
+                    . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '')
+                    . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '')
+                    . '>'
+                    . $itemValue['entry']
+                    . '</td>';
             }
 
             // insert buttons at the very end
-            $return .= '<td class="operations col_last"' . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '') . '>' . $strHidden;
+            $return .= '<td class="operations col_last"'
+                . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '')
+                . '>'
+                . $strHidden;
             $return .= $this->generateButtonString($k);
             $return .= '</td>';
             $return .= '</tr>';
@@ -1260,7 +1378,7 @@ class MultiColumnWizard extends Widget implements \uploadable
 
         if ($onlyRows == false) {
             $return .= '</tbody></table>';
-            $script = <<<SCRIPT
+            $script  = <<<SCRIPT
 <script>
 window.addEvent("domready", function() {
     window["MCW_" + %s] = new MultiColumnWizard({
@@ -1286,13 +1404,30 @@ SCRIPT;
         return $return;
     }
 
+    /**
+     * Generates a formatted MCW based on an template.
+     *
+     * @param array  $arrUnique      The array of unique fields.
+     *
+     * @param array  $arrDatepicker  Datapicker information.
+     *
+     * @param array  $arrColorpicker Colorpicker information.
+     *
+     * @param string $strHidden      Hidden information.
+     *
+     * @param array  $arrItems       List of items.
+     *
+     * @return string
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     protected function generateTemplateOutput($arrUnique, $arrDatepicker, $arrColorpicker, $strHidden, $arrItems)
     {
         $objTemplate        = new BackendTemplate($this->columnTemplate);
         $objTemplate->items = $arrItems;
 
         $arrButtons = array();
-        foreach ($arrItems as $k => $arrValue) {
+        foreach (array_keys($arrItems) as $k) {
             $arrButtons[$k] = $this->generateButtonString($k);
         }
         $objTemplate->buttons = $arrButtons;
@@ -1303,12 +1438,22 @@ SCRIPT;
     /**
      * Generates a div formatted MCW
      *
-     * @param array
-     * @param array
-     * @param string
-     * @param array
+     * @param array  $arrUnique       The array of unique fields.
+     *
+     * @param array  $arrDatepicker   Datapicker information.
+     *
+     * @param array  $arrColorpicker  Colorpicker information.
+     *
+     * @param string $strHidden       Hidden information.
+     *
+     * @param array  $arrItems        List of items.
+     *
+     * @param array  $arrHiddenHeader List of hidden headers.
      *
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function generateDiv(
         $arrUnique,
@@ -1331,14 +1476,30 @@ SCRIPT;
             );
         }
 
-
-        $return  = '<div' . (($this->style) ? (' style="' . $this->style . '"') : '') . ' data-operations="maxCount[' . ($this->maxCount ? $this->maxCount : '0') . '] minCount[' . ($this->minCount ? $this->minCount : '0') . '] unique[' . implode(
-            ',',
-            $arrUnique
-        ) . '] datepicker[' . implode(',', $arrDatepicker) . '] colorpicker[' . implode(
-            ',',
-            $arrColorpicker
-        ) . ']" id="ctrl_' . $this->strId . '" class="tl_modulewizard multicolumnwizard">';
+        $return  = '<div'
+            . (($this->style) ? (' style="' . $this->style . '"') : '')
+            . ' data-operations="maxCount['
+            . ($this->maxCount ? $this->maxCount : '0')
+            . '] minCount['
+            . ($this->minCount ? $this->minCount : '0')
+            . '] unique['
+            . implode(
+                ',',
+                $arrUnique
+            )
+            . '] datepicker['
+            . implode(
+                ',',
+                $arrDatepicker
+            )
+            . '] colorpicker['
+            . implode(
+                ',',
+                $arrColorpicker
+            )
+            . ']" id="ctrl_'
+            . $this->strId
+            . '" class="tl_modulewizard multicolumnwizard">';
         $return .= '<div class="header_fields">' . implode('', $arrHeaderItems) . '</div>';
 
 
@@ -1350,7 +1511,11 @@ SCRIPT;
                 $itemValue['tl_class'] .= ' invisible';
             }
 
-            $arrReturnItems[$itemKey] = '<div' . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '') . '>' . $itemValue['entry'] . '</div>';
+            $arrReturnItems[$itemKey] = '<div'
+                . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '')
+                . '>'
+                . $itemValue['entry']
+                . '</div>';
         }
 
         $return .= implode('', $arrReturnItems);
@@ -1369,6 +1534,8 @@ SCRIPT;
      * @param int $level The level.
      *
      * @return string The HTML with all buttons.
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
     protected function generateButtonString($level = 0)
     {
@@ -1408,7 +1575,7 @@ SCRIPT;
     /**
      * Get Time/Date-format from global config (BE) or Page settings (FE)
      *
-     * @param $rgxp
+     * @param string $rgxp The rgxp to use.
      *
      * @return mixed
      */

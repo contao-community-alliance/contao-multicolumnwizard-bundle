@@ -33,18 +33,6 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetDatePickerStringEvent;
 class DatePicker
 {
     /**
-     * Get Time/Date-format from global config (BE) or Page settings (FE)
-     *
-     * @param string $rgxp The rgxp for the date.
-     *
-     * @return mixed
-     */
-    private function getNumericDateFormat($rgxp)
-    {
-        return call_user_func(array('\Contao\Date', 'getNumeric' . ucfirst($rgxp) . 'Format'));
-    }
-
-    /**
      * Generate the date picker Script.
      *
      * @param GetDatePickerStringEvent $event The event.
