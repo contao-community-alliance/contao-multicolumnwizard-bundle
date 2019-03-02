@@ -64,11 +64,13 @@
   "autoload": {
     "psr-4": {
       "MenAtWork\\MultiColumnWizardBundle\\": "src",
-      "MenAtWork\\MultiColumnWizard\\": "legacy_layer/psr-4-maw",
-      "MultiColumnWizard\\": "legacy_layer/psr-4-mcw"
+      "MenAtWork\\MultiColumnWizard\\": "legacy_layer/psr-4-maw"
     },
     "classmap": [
       "legacy_layer/classmap"
+    ],
+    "files": [
+      "src/deprecated-autoload.php"
     ]
   },
   "replace": {
