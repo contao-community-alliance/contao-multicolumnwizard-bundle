@@ -89,6 +89,10 @@ class CreateWidget
             )
         );
 
+        // Set some more information.
+        $widget->currentRecord = $dcDriver->id;
+        $widget->activeRecord  = $dcDriver->activeRecord;
+
         $event->setWidget($widget);
     }
 
