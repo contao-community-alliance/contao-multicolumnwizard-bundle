@@ -39,6 +39,57 @@ class DeprecatedAutoloaderTest extends TestCase
     ];
 
     /**
+     * @inheritdoc
+     */
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+
+        // Some mapping for the system.
+        self::aliasContaoClass('TemplateInheritance');
+        self::aliasContaoClass('System');
+        self::aliasContaoClass('Controller');
+    }
+
+    /**
+     * Mapping between root namespace of contao and the contao namespace.
+     * Can map class, interface and trait.
+     *
+     * @param string $class The name of the class
+     *
+     * @return void
+     */
+    protected static function aliasContaoClass($class)
+    {
+        // Class.
+        if (!\class_exists($class, true) && \class_exists('\\Contao\\' . $class, true)) {
+            if (!\class_exists($class, false)) {
+                \class_alias('\\Contao\\' . $class, $class);
+            }
+
+            return;
+        }
+
+        // Trait.
+        if (!\trait_exists($class, true) && \trait_exists('\\Contao\\' . $class, true)) {
+            if (!\trait_exists($class, false)) {
+                \class_alias('\\Contao\\' . $class, $class);
+            }
+
+            return;
+        }
+
+        // Interface.
+        if (!\interface_exists($class, true) && \interface_exists('\\Contao\\' . $class, true)) {
+            if (!\interface_exists($class, false)) {
+                \class_alias('\\Contao\\' . $class, $class);
+            }
+
+            return;
+        }
+    }
+
+    /**
      * Provide the alias class map.
      *
      * @return array
@@ -57,6 +108,7 @@ class DeprecatedAutoloaderTest extends TestCase
      * Test if the deprecated classes are aliased to the new one.
      *
      * @param string $oldClass Old class name.
+     *
      * @param string $newClass New class name.
      *
      * @dataProvider provideAliasClassMap
