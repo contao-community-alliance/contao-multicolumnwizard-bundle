@@ -69,7 +69,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class MultiColumnWizard extends Widget implements \uploadable
+class MultiColumnWizard extends Widget
 {
     /**
      * The event Dispatcher.
