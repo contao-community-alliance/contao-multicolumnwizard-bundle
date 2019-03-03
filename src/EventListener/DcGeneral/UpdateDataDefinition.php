@@ -70,10 +70,14 @@ class UpdateDataDefinition
      * Add a property to the definition.
      *
      * @param array                         $extra      The extra data for the property.
+     *
      * @param PropertyInterface             $property   The property to add.
+     *
      * @param PropertiesDefinitionInterface $properties The definition the property shall be added to.
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function addPropertyToDefinition(
         array $extra,
