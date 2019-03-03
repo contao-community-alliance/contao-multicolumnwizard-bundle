@@ -14,6 +14,7 @@ php:
   - "7.0"
 
 env:
+  - CONTAO_VERSION=~4.7.0
   - CONTAO_VERSION=~4.6.0
   - CONTAO_VERSION=~4.5.0
   - CONTAO_VERSION=~4.4.0
@@ -22,6 +23,7 @@ env:
 matrix:
   exclude:
   allow_failures:
+    - env: CONTAO_VERSION=~4.7.0
     - env: CONTAO_VERSION=~4.6.0
     - env: CONTAO_VERSION=~4.5.0
 
