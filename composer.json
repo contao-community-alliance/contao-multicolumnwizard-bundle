@@ -55,7 +55,8 @@
   },
   "require": {
     "php": "^5.6 || ^7.0",
-    "contao/core-bundle": "^4.4.8"
+    "contao/core-bundle": "^4.4.8",
+    "contao-community-alliance/translator": "^2.1"
   },
   "require-dev": {
     "phpcq/all-tasks": "~1.2",
