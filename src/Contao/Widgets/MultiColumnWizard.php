@@ -164,7 +164,6 @@ class MultiColumnWizard extends Widget
             class_alias(self::class, 'MultiColumnWizard');
         }
         parent::__construct($arrAttributes);
-        $this->import('Database');
 
         if (TL_MODE == 'FE') {
             $this->strTemplate = 'form_widget';

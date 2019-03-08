@@ -78,7 +78,10 @@
   "autoload-dev": {
     "psr-4": {
       "MenAtWork\\MultiColumnWizardBundle\\Test\\": "tests"
-    }
+    },
+    "files": [
+      "tests/contao3-autoloader.php"
+    ]
   },
   "replace": {
     "contao-legacy/multicolumnwizard": "*",

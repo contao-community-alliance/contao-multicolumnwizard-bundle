@@ -44,57 +44,6 @@ class DeprecatedAutoloaderTest extends TestCase
     ];
 
     /**
-     * @inheritdoc
-     */
-    public static function setUpBeforeClass()
-    {
-        parent::setUpBeforeClass();
-
-        // Some mapping for the system.
-        self::aliasContaoClass('TemplateInheritance');
-        self::aliasContaoClass('System');
-        self::aliasContaoClass('Controller');
-    }
-
-    /**
-     * Mapping between root namespace of contao and the contao namespace.
-     * Can map class, interface and trait.
-     *
-     * @param string $class The name of the class
-     *
-     * @return void
-     */
-    protected static function aliasContaoClass($class)
-    {
-        // Class.
-        if (!\class_exists($class, true) && \class_exists('\\Contao\\' . $class, true)) {
-            if (!\class_exists($class, false)) {
-                \class_alias('\\Contao\\' . $class, $class);
-            }
-
-            return;
-        }
-
-        // Trait.
-        if (!\trait_exists($class, true) && \trait_exists('\\Contao\\' . $class, true)) {
-            if (!\trait_exists($class, false)) {
-                \class_alias('\\Contao\\' . $class, $class);
-            }
-
-            return;
-        }
-
-        // Interface.
-        if (!\interface_exists($class, true) && \interface_exists('\\Contao\\' . $class, true)) {
-            if (!\interface_exists($class, false)) {
-                \class_alias('\\Contao\\' . $class, $class);
-            }
-
-            return;
-        }
-    }
-
-    /**
      * Provide the alias class map.
      *
      * @return array
@@ -119,8 +68,6 @@ class DeprecatedAutoloaderTest extends TestCase
      * @dataProvider provideAliasClassMap
      *
      * @return void
-     *
-     * @throws \ReflectionException
      */
     public function testDeprecatedClassesAreAliased($oldClass, $newClass)
     {
@@ -141,8 +88,21 @@ class DeprecatedAutoloaderTest extends TestCase
     {
         System::setContainer($container = $this->getMockForAbstractClass(ContainerInterface::class));
         $container->method('has')->willReturn(true);
-        $container->method('get')->willReturn(null);
+        $container
+            ->method('get')
+            ->willReturnCallback(function ($service) {
+                switch ($service) {
+                    case 'contao.resource_locator':
+                        $locator = $this->getMockBuilder(\stdClass::class)->setMethods(['locate'])->getMock();
+                        $locator->method('locate')->willReturn([]);
+                        return $locator;
+                    case 'event_dispatcher':
+                    default:
+                        return null;
+                }
+            });
         define('TL_MODE', 'TEST');
+        define('TL_ROOT', sys_get_temp_dir());
 
         $mcw   = new MultiColumnWizard();
         $dummy = new Issue39Fixture();
