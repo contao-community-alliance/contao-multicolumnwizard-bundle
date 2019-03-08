@@ -159,6 +159,10 @@ class MultiColumnWizard extends Widget
      */
     public function __construct($arrAttributes = false)
     {
+        // Ensure we have aliased the deprecated class - circumvent issue #39 but can not trigger deprecation then. :/
+        if (!class_exists('MultiColumnWizard', false)) {
+            class_alias(self::class, 'MultiColumnWizard');
+        }
         parent::__construct($arrAttributes);
         $this->import('Database');
 

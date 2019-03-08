@@ -75,6 +75,11 @@
       "src/deprecated-autoload.php"
     ]
   },
+  "autoload-dev": {
+    "psr-4": {
+      "MenAtWork\\MultiColumnWizardBundle\\Test\\": "tests"
+    }
+  },
   "replace": {
     "contao-legacy/multicolumnwizard": "*",
     "menatwork/contao-multicolumnwizard": "self.version"

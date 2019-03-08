@@ -12,6 +12,7 @@
  *
  * @package    menatwork/contao-multicolumnwizard-bundle
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2019 MEN AT WORK
@@ -21,8 +22,12 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\Test;
 
+use Contao\System;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard as MultiColumnWizardBundle;
+use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
+use MenAtWork\MultiColumnWizardBundle\Test\Fixture\Issue39Fixture;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This tests the color picker event listener.
@@ -123,5 +128,28 @@ class DeprecatedAutoloaderTest extends TestCase
         $oldClassReflection = new \ReflectionClass($oldClass);
         $newClassReflection = new \ReflectionClass($newClass);
         $this->assertSame($newClassReflection->getFileName(), $oldClassReflection->getFileName());
+    }
+
+    /**
+     * Test for issue #39 bc break for aliased class in root namespace.
+     *
+     * @return void
+     *
+     * @runInSeparateProcess
+     */
+    public function testIssue39()
+    {
+        System::setContainer($container = $this->getMockForAbstractClass(ContainerInterface::class));
+        $container->method('has')->willReturn(true);
+        $container->method('get')->willReturn(null);
+        define('TL_MODE', 'TEST');
+
+        $mcw   = new MultiColumnWizard();
+        $dummy = new Issue39Fixture();
+
+        $dummy->testing($mcw);
+
+        // If we end up here, we have succeeded.
+        $this->addToAssertionCount(1);
     }
 }
