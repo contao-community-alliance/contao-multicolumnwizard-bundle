@@ -12,6 +12,7 @@
  *
  * @package    menatwork/contao-multicolumnwizard-bundle
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2019 MEN AT WORK
@@ -37,7 +38,9 @@ spl_autoload_register(
                 spl_autoload_call($class);
             }
 
-            class_alias($classes[$class], $class);
+            if (!class_exists($class, false)) {
+                class_alias($classes[$class], $class);
+            }
         }
     }
 );

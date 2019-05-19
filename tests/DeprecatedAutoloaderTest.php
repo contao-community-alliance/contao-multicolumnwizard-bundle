@@ -12,6 +12,7 @@
  *
  * @package    menatwork/contao-multicolumnwizard-bundle
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2019 MEN AT WORK
@@ -21,8 +22,12 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\Test;
 
+use Contao\System;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard as MultiColumnWizardBundle;
+use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
+use MenAtWork\MultiColumnWizardBundle\Test\Fixture\Issue39Fixture;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * This tests the color picker event listener.
@@ -37,57 +42,6 @@ class DeprecatedAutoloaderTest extends TestCase
     private static $classes = [
         'MultiColumnWizard' => MultiColumnWizardBundle::class,
     ];
-
-    /**
-     * @inheritdoc
-     */
-    public static function setUpBeforeClass()
-    {
-        parent::setUpBeforeClass();
-
-        // Some mapping for the system.
-        self::aliasContaoClass('TemplateInheritance');
-        self::aliasContaoClass('System');
-        self::aliasContaoClass('Controller');
-    }
-
-    /**
-     * Mapping between root namespace of contao and the contao namespace.
-     * Can map class, interface and trait.
-     *
-     * @param string $class The name of the class
-     *
-     * @return void
-     */
-    protected static function aliasContaoClass($class)
-    {
-        // Class.
-        if (!\class_exists($class, true) && \class_exists('\\Contao\\' . $class, true)) {
-            if (!\class_exists($class, false)) {
-                \class_alias('\\Contao\\' . $class, $class);
-            }
-
-            return;
-        }
-
-        // Trait.
-        if (!\trait_exists($class, true) && \trait_exists('\\Contao\\' . $class, true)) {
-            if (!\trait_exists($class, false)) {
-                \class_alias('\\Contao\\' . $class, $class);
-            }
-
-            return;
-        }
-
-        // Interface.
-        if (!\interface_exists($class, true) && \interface_exists('\\Contao\\' . $class, true)) {
-            if (!\interface_exists($class, false)) {
-                \class_alias('\\Contao\\' . $class, $class);
-            }
-
-            return;
-        }
-    }
 
     /**
      * Provide the alias class map.
@@ -114,8 +68,6 @@ class DeprecatedAutoloaderTest extends TestCase
      * @dataProvider provideAliasClassMap
      *
      * @return void
-     *
-     * @throws \ReflectionException
      */
     public function testDeprecatedClassesAreAliased($oldClass, $newClass)
     {
@@ -123,5 +75,41 @@ class DeprecatedAutoloaderTest extends TestCase
         $oldClassReflection = new \ReflectionClass($oldClass);
         $newClassReflection = new \ReflectionClass($newClass);
         $this->assertSame($newClassReflection->getFileName(), $oldClassReflection->getFileName());
+    }
+
+    /**
+     * Test for issue #39 bc break for aliased class in root namespace.
+     *
+     * @return void
+     *
+     * @runInSeparateProcess
+     */
+    public function testIssue39()
+    {
+        System::setContainer($container = $this->getMockForAbstractClass(ContainerInterface::class));
+        $container->method('has')->willReturn(true);
+        $container
+            ->method('get')
+            ->willReturnCallback(function ($service) {
+                switch ($service) {
+                    case 'contao.resource_locator':
+                        $locator = $this->getMockBuilder(\stdClass::class)->setMethods(['locate'])->getMock();
+                        $locator->method('locate')->willReturn([]);
+                        return $locator;
+                    case 'event_dispatcher':
+                    default:
+                        return null;
+                }
+            });
+        define('TL_MODE', 'TEST');
+        define('TL_ROOT', sys_get_temp_dir());
+
+        $mcw   = new MultiColumnWizard();
+        $dummy = new Issue39Fixture();
+
+        $dummy->testing($mcw);
+
+        // If we end up here, we have succeeded.
+        $this->addToAssertionCount(1);
     }
 }
