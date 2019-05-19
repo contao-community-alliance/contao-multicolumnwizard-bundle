@@ -24,6 +24,7 @@ namespace MenAtWork\MultiColumnWizardBundle;
 
 use MenAtWork\MultiColumnWizardBundle\DependencyInjection\MultiColumnWizardExtension;
 use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -47,8 +48,12 @@ class MultiColumnWizardBundle extends Bundle
     /**
      * {@inheritdoc}
      */
-    public function registerCommands(Application $application)
+    public function build(ContainerBuilder $container)
     {
-        // disable automatic command registration
+        $container->loadFromExtension('twig', [
+            'paths' => [
+                '%kernel.project_dir%/vendor/menatwork/contao-multicolumnwizard-bundle/src/Resources/views' => 'MawMCW',
+            ],
+        ]);
     }
 }

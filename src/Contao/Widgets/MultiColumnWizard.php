@@ -174,6 +174,16 @@ class MultiColumnWizard extends Widget
     }
 
     /**
+     * Get Twig. Since i don't know how the best practices is, we will use this to wrap the call.
+     *
+     * @return \Twig\Environment
+     */
+    protected function getTwig()
+    {
+        return \System::getContainer()->get('twig');
+    }
+
+    /**
      * Add specific attributes
      *
      * @param string $strKey   The key to search for.
