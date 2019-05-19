@@ -475,7 +475,7 @@ class MultiColumnWizard extends Widget
         // Return the result.
         return $event->getWizard();
     }
-    
+
     /**
      * Try to get the DC Drive.
      * For the DCG we have to handel the HTTP_X_REQUESTED_WITH, to cancel an endless loop.
@@ -1291,6 +1291,192 @@ class MultiColumnWizard extends Widget
      *
      * @return string
      *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    protected function generateOutput(
+        $arrUnique,
+        $arrDatepicker,
+        $arrColorpicker,
+        $strHidden,
+        $arrItems,
+        $arrHiddenHeader = array(),
+        $onlyRows = false
+    ) {
+        $twigData = [
+            'header' => $this->getTemplateInformationHeader($arrHiddenHeader),
+            'meta'   => $this->getTemplateInformationMeta(
+                $arrUnique,
+                $arrDatepicker,
+                $arrColorpicker,
+                $strHidden,
+                $onlyRows
+            ),
+            'items'  => $this->getTemplateInformationItems($arrItems),
+        ];
+
+        $twig = $this->getTwig();
+
+        return $twig->render(
+            '@MawMCW/mcw_outter.twig',
+            [
+                'html'   => $twig->render(
+                    '@MawMCW/mcw_div.twig',
+                    $twigData
+                ),
+                'script' => $twig->render(
+                    '@MawMCW/mcw_script.twig',
+                    $twigData
+                )
+            ]
+        );
+    }
+
+    /**
+     * @param array $items List of items.
+     *
+     * @return array
+     */
+    protected function getTemplateInformationItems($items)
+    {
+        $itemsFullData = [];
+        foreach ($items as $k => $arrValue) {
+            $row = [
+                'rowId'      => $k,
+                'fields'     => [],
+                'operations' => [],
+            ];
+
+            // Fields.
+            foreach ($arrValue as $fieldKey => $itemValue) {
+                $field = [
+                    'isHidden' => $itemValue['hide'],
+                    'class'    => $itemValue['tl_class'],
+                    'value'    => $itemValue['entry']
+                ];
+
+                $row['fields'][$fieldKey] = $field;
+            }
+
+            // Operations.
+            foreach ($this->arrButtons as $button => $image) {
+                // If we have no images go to the next image.
+                if ($image === false) {
+                    continue;
+                }
+
+                $btnName                    = \sprintf('tw_r%s', StringUtil::specialchars($button));
+                $row['operations'][$button] = [
+                    'name'  => $button,
+                    'url'   => $this->addToUrl(
+                        \sprintf(
+                            '&%s=%s&cid=%s&id=',
+                            $this->strCommand,
+                            $button,
+                            $k,
+                            $this->currentRecord
+                        )
+                    ),
+                    'label' => $GLOBALS['TL_LANG']['MSC'][$btnName],
+                    'image' => [
+                        'path'  => Image::getPath($image),
+                        'label' => $GLOBALS['TL_LANG']['MSC'][$btnName]
+                    ]
+                ];
+            }
+
+            $itemsFullData[$k] = $row;
+        }
+
+        return $itemsFullData;
+    }
+
+    /**
+     * @param array $arrUnique      The array of unique fields.
+     *
+     * @param array $arrDatepicker  Datapicker information.
+     *
+     * @param array $arrColorpicker Colorpicker information.
+     *
+     * @return array
+     */
+    protected function getTemplateInformationMeta($arrUnique, $arrDatepicker, $arrColorpicker)
+    {
+        return [
+            'name'        => json_encode($this->strId),
+            'id'          => $this->strId,
+            'min'         => intval($this->minCount),
+            'max'         => intval($this->maxCount),
+            'style'       => (($this->style) ?: ''),
+            'unique'      => implode(',', $arrUnique),
+            'datepicker'  => implode(',', $arrDatepicker),
+            'colorpicker' => implode(',', $arrColorpicker),
+        ];
+    }
+
+    /**
+     * Create a list with the information of the header for the twig template.
+     *
+     * @param array $hiddenHeader A list of the hidden fields.
+     *
+     * @return array A list with the information.
+     */
+    protected function getTemplateInformationHeader($hiddenHeader)
+    {
+        $header = [];
+        foreach ($this->columnFields as $strKey => $arrField) {
+            $columnHeader = [
+                'column'         => $strKey,
+                'isHidden'       => false,
+                'label'          => '',
+                'hasDescription' => false,
+                'description'    => '',
+            ];
+
+            // Meta information.
+            $columnHeader['isHidden'] = key_exists($strKey, $hiddenHeader);
+
+            // Label.
+            if (is_array($arrField['label']) && isset($arrField['label'][0])) {
+                $columnHeader['label'] = $arrField['label'][0];
+            } elseif (is_string($arrField['label'])) {
+                $columnHeader['label'] = $arrField['label'];
+            }
+
+            // Description.
+            if (is_array($arrField['label']) && isset($arrField['label'][1])) {
+                $columnHeader['description']    = $arrField['label'][1];
+                $columnHeader['hasDescription'] = true;
+            }
+
+            $header[$strKey] = $columnHeader;
+        }
+
+        return $header;
+    }
+
+    /**
+     * Generates a table formatted MCW
+     *
+     * @param array  $arrUnique       The array of unique fields.
+     *
+     * @param array  $arrDatepicker   Datapicker information.
+     *
+     * @param array  $arrColorpicker  Colorpicker information.
+     *
+     * @param string $strHidden       Hidden information.
+     *
+     * @param array  $arrItems        List of items.
+     *
+     * @param array  $arrHiddenHeader List of hidden headers.
+     *
+     * @param bool   $onlyRows        Flag if the only want some rows.
+     *
+     * @return string
+     *
+     * @deprecated Will be removed in Version 4.0.0
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
@@ -1304,6 +1490,16 @@ class MultiColumnWizard extends Widget
         $arrHiddenHeader = array(),
         $onlyRows = false
     ) {
+
+        return $this->generateOutput(
+            $arrUnique,
+            $arrDatepicker,
+            $arrColorpicker,
+            $strHidden,
+            $arrItems,
+            $arrHiddenHeader,
+            $onlyRows
+        );
 
         $return = '';
 
@@ -1432,10 +1628,20 @@ SCRIPT;
      *
      * @return string
      *
+     * @deprecated Will be removed in Version 4.0.0
+     *
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     protected function generateTemplateOutput($arrUnique, $arrDatepicker, $arrColorpicker, $strHidden, $arrItems)
     {
+        return $this->generateOutput(
+            $arrUnique,
+            $arrDatepicker,
+            $arrColorpicker,
+            $strHidden,
+            $arrItems
+        );
+
         $objTemplate        = new BackendTemplate($this->columnTemplate);
         $objTemplate->items = $arrItems;
 
@@ -1465,6 +1671,8 @@ SCRIPT;
      *
      * @return string
      *
+     * @deprecated Will be removed in Version 4.0.0
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
@@ -1476,6 +1684,15 @@ SCRIPT;
         $arrItems,
         $arrHiddenHeader = array()
     ) {
+        return $this->generateOutput(
+            $arrUnique,
+            $arrDatepicker,
+            $arrColorpicker,
+            $strHidden,
+            $arrItems,
+            $arrHiddenHeader
+        );
+
         // generate header fields
         foreach ($this->columnFields as $strKey => $arrField) {
             if (key_exists($strKey, $arrHiddenHeader)) {

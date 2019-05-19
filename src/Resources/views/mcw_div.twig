@@ -1,0 +1,80 @@
+<style>
+    .multicolumnwizard .mcw-header,
+    .multicolumnwizard .mcw-body .mcw-row {
+        display: flex;
+        
+    }
+
+    .multicolumnwizard .mcw-body .mcw-row label {
+        display: none;
+    }
+
+    .multicolumnwizard .mcw-body .mcw-row .tl_checkbox_single_container label{
+        display: block;
+    }
+</style>
+<div id="{{ meta.id }}"
+     class="tl_modulewizard multicolumnwizard mcw-wrapper"
+     {% if meta.style is not empty %}style="{{ meta.style }}"{% endif %}
+     data-operations="maxCount[{{ meta.max }}] minCount[{{ meta.min }}] unique[{{ meta.unique }}] datepicker[{{ meta.datepicker }}] colorpicker[{{ meta.colorpicker }}]"
+     data-name="{{ meta.name }}"
+     data-max="{{ meta.max }}"
+     data-min="{{ meta.min }}"
+     data-unique="{{ meta.unique }}"
+     data-datepicker="{{ meta.datepicker }}"
+     data-colorpicker="{{ meta.colorpicker }}">
+    <div class="mcw-header">
+        {% for item in header %}
+            {% if item.isHidden == true %}
+                <div class="mwc-header-column isHidden">
+                    &nbsp;
+                </div>
+            {% else %}
+                <div class="mwc-header-column{% if item.hasDescription == true %} hasDescription{% endif %}">
+                    {{ item.label }}
+                    {% if item.hasDescription == true %}
+                        <span title="{{ item.description }}">
+                            <sup>(?)</sup>
+                        </span>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="mcw-body">
+        {% for row in items %}
+            <div class="mcw-row" data-row="{{ row.rowId }}">
+                {% for field in row.fields %}
+                    <div class="mcw-column mcw-widget{% if field.isHidden == true %}isHidden{% endif %}">
+                        {% if field.isHidden == true %}
+                            &nbsp;
+                        {% else %}
+                            {{ field.value|raw }}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+                <div class="mcw-column mcw-opperations">
+                    {% for operation in row.operations %}
+                        <a data-operations="{{ operation.name }}"
+                           href="{{ operation.url }}"
+                           class="widgetImage"
+                           title="{{ operation.label }}"
+                           onclick="return false;">
+                            <img src="{{ operation.image.path }}"
+                                 width="16"
+                                 height="16"
+                                 alt="{{ operation.image.label }}"
+                                 class="tl_listwizard_img">
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+
+
+

@@ -1,0 +1,10 @@
+<script>
+    window.addEvent("domready", function () {
+        window["MCW_{{ meta.name }}"] = new MultiColumnWizard({
+            table: "ctrl_{{ meta.name }}",
+            maxCount: {{ meta.max }},
+            minCount: {{ meta.min }},
+            uniqueFields: []
+        });
+    });
+</script>
