@@ -25,6 +25,7 @@
  * @author     Gerald Meier <garyee@gmx.de>
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     Jozef Dvorský <creatingo@users.noreply.github.com>
+ * @author     Julian Aziz Haslinger <me@aziz.wtf>
  * @author     Kester Mielke <kester.mieke@gmx.net>
  * @author     mediabakery <s.tilch@mediabakery.de>
  * @author     Oliver Hoff <oliver@hofff.com>
@@ -465,7 +466,7 @@ class MultiColumnWizard extends Widget
         // Return the result.
         return $event->getWizard();
     }
-    
+
     /**
      * Try to get the DC Drive.
      * For the DCG we have to handel the HTTP_X_REQUESTED_WITH, to cancel an endless loop.
@@ -819,6 +820,14 @@ class MultiColumnWizard extends Widget
                         $objWidget->parse(),
                         implode('', $additionalCode)
                     );
+                }
+
+                // Contao changed the name for FileTree and PageTree widgets @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
+                if((version_compare(VERSION, '4.4.41', '>=') &&
+                    version_compare(VERSION, '4.5.0', '<')) ||
+                   version_compare(VERSION, '4.7.7', '>=')) {
+                    $strWidget = str_replace(['reloadFiletree', 'reloadFiletreeDMA'], 'reloadFiletree_mcw', $strWidget);
+                    $strWidget = str_replace(['reloadPagetree', 'reloadPagetreeDMA'], 'reloadPagetree_mcw', $strWidget);
                 }
 
                 // Build array of items
