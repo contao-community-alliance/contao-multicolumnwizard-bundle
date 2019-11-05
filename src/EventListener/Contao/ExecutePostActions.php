@@ -186,7 +186,7 @@ class ExecutePostActions extends BaseListener
         // Handle the keys in "edit multiple" mode
         if (\Input::get('act') == 'editAll') {
             if ($vNameCheck) {
-                $intId = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $mcwBaseName);
+                $intId       = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $mcwBaseName);
                 $mcwBaseName = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $mcwBaseName);
             } else {
                 $intId    = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $strField);
