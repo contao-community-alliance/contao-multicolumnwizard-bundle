@@ -157,13 +157,14 @@ class ExecutePostActions extends BaseListener
 
         $intId    = \Input::get('id');
         $strField = $container->inputName = \Input::post('name');
-        // Contao changed the name for FileTree and PageTree widgets @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
+        // Contao changed the name for FileTree and PageTree widgets
+        // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
         $vNameCheck = (version_compare(VERSION, '4.4.41', '>=') &&
                        version_compare(VERSION, '4.5.0', '<')) ||
                       version_compare(VERSION, '4.7.7', '>=');
 
-        if($vNameCheck) {
-            $fieldParts       = preg_split("/[\[,]|[]\[,]+/", $strField);
+        if ($vNameCheck) {
+            $fieldParts       = preg_split('/[\[,]|[]\[,]+/', $strField);
             $container->field = $strField;
             $mcwBaseName      = $fieldParts[0];
             $intRow           = $fieldParts[1];
@@ -184,7 +185,7 @@ class ExecutePostActions extends BaseListener
 
         // Handle the keys in "edit multiple" mode
         if (\Input::get('act') == 'editAll') {
-            if($vNameCheck) {
+            if ($vNameCheck) {
                 $intId = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $mcwBaseName);
                 $mcwBaseName = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $mcwBaseName);
             } else {
@@ -301,7 +302,7 @@ class ExecutePostActions extends BaseListener
         $objWidget = new $strClass($fieldAttributes);
         $strWidget = $objWidget->generate();
 
-        if($vNameCheck) {
+        if ($vNameCheck) {
             $strWidget = str_replace(['reloadFiletree', 'reloadFiletreeDMA'], 'reloadFiletree_mcw', $strWidget);
             $strWidget = str_replace(['reloadPagetree', 'reloadPagetreeDMA'], 'reloadPagetree_mcw', $strWidget);
         }

@@ -822,8 +822,9 @@ class MultiColumnWizard extends Widget
                     );
                 }
 
-                // Contao changed the name for FileTree and PageTree widgets @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
-                if((version_compare(VERSION, '4.4.41', '>=') &&
+                // Contao changed the name for FileTree and PageTree widgets
+                // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
+                if ((version_compare(VERSION, '4.4.41', '>=') &&
                     version_compare(VERSION, '4.5.0', '<')) ||
                    version_compare(VERSION, '4.7.7', '>=')) {
                     $strWidget = str_replace(['reloadFiletree', 'reloadFiletreeDMA'], 'reloadFiletree_mcw', $strWidget);
