@@ -1506,26 +1506,21 @@ SCRIPT;
             . '" class="tl_modulewizard multicolumnwizard">';
         $return .= '<div class="header_fields">' . implode('', $arrHeaderItems) . '</div>';
 
-
-        // new array for items so we get rid of the ['entry'] and ['valign']
-        $arrReturnItems = array();
-
         foreach ($arrItems as $k => $arrValue) {
+            $return .= \sprintf('<div data-rowId="%s">', $k);
             foreach ($arrValue as $itemKey => $itemValue) {
                 if ($itemValue['hide']) {
                     $itemValue['tl_class'] .= ' hidden';
                 }
 
-                $arrReturnItems[$itemKey] = '<div'
-                    . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '')
-                    . '>'
-                    . $itemValue['entry']
-                    . '</div>';
+                $return.= '<div'
+                          . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '')
+                          . '>'
+                          . $itemValue['entry']
+                          . '</div>';
             }
+            $return .= '</div>';
         }
-
-        $return .= implode('', $arrReturnItems);
-
 
         $return .= '<div class="col_last buttons">' . $this->generateButtonString($strKey) . '</div>';
 
