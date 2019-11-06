@@ -25,6 +25,7 @@
  * @author     Gerald Meier <garyee@gmx.de>
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     Jozef Dvorský <creatingo@users.noreply.github.com>
+ * @author     Julian Aziz Haslinger <me@aziz.wtf>
  * @author     Kester Mielke <kester.mieke@gmx.net>
  * @author     mediabakery <s.tilch@mediabakery.de>
  * @author     Oliver Hoff <oliver@hofff.com>
@@ -1509,16 +1510,18 @@ SCRIPT;
         // new array for items so we get rid of the ['entry'] and ['valign']
         $arrReturnItems = array();
 
-        foreach ($arrItems as $itemKey => $itemValue) {
-            if ($itemValue['hide']) {
-                $itemValue['tl_class'] .= ' invisible';
-            }
+        foreach ($arrItems as $k => $arrValue) {
+            foreach ($arrValue as $itemKey => $itemValue) {
+                if ($itemValue['hide']) {
+                    $itemValue['tl_class'] .= ' hidden';
+                }
 
-            $arrReturnItems[$itemKey] = '<div'
-                . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '')
-                . '>'
-                . $itemValue['entry']
-                . '</div>';
+                $arrReturnItems[$itemKey] = '<div'
+                    . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '')
+                    . '>'
+                    . $itemValue['entry']
+                    . '</div>';
+            }
         }
 
         $return .= implode('', $arrReturnItems);
