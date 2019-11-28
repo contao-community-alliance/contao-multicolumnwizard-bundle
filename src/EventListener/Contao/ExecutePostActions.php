@@ -159,9 +159,10 @@ class ExecutePostActions extends BaseListener
         $strField = $container->inputName = \Input::post('name');
         // Contao changed the name for FileTree and PageTree widgets
         // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
-        $vNameCheck = (version_compare(VERSION, '4.4.41', '>=') &&
-                       version_compare(VERSION, '4.5.0', '<')) ||
-                      version_compare(VERSION, '4.7.7', '>=');
+        $contaoVersion = VERSION . '.' . BUILD;
+        $vNameCheck    = (version_compare($contaoVersion, '4.4.41', '>=') &&
+                          version_compare($contaoVersion, '4.5.0', '<')) ||
+                         version_compare($contaoVersion, '4.7.7', '>=');
 
         if ($vNameCheck) {
             $fieldParts       = preg_split('/[\[,]|[]\[,]+/', $strField);
