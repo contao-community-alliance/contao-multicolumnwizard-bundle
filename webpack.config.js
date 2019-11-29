@@ -8,52 +8,56 @@ const gitRevisionPlugin = new GitRevisionPlugin();
 
 const version = gitRevisionPlugin.version(); // same as `git describe`
 
-module.exports = {
-    entry: './src/Resources/assets/js/multicolumnwizard.js',
-    output: {
-        path: path.resolve(__dirname, 'src/Resources/public'),
-        filename: 'js/multicolumnwizard_be_src.js',
-    },
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: 'babel-loader'
-            },
-            {
-                test: /\.(scss|sass|css)$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    {
-                        loader: 'css-loader',
-                    },
-                    {
-                        loader: 'postcss-loader',
-                        options: {
-                            sourceMap: true,
-                            ident: 'postcss',
-                            plugins: () => [
-                                postcssPresetEnv({})
-                            ]
-                        }
-                    },
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            sourceMap: true,
-                        }
-                    },
-                ]
-            }
-        ]
-    },
-    plugins: [
-        new MiniCssExtractPlugin({
-            filename: 'css/multicolumnwizard_src.css'
-        }),
-        new webpack.BannerPlugin({
-            banner: `
+module.exports = (env, argv) => {
+
+    const isProd = (argv.mode !== 'development');
+
+    return {
+        devtool: isProd ? false : 'source-map',
+        entry: './src/Resources/assets/js/multicolumnwizard.js',
+        output: {
+            path: path.resolve(__dirname, 'src/Resources/public'),
+            filename: 'js/multicolumnwizard.js',
+        },
+        optimization: {
+            minimize: isProd,
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    loader: 'babel-loader'
+                },
+                {
+                    test: /\.(scss|sass|css)$/,
+                    use: [
+                        MiniCssExtractPlugin.loader,
+                        {
+                            loader: 'css-loader',
+                        },
+                        {
+                            loader: 'postcss-loader',
+                            options: {
+                                ident: 'postcss',
+                                plugins: () => [
+                                    postcssPresetEnv({})
+                                ]
+                            }
+                        },
+                        {
+                            loader: 'sass-loader',
+                        },
+                    ]
+                }
+            ]
+        },
+        plugins: [
+            new MiniCssExtractPlugin({
+                filename: 'css/multicolumnwizard.css'
+            }),
+            new webpack.BannerPlugin({
+                banner: `
 @name        ${packageData.name}
 @version     ${version}
 @copyright   Andreas Schempp 2011
@@ -62,7 +66,8 @@ module.exports = {
 @package     MultiColumnWizard
 @license     ${packageData.license}
 @file        [name]
- `.trim()
-        }),
-    ],
+     `.trim()
+            }),
+        ],
+    }
 };

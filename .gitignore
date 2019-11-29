@@ -18,3 +18,7 @@ vendor/
 
 # build
 build/
+
+# source-map
+!/src/Resources/public/**/*.map
+!/src/Resources/public/css/multicolumnwizard.css.map

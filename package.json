@@ -1,6 +1,6 @@
 {
     "name": "contao-multicolumnwizard-bundle",
-    "main": "src/Resources/public/js/multicolumnwizard_be.js",
+    "main": "src/Resources/public/js/multicolumnwizard.js",
     "scripts": {
         "build": "webpack --mode=production",
         "start": "webpack --watch --mode=development"
@@ -17,7 +17,6 @@
         "babel-loader": "^8.0.6",
         "css-loader": "^3.2.0",
         "git-revision-webpack-plugin": "^3.0.4",
-        "husky": "^3.0.9",
         "mini-css-extract-plugin": "^0.8.0",
         "node-sass": "^4.13.0",
         "postcss-loader": "^3.0.0",
@@ -26,10 +25,8 @@
         "webpack": "^4.41.2",
         "webpack-cli": "^3.3.10"
     },
-    "husky": {
-        "hooks": {
-            "pre-commit": "npm run build"
-        }
-    },
-    "browserslist": "> 0.25%, not dead"
+    "browserslist": [
+        "last 1 version",
+        "> 0.25%"
+    ]
 }

@@ -1,6 +1,6 @@
 /*!
  * @name        contao-multicolumnwizard-bundle
- * @version     3.4.2-1-gd4a0b33
+ * @version     3.4.2-3-g9a86f53
  * @copyright   Andreas Schempp 2011
  * @copyright   certo web & design GmbH 2011
  * @copyright   MEN AT WORK 2013

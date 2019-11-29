@@ -16,6 +16,7 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     David Maack <david.maack@arcor.de>
  * @author     fritzmg <email@spikx.net>
+ * @author     Julian Aziz Haslinger <me@aziz.wtf>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Tristan Lins <tristan.lins@bit3.de>
  * @author     Yanick Witschi <yanick.witschi@certo-net.ch>
@@ -52,13 +53,9 @@ if (TL_MODE == 'BE') {
     );
 
     // Add the JS.
-    $GLOBALS['TL_JAVASCRIPT']['multicolumnwizard'] = $GLOBALS['TL_CONFIG']['debugMode']
-        ? 'bundles/multicolumnwizard/js/multicolumnwizard_be_src.js'
-        : 'bundles/multicolumnwizard/js/multicolumnwizard_be.js';
+    $GLOBALS['TL_JAVASCRIPT']['multicolumnwizard'] = 'bundles/multicolumnwizard/js/multicolumnwizard.js';
 
     // Add the css.
-    $GLOBALS['TL_CSS']['multicolumnwizard'] = $GLOBALS['TL_CONFIG']['debugMode']
-        ? 'bundles/multicolumnwizard/css/multicolumnwizard_src.css'
-        : 'bundles/multicolumnwizard/css/multicolumnwizard.css';
+    $GLOBALS['TL_CSS']['multicolumnwizard'] = 'bundles/multicolumnwizard/css/multicolumnwizard.css';
 }
 
