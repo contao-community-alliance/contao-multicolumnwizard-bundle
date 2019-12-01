@@ -25,6 +25,7 @@
  * @author     Gerald Meier <garyee@gmx.de>
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     Jozef Dvorský <creatingo@users.noreply.github.com>
+ * @author     Julian Aziz Haslinger <me@aziz.wtf>
  * @author     Kester Mielke <kester.mieke@gmx.net>
  * @author     mediabakery <s.tilch@mediabakery.de>
  * @author     Oliver Hoff <oliver@hofff.com>
@@ -465,7 +466,7 @@ class MultiColumnWizard extends Widget
         // Return the result.
         return $event->getWizard();
     }
-    
+
     /**
      * Try to get the DC Drive.
      * For the DCG we have to handel the HTTP_X_REQUESTED_WITH, to cancel an endless loop.
@@ -1086,7 +1087,7 @@ class MultiColumnWizard extends Widget
         $arrField['activeRow']         = $intRow;
         $arrField['name']              = $this->strName . '[' . $intRow . '][' . $strKey . ']';
         $arrField['id']                = $this->strId . '_row' . $intRow . '_' . $strKey;
-        $arrField['value']             = ($varValue !== '') ? $varValue : $arrField['default'];
+        $arrField['value']             = (null !== $varValue) ? $varValue : $arrField['default'];
         $arrField['eval']['tableless'] = true;
 
         $arrData = $this->handleDcGeneral($arrField, $strKey);
@@ -1358,7 +1359,7 @@ class MultiColumnWizard extends Widget
             $return .= \sprintf('<tr data-rowId="%s">', $k);
             foreach ($arrValue as $itemValue) {
                 if ($itemValue['hide'] == true) {
-                    $itemValue['tl_class'] .= ' invisible';
+                    $itemValue['tl_class'] .= ' hidden';
                 }
 
                 $return .= '<td'
