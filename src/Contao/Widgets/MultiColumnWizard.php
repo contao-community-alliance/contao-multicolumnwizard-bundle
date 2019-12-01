@@ -1086,7 +1086,7 @@ class MultiColumnWizard extends Widget
         $arrField['activeRow']         = $intRow;
         $arrField['name']              = $this->strName . '[' . $intRow . '][' . $strKey . ']';
         $arrField['id']                = $this->strId . '_row' . $intRow . '_' . $strKey;
-        $arrField['value']             = ($varValue !== '') ? $varValue : $arrField['default'];
+        $arrField['value']             = (null !== $varValue) ? $varValue : $arrField['default'];
         $arrField['eval']['tableless'] = true;
 
         $arrData = $this->handleDcGeneral($arrField, $strKey);
