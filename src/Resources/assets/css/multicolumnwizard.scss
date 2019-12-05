@@ -1,12 +1,3 @@
-/**
- * Contao Open Source CMS
- *
- * @copyright   MEN AT WORK 2013
- * @package     MultiColumnWizard
- * @license     GNU/LGPL
- * @info        tab is set to 4 whitespaces
- */
-
 .multicolumnwizard {
     margin-top: 5px;
 }
@@ -21,7 +12,7 @@
     height: auto;
 }
 
-.multicolumnwizard .tl_select, 
+.multicolumnwizard .tl_select,
 .multicolumnwizard .tl_mselect {
     width: auto;
 }
@@ -52,7 +43,6 @@
     cursor: move;
 }
 
-
 .multicolumnwizard .w50 {
     float: none;
     width: auto;
@@ -65,17 +55,9 @@
 }
 
 .multicolumnwizard a.rotate img {
-    -webkit-animation: mcw-spin .4s linear infinite;
-    -moz-animation: mcw-spin .4s linear infinite;
     animation: mcw-spin .4s linear infinite;
 }
 
-@-moz-keyframes mcw-spin {
-    100% {-moz-transform: rotate(360deg);}
-}
-@-webkit-keyframes mcw-spin {
-    100% {-webkit-transform: rotate(360deg);}
-}
 @keyframes mcw-spin {
-    100% {-webkit-transform: rotate(360deg); transform:rotate(360deg);}
+    100% {transform:rotate(360deg);}
 }

@@ -2,7 +2,7 @@
 .DS_Store
 Thumbs.db
 
-# IDEs 
+# IDEs
 .buildpath
 .project
 .settings/
@@ -12,8 +12,13 @@ Thumbs.db
 nbproject/
 _notes/
 
-# composer related
+# composer/node related
+node_modules/
 vendor/
 
 # build
 build/
+
+# source-map
+!/src/Resources/public/**/*.map
+!/src/Resources/public/css/multicolumnwizard.css.map

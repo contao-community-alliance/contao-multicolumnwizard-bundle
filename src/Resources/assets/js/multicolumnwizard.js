@@ -1,16 +1,6 @@
-/**
- * Contao Open Source CMS
- *
- * @copyright   Andreas Schempp 2011
- * @copyright   certo web & design GmbH 2011
- * @copyright   MEN AT WORK 2013
- * @author      Ingolf Steinhardt <info@e-spin.de> 2017
- * @package     MultiColumnWizard
- * @license     GNU/LGPL
- * @info        tab is set to 4 whitespaces
- */
+import '../css/multicolumnwizard.scss';
 
-var MultiColumnWizard = new Class(
+var MultiColumnWizard = window.MultiColumnWizard = new Class(
     {
         Implements: [Options],
         options:
