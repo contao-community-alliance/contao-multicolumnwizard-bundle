@@ -1306,7 +1306,7 @@ class MultiColumnWizard extends Widget
                 } else {
                     $strHeaderItem = '<th>';
 
-                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="invisible">' : '';
+                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="hidden">' : '';
                     $strHeaderItem .=
                     (
                         (is_array($arrField['label']))
@@ -1470,7 +1470,7 @@ SCRIPT;
         // generate header fields
         foreach ($this->columnFields as $strKey => $arrField) {
             if (key_exists($strKey, $arrHiddenHeader)) {
-                $strKey = $strKey . ' invisible';
+                $strKey = $strKey . ' hidden';
             }
 
             $arrHeaderItems[] = sprintf(
@@ -1512,7 +1512,7 @@ SCRIPT;
 
         foreach ($arrItems as $itemKey => $itemValue) {
             if ($itemValue['hide']) {
-                $itemValue['tl_class'] .= ' invisible';
+                $itemValue['tl_class'] .= ' hidden';
             }
 
             $arrReturnItems[$itemKey] = '<div'
