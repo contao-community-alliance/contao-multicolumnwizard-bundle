@@ -127,6 +127,8 @@ $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
             'up'     => false,
             'down'   => false
         ],
+        // as alternative to hide all buttons use the next line
+        //'hideButtons'  => true,
         'columnFields' => [
             'ts_client_browser' => [
                 'label'     => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_browser'],
