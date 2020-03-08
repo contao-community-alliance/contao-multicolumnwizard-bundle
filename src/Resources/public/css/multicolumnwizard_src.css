@@ -79,3 +79,8 @@
 @keyframes mcw-spin {
     100% {-webkit-transform: rotate(360deg); transform:rotate(360deg);}
 }
+
+/* Override contao flexible theme */
+.tl_modulewizard {
+    max-width:100%;
+}
