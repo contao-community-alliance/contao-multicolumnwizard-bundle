@@ -822,6 +822,16 @@ class MultiColumnWizard extends Widget
                     );
                 }
 
+                // Contao changed the name for FileTree and PageTree widgets
+                // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
+                $contaoVersion = VERSION.'.'.BUILD;
+                if ((version_compare($contaoVersion, '4.4.41', '>=') &&
+                    version_compare($contaoVersion, '4.5.0', '<')) ||
+                   version_compare($contaoVersion, '4.7.7', '>=')) {
+                    $strWidget = str_replace(['reloadFiletree', 'reloadFiletreeDMA'], 'reloadFiletree_mcw', $strWidget);
+                    $strWidget = str_replace(['reloadPagetree', 'reloadPagetreeDMA'], 'reloadPagetree_mcw', $strWidget);
+                }
+
                 // Build array of items
                 if ($arrField['eval']['columnPos'] != '') {
                     $arrItems[$i][$objWidget->columnPos]['entry']   .= $strWidget;
@@ -1304,9 +1314,9 @@ class MultiColumnWizard extends Widget
                 if ($arrField['eval']['columnPos']) {
                     $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
                 } else {
-                    $strHeaderItem = '<th>';
+                    $strHeaderItem = (key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
 
-                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="invisible">' : '';
+                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="hidden">' : '';
                     $strHeaderItem .=
                     (
                         (is_array($arrField['label']))
@@ -1470,7 +1480,7 @@ SCRIPT;
         // generate header fields
         foreach ($this->columnFields as $strKey => $arrField) {
             if (key_exists($strKey, $arrHiddenHeader)) {
-                $strKey = $strKey . ' invisible';
+                $strKey = $strKey . ' hidden';
             }
 
             $arrHeaderItems[] = sprintf(
@@ -1512,7 +1522,7 @@ SCRIPT;
 
         foreach ($arrItems as $itemKey => $itemValue) {
             if ($itemValue['hide']) {
-                $itemValue['tl_class'] .= ' invisible';
+                $itemValue['tl_class'] .= ' hidden';
             }
 
             $arrReturnItems[$itemKey] = '<div'
