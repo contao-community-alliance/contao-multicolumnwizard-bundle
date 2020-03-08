@@ -1304,7 +1304,7 @@ class MultiColumnWizard extends Widget
                 if ($arrField['eval']['columnPos']) {
                     $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
                 } else {
-                    $strHeaderItem = '<th>';
+                    $strHeaderItem = (key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
 
                     $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="hidden">' : '';
                     $strHeaderItem .=
