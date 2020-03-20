@@ -361,7 +361,7 @@ var MultiColumnWizard = new Class(
                 this.operationUpdateCallbacks[key] = [];
             }
 
-            this.operationLoadCallbacks[key].include(func);
+            this.operationUpdateCallbacks[key].include(func);
         },
 
         /**
