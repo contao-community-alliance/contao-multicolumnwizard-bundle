@@ -3,7 +3,7 @@
 /**
  * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * (c) 2012-2019 MEN AT WORK.
+ * (c) 2012-2020 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,7 +40,7 @@
  * @author     Andreas Dziemba <adziemba@web.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
- * @copyright  2013-2019 MEN AT WORK
+ * @copyright  2013-2020 MEN AT WORK
  * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -1392,7 +1392,29 @@ class MultiColumnWizard extends Widget
 
         if ($onlyRows == false) {
             $return .= '</tbody></table>';
-            $script  = <<<SCRIPT
+            $return .= $this->generateScriptBlock($this->strId, $this->maxCount, $this->minCount);
+        } else {
+            $return .= '</table>';
+        }
+
+        return $return;
+    }
+
+    /**
+     * Generates the javascript block for the mcw.
+     *
+     * @param string $strId    The html id of the element.
+     *
+     * @param int    $maxCount The max amount of rows.
+     *
+     * @param int    $minCount The min amount of rows.
+     *
+     * @return string
+     */
+    protected function generateScriptBlock($strId, $maxCount, $minCount)
+    {
+        $script = <<<SCRIPT
+
 <script>
 window.addEvent("domready", function() {
     window["MCW_" + %s] = new MultiColumnWizard({
@@ -1404,18 +1426,14 @@ window.addEvent("domready", function() {
 });
 </script>
 SCRIPT;
-            $return .= sprintf(
-                $script,
-                json_encode($this->strId),
-                json_encode($this->strId),
-                intval($this->maxCount),
-                intval($this->minCount)
-            );
-        } else {
-            $return .= '</table>';
-        }
 
-        return $return;
+        return sprintf(
+            $script,
+            json_encode($strId),
+            json_encode($strId),
+            intval($maxCount),
+            intval($minCount)
+        );
     }
 
     /**
