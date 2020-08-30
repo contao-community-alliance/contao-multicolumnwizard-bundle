@@ -3,7 +3,7 @@
 /**
  * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * (c) 2012-2019 MEN AT WORK.
+ * (c) 2012-2020 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,6 +25,7 @@
  * @author     Gerald Meier <garyee@gmx.de>
  * @author     Ingolf Steinhardt <info@e-spin.de>
  * @author     Jozef Dvorský <creatingo@users.noreply.github.com>
+ * @author     Julian Aziz Haslinger <me@aziz.wtf>
  * @author     Kester Mielke <kester.mieke@gmx.net>
  * @author     mediabakery <s.tilch@mediabakery.de>
  * @author     Oliver Hoff <oliver@hofff.com>
@@ -39,7 +40,7 @@
  * @author     Andreas Dziemba <adziemba@web.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
- * @copyright  2013-2019 MEN AT WORK
+ * @copyright  2013-2020 MEN AT WORK
  * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -831,6 +832,16 @@ class MultiColumnWizard extends Widget
                     );
                 }
 
+                // Contao changed the name for FileTree and PageTree widgets
+                // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
+                $contaoVersion = VERSION.'.'.BUILD;
+                if ((version_compare($contaoVersion, '4.4.41', '>=') &&
+                    version_compare($contaoVersion, '4.5.0', '<')) ||
+                   version_compare($contaoVersion, '4.7.7', '>=')) {
+                    $strWidget = str_replace(['reloadFiletree', 'reloadFiletreeDMA'], 'reloadFiletree_mcw', $strWidget);
+                    $strWidget = str_replace(['reloadPagetree', 'reloadPagetreeDMA'], 'reloadPagetree_mcw', $strWidget);
+                }
+
                 // Build array of items
                 if ($arrField['eval']['columnPos'] != '') {
                     $arrItems[$i][$objWidget->columnPos]['entry']   .= $strWidget;
@@ -1096,7 +1107,7 @@ class MultiColumnWizard extends Widget
         $arrField['activeRow']         = $intRow;
         $arrField['name']              = $this->strName . '[' . $intRow . '][' . $strKey . ']';
         $arrField['id']                = $this->strId . '_row' . $intRow . '_' . $strKey;
-        $arrField['value']             = ($varValue !== '') ? $varValue : $arrField['default'];
+        $arrField['value']             = (null !== $varValue) ? $varValue : $arrField['default'];
         $arrField['eval']['tableless'] = true;
 
         $arrData = $this->handleDcGeneral($arrField, $strKey);
@@ -1509,9 +1520,9 @@ class MultiColumnWizard extends Widget
                 if ($arrField['eval']['columnPos']) {
                     $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
                 } else {
-                    $strHeaderItem = '<th>';
+                    $strHeaderItem = (key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
 
-                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="invisible">' : '';
+                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="hidden">' : '';
                     $strHeaderItem .=
                     (
                         (is_array($arrField['label']))
@@ -1564,7 +1575,7 @@ class MultiColumnWizard extends Widget
             $return .= \sprintf('<tr data-rowId="%s">', $k);
             foreach ($arrValue as $itemValue) {
                 if ($itemValue['hide'] == true) {
-                    $itemValue['tl_class'] .= ' invisible';
+                    $itemValue['tl_class'] .= ' hidden';
                 }
 
                 $return .= '<td'
@@ -1587,7 +1598,29 @@ class MultiColumnWizard extends Widget
 
         if ($onlyRows == false) {
             $return .= '</tbody></table>';
-            $script  = <<<SCRIPT
+            $return .= $this->generateScriptBlock($this->strId, $this->maxCount, $this->minCount);
+        } else {
+            $return .= '</table>';
+        }
+
+        return $return;
+    }
+
+    /**
+     * Generates the javascript block for the mcw.
+     *
+     * @param string $strId    The html id of the element.
+     *
+     * @param int    $maxCount The max amount of rows.
+     *
+     * @param int    $minCount The min amount of rows.
+     *
+     * @return string
+     */
+    protected function generateScriptBlock($strId, $maxCount, $minCount)
+    {
+        $script = <<<SCRIPT
+
 <script>
 window.addEvent("domready", function() {
     window["MCW_" + %s] = new MultiColumnWizard({
@@ -1599,18 +1632,14 @@ window.addEvent("domready", function() {
 });
 </script>
 SCRIPT;
-            $return .= sprintf(
-                $script,
-                json_encode($this->strId),
-                json_encode($this->strId),
-                intval($this->maxCount),
-                intval($this->minCount)
-            );
-        } else {
-            $return .= '</table>';
-        }
 
-        return $return;
+        return sprintf(
+            $script,
+            json_encode($strId),
+            json_encode($strId),
+            intval($maxCount),
+            intval($minCount)
+        );
     }
 
     /**
@@ -1696,7 +1725,7 @@ SCRIPT;
         // generate header fields
         foreach ($this->columnFields as $strKey => $arrField) {
             if (key_exists($strKey, $arrHiddenHeader)) {
-                $strKey = $strKey . ' invisible';
+                $strKey = $strKey . ' hidden';
             }
 
             $arrHeaderItems[] = sprintf(
@@ -1738,7 +1767,7 @@ SCRIPT;
 
         foreach ($arrItems as $itemKey => $itemValue) {
             if ($itemValue['hide']) {
-                $itemValue['tl_class'] .= ' invisible';
+                $itemValue['tl_class'] .= ' hidden';
             }
 
             $arrReturnItems[$itemKey] = '<div'

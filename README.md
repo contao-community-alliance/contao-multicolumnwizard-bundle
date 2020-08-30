@@ -107,3 +107,39 @@ $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
 
 ?>
 ```
+
+### Hide buttons
+
+```php
+<?php
+
+$GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_theme']['templateSelection'],
+    'exclude'   => true,
+    'inputType' => 'multiColumnWizard',
+    'eval'      => [
+        // add this line for hide one or all buttons
+        'buttons'      =>
+        [
+            'new'    => false,
+            'copy'   => false,
+            'delete' => false,
+            'up'     => false,
+            'down'   => false
+        ],
+        // as alternative to hide all buttons use the next line
+        //'hideButtons'  => true,
+        'columnFields' => [
+            'ts_client_browser' => [
+                'label'     => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_browser'],
+                'exclude'   => true,
+                'inputType' => 'text',
+                'eval'      => [ 'style' => 'width:180px' ],
+            ],
+        ],
+    ],
+    'sql'       => 'blob NULL',
+];
+
+?>
+```
