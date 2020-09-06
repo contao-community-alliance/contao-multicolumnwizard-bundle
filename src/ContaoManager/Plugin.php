@@ -27,7 +27,9 @@ use Contao\ManagerBundle\ContaoManagerBundle;
 use Contao\ManagerPlugin\Bundle\BundlePluginInterface;
 use Contao\ManagerPlugin\Bundle\Config\BundleConfig;
 use Contao\ManagerPlugin\Bundle\Parser\ParserInterface;
+use FOS\HttpCache\ProxyClient\Symfony;
 use MenAtWork\MultiColumnWizardBundle\MultiColumnWizardBundle;
+use Symfony\Bundle\TwigBundle\TwigBundle;
 
 /**
  * Class Plugin
@@ -43,6 +45,7 @@ class Plugin implements BundlePluginInterface
             BundleConfig::create(MultiColumnWizardBundle::class)
                 ->setLoadAfter(
                     [
+                        TwigBundle::class,
                         ContaoCoreBundle::class,
                         ContaoManagerBundle::class,
                     ]
