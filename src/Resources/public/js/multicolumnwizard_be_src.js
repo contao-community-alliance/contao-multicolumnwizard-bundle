@@ -4,7 +4,7 @@
  * @copyright   Andreas Schempp 2011
  * @copyright   certo web & design GmbH 2011
  * @copyright   MEN AT WORK 2013
- * @author      Ingolf Steinhardt <info@e-spin.de> 2017
+ * @author      Ingolf Steinhardt <info@e-spin.de> 2020
  * @package     MultiColumnWizard
  * @license     GNU/LGPL
  * @info        tab is set to 4 whitespaces
@@ -563,41 +563,46 @@ Object.append(MultiColumnWizard,
                 maxRowId = Math.max(maxRowId, ($(rows[i]).getAttribute('data-rowid')));
             }
 
-            var self=this;
+            var self = this;
             new Request.Contao({
                 evalScripts: false,
                 onSuccess:   function (txt, json) {
-                    el.removeClass('rotate');
-                    // Text to html.
-                    var newEl = new Element('div', {
-                        html: json.content
-                    });
-                    // Inject it on the right place.
-                    $(newEl).getElement('tr').inject(row, 'after');
-                    // Execute the JS from widgets.
-                    json.javascript && Browser.exec(json.javascript);
-                    // Rebind the events.
-                    $(newEl).getElements('td.operations a').each(function (operation) {
-                        var key = operation.get('data-operations');
+                   el.removeClass('rotate');
+                   // Text to html.
+                   var newEl = new Element('div', {
+                       html: json.content
+                   });
+                   // Inject it on the right place.
+                   var newRow = $(newEl).getElement('tr')
+                   newRow.inject(row, 'after');
+                   // Execute the JS from widgets.
+                   json.javascript && Browser.exec(json.javascript);
+                   // Rebind the events.
+                   newRow.getElements('td.operations a').each(function (operation) {
+                       var key = operation.get('data-operations');
 
-                        // call static load callbacks
-                        if (MultiColumnWizard.operationLoadCallbacks[key])
-                        {
-                            MultiColumnWizard.operationLoadCallbacks[key].each(function (callback) {
-                                callback.pass([operation, el], self)();
-                            });
-                        }
+                       // call static load callbacks
+                       if (MultiColumnWizard.operationLoadCallbacks[key])
+                       {
+                           MultiColumnWizard.operationLoadCallbacks[key].each(function (callback) {
+                               callback.pass([operation, el], self)();
+                           });
+                       }
 
-                        // call instance load callbacks
-                        if (self.operationLoadCallbacks[key])
-                        {
-                            self.operationLoadCallbacks[key].each(function (callback) {
-                                callback.pass([operation, el], self)();
-                            });
-                        }
-                    });
-                    self.updateOperations();
-                    self.asyncBlock = false;
+                       // call instance load callbacks
+                       if (self.operationLoadCallbacks[key])
+                       {
+                           self.operationLoadCallbacks[key].each(function (callback) {
+                               callback.pass([operation, el], self)();
+                           });
+                       }
+                   });
+                   // Add init chosen if tl_chosen defined in select for the new row.
+                   if (Elements.chosen !== undefined) {
+                       newRow.getElements('select.tl_chosen').chosen();
+                   }
+                   self.updateOperations();
+                   self.asyncBlock = false;
                 },
                 onFailure: function(xhr){
                     el.removeClass('rotate');
