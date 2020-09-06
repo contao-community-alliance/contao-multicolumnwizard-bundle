@@ -13,16 +13,16 @@
         display: block;
     }
 </style>
-<div id="{{ meta.id }}"
+<div id="{{ mcw.id }}"
      class="tl_modulewizard multicolumnwizard mcw-wrapper"
-     {% if meta.style is not empty %}style="{{ meta.style }}"{% endif %}
-     data-operations="maxCount[{{ meta.max }}] minCount[{{ meta.min }}] unique[{{ meta.unique }}] datepicker[{{ meta.datepicker }}] colorpicker[{{ meta.colorpicker }}]"
-     data-name="{{ meta.name }}"
-     data-max="{{ meta.max }}"
-     data-min="{{ meta.min }}"
-     data-unique="{{ meta.unique }}"
-     data-datepicker="{{ meta.datepicker }}"
-     data-colorpicker="{{ meta.colorpicker }}">
+     {% if mcw.style is not empty %}style="{{ mcw.style }}"{% endif %}
+     data-operations="maxCount[{{ mcw.max }}] minCount[{{ mcw.min }}] unique[{{ mcw.uniqueList | join(',') }}] datepicker[{{ mcw.datepickerList | join(',') }}] colorpicker[{{ mcw.colorpickerList | join(',') }}]"
+     data-name="{{ mcw.name }}"
+     data-max="{{ mcw.max }}"
+     data-min="{{ mcw.min }}"
+     data-unique="{{ mcw.uniqueList | join(',') }}"
+     data-datepicker="{{ mcw.datepickerList }}"
+     data-colorpicker="{{ mcw.colorpickerList | join(',') }}">
     <div class="mcw-header">
         {% for item in header %}
             {% if item.isHidden == true %}

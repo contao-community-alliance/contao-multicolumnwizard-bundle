@@ -154,6 +154,39 @@ class MultiColumnWizard extends Widget
     ];
 
     /**
+     * Field list of unique fields.
+     *
+     * @var array
+     */
+    protected $arrUnique = [];
+
+    /**
+     * Field list of datepicker fields.
+     *
+     * @var array
+     */
+    protected $arrDatepicker = [];
+
+    /**
+     * Field list of color picker fields.
+     *
+     * @var array
+     */
+    protected $arrColorpicker = [];
+
+    /**
+     * Field list of tineMce fields.
+     *
+     * @var array
+     */
+    protected $arrTinyMCE = [];
+
+    /**
+     * @var array|string
+     */
+    private $strCommand;
+
+    /**
      * Initialize the object
      *
      * @param bool $arrAttributes The attributes for the widget.
@@ -242,7 +275,7 @@ class MultiColumnWizard extends Widget
                 if ($varValue === true) {
                     $this->arrButtons = array();
                 }
-                // No break here.
+            // No break here.
             case 'disableSorting':
                 if ($varValue == true) {
                     unset($this->arrButtons['up']);
@@ -288,31 +321,266 @@ class MultiColumnWizard extends Widget
      */
     public function __get($strKey)
     {
-        switch ($strKey) {
-            case 'value':
-                /*
-                 * reformat array if we have only one field
-                 * from array[]['fieldname'] = value
-                 * to array[] = value
-                 * so we have the same behavoir like multiple-checkbox fields
-                 */
+        return parent::__get($strKey);
+    }
 
-                if ($this->flatArray) {
-                    $arrNew = array();
+    /**
+     * Get the current id of the mcw.
+     *
+     * @return string
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
 
-                    foreach ($this->varValue as $val) {
-                        $arrNew[] = $val[key($this->columnFields)];
-                    }
+    /**
+     * Get the name of the mcw.
+     *
+     * @return string
+     *
+     * @throws \JsonException
+     */
+    public function getName(): string
+    {
+        return json_encode($this->strId, JSON_THROW_ON_ERROR);
+    }
 
-                    return $arrNew;
-                } else {
-                    return parent::__get($strKey);
-                }
-                break;
+    /**
+     * reformat array if we have only one field
+     * from array[]['fieldname'] = value to array[] = value
+     * so we have the same behavoir like multiple-checkbox fields
+     *
+     * @return array|bool|int|object|string|null
+     */
+    public function getValue()
+    {
+        if ($this->flatArray) {
+            $arrNew = array();
 
-            default:
-                return parent::__get($strKey);
+            foreach ($this->varValue as $val) {
+                $arrNew[] = $val[key($this->columnFields)];
+            }
+
+            return $arrNew;
         }
+
+        return parent::__get('value');
+    }
+
+    /**
+     * Get the css style string or an empty string.
+     *
+     * @return string
+     */
+    public function getStyle(): string
+    {
+        return (($this->style) ?: '');
+    }
+
+    /**
+     * Get the mac count of rows.
+     *
+     * @return int
+     */
+    public function getMax(): int
+    {
+        return (int)$this->maxCount;
+    }
+
+    /**
+     * Get min count of rows.
+     *
+     * @return int
+     */
+    public function getMin(): int
+    {
+        return (int)$this->minCount;
+    }
+
+    /**
+     * Get list of unique fields.
+     *
+     * @return array
+     */
+    public function getUniqueList(): array
+    {
+        return $this->arrUnique;
+    }
+
+    /**
+     * Get list of datepicker fields.
+     *
+     * @return array
+     */
+    public function getDatepickerList(): array
+    {
+        return $this->arrDatepicker;
+    }
+
+    /**
+     * Get list of colorpicker fields.
+     *
+     * @return array
+     */
+    public function getColorpickerList(): array
+    {
+        return $this->arrColorpicker;
+    }
+
+    /**
+     * Get list of TineMce fields.
+     *
+     * @return array
+     */
+    public function getTinyMceList(): array
+    {
+        return $this->arrTinyMCE;
+    }
+
+    /**
+     * Get the widget data for the template.
+     *
+     * @param string $field Name of field.
+     *
+     * @param int    $row   The number of the row.
+     *
+     * @return array|null
+     */
+    protected function getRawWidgetFor($field, $row): ?array
+    {
+        if (!isset($this->columnFields[$field])) {
+            return null;
+        }
+
+        $arrField        = $this->columnFields[$field];
+        $this->activeRow = $row;
+        $blnHiddenBody   = false;
+
+        // load row specific data (useful for example for default values in different rows)
+        if (isset($this->arrRowSpecificData[$row][$field])) {
+            $arrField = array_merge($arrField, $this->arrRowSpecificData[$row][$field]);
+        }
+
+        $objWidget = $this->initializeWidget(
+            $arrField,
+            $row,
+            $field,
+            $this->varValue[$row][$field]
+        );
+
+        if ($objWidget === null) {
+            return null;
+        }
+
+        // load errors if there are any
+        if (!empty($this->arrWidgetErrors[$field][$row])) {
+            foreach ($this->arrWidgetErrors[$field][$row] as $strErrorMsg) {
+                $objWidget->addError($strErrorMsg);
+            }
+        }
+
+        if (is_string($objWidget)) {
+            $strWidget = $objWidget;
+        } elseif ($arrField['inputType'] === 'hidden') {
+            $strWidget = $objWidget->generate();
+        } elseif (true === $arrField['eval']['hideBody'] || true === $arrField['eval']['hideHead']) {
+            if (true === $arrField['eval']['hideBody']) {
+                $blnHiddenBody = true;
+            }
+
+            $strWidget = $objWidget->parse();
+        } else {
+            $additionalCode = [];
+
+            // Date picker.
+            $additionalCode['datePicker'] = $this->getMcWDatePickerString(
+                $objWidget->id,
+                $field,
+                null,
+                $arrField,
+                $this->strTable
+            );
+
+            // Color picker.
+            $additionalCode['colorPicker'] = $this->getMcWColorPicker(
+                $objWidget->id,
+                $field,
+                $arrField,
+                $this->strTable
+            );
+
+            // Tiny MCE.
+            if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
+                $additionalCode['tinyMce']    = $this->getMcWTinyMCEString(
+                    $objWidget->id,
+                    $arrField,
+                    $this->strTable
+                );
+                $arrField['eval']['tl_class'] .= ' tinymce';
+            }
+
+            // Add custom wizard
+            $additionalCode['dcaPicker'] = $this->getMcWDcaPickerWizard(
+                $objWidget->id,
+                $field,
+                $arrField,
+                $this->strTable
+            );
+
+            if ($arrField['wizard']) {
+                $wizard = '';
+
+                $dc               = $this->getDcDriver();
+                $dc->field        = $field;
+                $dc->inputName    = $objWidget->id;
+                $dc->strInputName = $objWidget->id;
+                $dc->value        = $objWidget->value;
+
+                if (is_array($arrField['wizard'])) {
+                    foreach ($arrField['wizard'] as $callback) {
+                        $this->import($callback[0]);
+                        $wizard .= $this->{$callback[0]}->{$callback[1]}($dc, $objWidget);
+                    }
+                } elseif (is_callable($arrField['wizard'])) {
+                    $wizard .= $arrField['wizard']($dc, $objWidget);
+                }
+
+                $objWidget->wizard = $wizard;
+            }
+
+            // Remove empty elements.
+            $additionalCode = array_filter(
+                $additionalCode,
+                static function ($value) {
+                    return !empty($value);
+                }
+            );
+
+            $strWidget = sprintf(
+                '%s%s',
+                $objWidget->parse(),
+                implode('', $additionalCode)
+            );
+        }
+
+        // Contao changed the name for FileTree and PageTree widgets
+        // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
+        $contaoVersion = VERSION . '.' . BUILD;
+        if ((version_compare($contaoVersion, '4.4.41', '>=') &&
+                version_compare($contaoVersion, '4.5.0', '<')) ||
+            version_compare($contaoVersion, '4.7.7', '>=')) {
+            $strWidget = str_replace(['reloadFiletree', 'reloadFiletreeDMA'], 'reloadFiletree_mcw', $strWidget);
+            $strWidget = str_replace(['reloadPagetree', 'reloadPagetreeDMA'], 'reloadPagetree_mcw', $strWidget);
+        }
+
+        return [
+            'entry'    => $strWidget,
+            'valign'   => $arrField['eval']['valign'],
+            'tl_class' => $arrField['eval']['tl_class'],
+            'hide'     => $blnHiddenBody,
+            'config'   => $arrField
+        ];
     }
 
     /**
@@ -518,7 +786,7 @@ class MultiColumnWizard extends Widget
     protected function validator($varInput)
     {
         // Cast all to an array. This should prevent us for some errors. See #35
-        $varInput = (array) $varInput;
+        $varInput = (array)$varInput;
 
         // The order of the data are in the right order. So just catch it and save it.
         $sortOrder = [];
@@ -623,7 +891,6 @@ class MultiColumnWizard extends Widget
         }
         $this->arrWidgetErrors = $newWidgetError;
 
-
         return $sortedData;
     }
 
@@ -646,38 +913,45 @@ class MultiColumnWizard extends Widget
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.ShortVariable)
      */
-    public function generate($overwriteRowCurrentRow = null, $onlyRows = false)
+    public function generate($overwriteRowCurrentRow = null, $onlyRows = false): string
     {
-        /*
-         * Load the callback data if there's any
-         * (do not do this in __set() already because then we don't have access to currentRecord)
-         */
-
+        // Load the callback data if there's any (do not do this in __set()
+        // already because then we don't have access to currentRecord).
         if (is_array($this->arrCallback)) {
             $this->import($this->arrCallback[0]);
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
         }
 
+        // Setup from some information.
         $this->strCommand = 'cmd_' . $this->strField;
-        $arrUnique        = array();
-        $arrDatepicker    = array();
-        $arrColorpicker   = array();
-        $arrTinyMCE       = array();
+        $intNumberOfRows  = max(count($this->varValue), 1);
+        // Always show the minimum number of rows if set.
+        if ($this->minCount && ($intNumberOfRows < $this->minCount)) {
+            $intNumberOfRows = $this->minCount;
+        }
+        // Declare the current row.
+        if ($overwriteRowCurrentRow !== null) {
+            $i               = (int) $overwriteRowCurrentRow;
+            $intNumberOfRows = ($i + 1);
+        } else {
+            $i = 0;
+        }
 
+        // Run all fields and generate a basic list of information.
         foreach ($this->columnFields as $strKey => $arrField) {
             // Store unique fields
             if ($arrField['eval']['unique']) {
-                $arrUnique[] = $strKey;
+                $this->arrUnique[] = $strKey;
             }
 
             // Store date picker fields
             if ($arrField['eval']['datepicker']) {
-                $arrDatepicker[] = $strKey;
+                $this->arrDatepicker[] = $strKey;
             }
 
             // Store color picker fields
             if ($arrField['eval']['colorpicker']) {
-                $arrColorpicker[] = $strKey;
+                $this->arrColorpicker[] = $strKey;
             }
 
             // Store tiny mce fields
@@ -692,207 +966,38 @@ class MultiColumnWizard extends Widget
                     );
                 }
 
-                $arrTinyMCE[] = $strKey;
-            }
-
-            if ($arrField['inputType'] == 'hidden') {
-                continue;
+                $this->arrTinyMCE[] = $strKey;
             }
         }
 
-        $intNumberOfRows = max(count($this->varValue), 1);
+        return $this->generateOutput($i);
+    }
 
-        // always show the minimum number of rows if set
-        if ($this->minCount && ($intNumberOfRows < $this->minCount)) {
-            $intNumberOfRows = $this->minCount;
-        }
 
-        $arrItems        = array();
-        $arrHiddenHeader = array();
+    /**
+     * Generates a table formatted MCW
+     *
+     * @param int $currentRow The current row, needed for particle generation.
+     *
+     * @return string
+     *
+     * @throws \Twig\Error\LoaderError
+     * @throws \Twig\Error\RuntimeError
+     * @throws \Twig\Error\SyntaxError
+     */
+    protected function generateOutput($currentRow = 0): string
+    {
+        $twigData = [
+            'mcw'        => $this,
+            'currentRow' => $currentRow
+        ];
 
-        if ($overwriteRowCurrentRow !== null) {
-            $i               = \intval($overwriteRowCurrentRow);
-            $intNumberOfRows = ($i + 1);
-        } else {
-            $i = 0;
-        }
+        $twig = $this->getTwig();
 
-        // Add input fields
-        for (; $i < $intNumberOfRows; $i++) {
-            $this->activeRow = $i;
-            $strHidden       = '';
-
-            // Walk every column
-            foreach ($this->columnFields as $strKey => $arrField) {
-                $strWidget     = '';
-                $blnHiddenBody = false;
-
-                if ($arrField['eval']['hideHead'] == true) {
-                    $arrHiddenHeader[$strKey] = true;
-                }
-
-                // load row specific data (useful for example for default values in different rows)
-                if (isset($this->arrRowSpecificData[$i][$strKey])) {
-                    $arrField = array_merge($arrField, $this->arrRowSpecificData[$i][$strKey]);
-                }
-
-                $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
-
-                // load errors if there are any
-                if (!empty($this->arrWidgetErrors[$strKey][$i])) {
-                    foreach ($this->arrWidgetErrors[$strKey][$i] as $strErrorMsg) {
-                        $objWidget->addError($strErrorMsg);
-                    }
-                }
-
-                if ($objWidget === null) {
-                    continue;
-                } elseif (is_string($objWidget)) {
-                    $strWidget = $objWidget;
-                } elseif ($arrField['inputType'] == 'hidden') {
-                    $strHidden .= $objWidget->generate();
-                    continue;
-                } elseif ($arrField['eval']['hideBody'] == true || $arrField['eval']['hideHead'] == true) {
-                    if ($arrField['eval']['hideBody'] == true) {
-                        $blnHiddenBody = true;
-                    }
-
-                    $strWidget = $objWidget->parse();
-                } else {
-                    $additionalCode = [];
-
-                    // Date picker.
-                    $additionalCode['datePicker'] = $this->getMcWDatePickerString(
-                        $objWidget->id,
-                        $strKey,
-                        null,
-                        $arrField,
-                        $this->strTable
-                    );
-
-                    // Color picker.
-                    $additionalCode['colorPicker'] = $this->getMcWColorPicker(
-                        $objWidget->id,
-                        $strKey,
-                        $arrField,
-                        $this->strTable
-                    );
-
-                    // Tiny MCE.
-                    if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
-                        $additionalCode['tinyMce']     = $this->getMcWTinyMCEString(
-                            $objWidget->id,
-                            $arrField,
-                            $this->strTable
-                        );
-                        $arrField['eval']['tl_class'] .= ' tinymce';
-                    }
-
-                    // Add custom wizard
-                    $additionalCode['dcaPicker'] = $this->getMcWDcaPickerWizard(
-                        $objWidget->id,
-                        $strKey,
-                        $arrField,
-                        $this->strTable
-                    );
-
-                    if ($arrField['wizard']) {
-                        $wizard = '';
-
-                        $dc               = $this->getDcDriver();
-                        $dc->field        = $strKey;
-                        $dc->inputName    = $objWidget->id;
-                        $dc->strInputName = $objWidget->id;
-                        $dc->value        = $objWidget->value;
-
-                        if (is_array($arrField['wizard'])) {
-                            foreach ($arrField['wizard'] as $callback) {
-                                $this->import($callback[0]);
-                                $wizard .= $this->{$callback[0]}->{$callback[1]}($dc, $objWidget);
-                            }
-                        } elseif (is_callable($arrField['wizard'])) {
-                            $wizard .= $arrField['wizard']($dc, $objWidget);
-                        }
-
-                        $objWidget->wizard = $wizard;
-                    }
-
-                    // Remove empty elements.
-                    $additionalCode = array_filter(
-                        $additionalCode,
-                        function ($value) {
-                            return !empty($value);
-                        }
-                    );
-
-                    $strWidget = sprintf(
-                        '%s%s',
-                        $objWidget->parse(),
-                        implode('', $additionalCode)
-                    );
-                }
-
-                // Contao changed the name for FileTree and PageTree widgets
-                // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
-                $contaoVersion = VERSION.'.'.BUILD;
-                if ((version_compare($contaoVersion, '4.4.41', '>=') &&
-                    version_compare($contaoVersion, '4.5.0', '<')) ||
-                   version_compare($contaoVersion, '4.7.7', '>=')) {
-                    $strWidget = str_replace(['reloadFiletree', 'reloadFiletreeDMA'], 'reloadFiletree_mcw', $strWidget);
-                    $strWidget = str_replace(['reloadPagetree', 'reloadPagetreeDMA'], 'reloadPagetree_mcw', $strWidget);
-                }
-
-                // Build array of items
-                if ($arrField['eval']['columnPos'] != '') {
-                    $arrItems[$i][$objWidget->columnPos]['entry']   .= $strWidget;
-                    $arrItems[$i][$objWidget->columnPos]['valign']   = $arrField['eval']['valign'];
-                    $arrItems[$i][$objWidget->columnPos]['tl_class'] = $arrField['eval']['tl_class'];
-                    $arrItems[$i][$objWidget->columnPos]['hide']     = $blnHiddenBody;
-                } else {
-                    $arrItems[$i][$strKey] = array
-                    (
-                        'entry'    => $strWidget,
-                        'valign'   => $arrField['eval']['valign'],
-                        'tl_class' => $arrField['eval']['tl_class'],
-                        'hide'     => $blnHiddenBody
-                    );
-                }
-            }
-        }
-
-        if ($this->blnTableless) {
-            $strOutput = $this->generateDiv(
-                $arrUnique,
-                $arrDatepicker,
-                $arrColorpicker,
-                $strHidden,
-                $arrItems,
-                $arrHiddenHeader,
-                $onlyRows
-            );
-        } elseif ($this->columnTemplate != '') {
-            $strOutput = $this->generateTemplateOutput(
-                $arrUnique,
-                $arrDatepicker,
-                $arrColorpicker,
-                $strHidden,
-                $arrItems,
-                $arrHiddenHeader,
-                $onlyRows
-            );
-        } else {
-            $strOutput = $this->generateTable(
-                $arrUnique,
-                $arrDatepicker,
-                $arrColorpicker,
-                $strHidden,
-                $arrItems,
-                $arrHiddenHeader,
-                $onlyRows
-            );
-        }
-
-        return $strOutput;
+        return $twig->render(
+            '@MawMCW/mcw_div.twig',
+            $twigData
+        );
     }
 
     /**
@@ -971,7 +1076,7 @@ class MultiColumnWizard extends Widget
                 $path = '?node=' . $arrField['eval']['path'];
             }
 
-            $xlabel              .= ' <a href="'
+            $xlabel               .= ' <a href="'
                 . $strContaoPrefix . 'files.php' . $path
                 . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['fileManager'])
                 . '" data-lightbox="files 765 80%">'
@@ -1110,8 +1215,7 @@ class MultiColumnWizard extends Widget
         $arrField['value']             = (null !== $varValue) ? $varValue : $arrField['default'];
         $arrField['eval']['tableless'] = true;
 
-        $arrData = $this->handleDcGeneral($arrField, $strKey);
-
+        $arrData   = $this->handleDcGeneral($arrField, $strKey);
         $objWidget = $this->buildWidget($strClass, $arrData, $arrField);
 
         $objWidget->strId         = $arrField['id'];
@@ -1195,7 +1299,7 @@ class MultiColumnWizard extends Widget
         if (isset($arrField['reference'])) {
             $property->setExtra(
                 array_merge(
-                    (array) $property->getExtra(),
+                    (array)$property->getExtra(),
                     array('reference' => $arrField['reference'])
                 )
             );
@@ -1281,67 +1385,6 @@ class MultiColumnWizard extends Widget
     public function addDataToFieldAtIndex($intIndex, $strField, $arrData)
     {
         $this->arrRowSpecificData[$intIndex][$strField] = $arrData;
-    }
-
-    /**
-     * Generates a table formatted MCW
-     *
-     * @param array  $arrUnique       The array of unique fields.
-     *
-     * @param array  $arrDatepicker   Datapicker information.
-     *
-     * @param array  $arrColorpicker  Colorpicker information.
-     *
-     * @param string $strHidden       Hidden information.
-     *
-     * @param array  $arrItems        List of items.
-     *
-     * @param array  $arrHiddenHeader List of hidden headers.
-     *
-     * @param bool   $onlyRows        Flag if the only want some rows.
-     *
-     * @return string
-     *
-     * @throws \Twig\Error\LoaderError
-     * @throws \Twig\Error\RuntimeError
-     * @throws \Twig\Error\SyntaxError
-     */
-    protected function generateOutput(
-        $arrUnique,
-        $arrDatepicker,
-        $arrColorpicker,
-        $strHidden,
-        $arrItems,
-        $arrHiddenHeader = array(),
-        $onlyRows = false
-    ) {
-        $twigData = [
-            'header' => $this->getTemplateInformationHeader($arrHiddenHeader),
-            'meta'   => $this->getTemplateInformationMeta(
-                $arrUnique,
-                $arrDatepicker,
-                $arrColorpicker,
-                $strHidden,
-                $onlyRows
-            ),
-            'items'  => $this->getTemplateInformationItems($arrItems),
-        ];
-
-        $twig = $this->getTwig();
-
-        return $twig->render(
-            '@MawMCW/mcw_outter.twig',
-            [
-                'html'   => $twig->render(
-                    '@MawMCW/mcw_div.twig',
-                    $twigData
-                ),
-                'script' => $twig->render(
-                    '@MawMCW/mcw_script.twig',
-                    $twigData
-                )
-            ]
-        );
     }
 
     /**
@@ -1468,145 +1511,6 @@ class MultiColumnWizard extends Widget
     }
 
     /**
-     * Generates a table formatted MCW
-     *
-     * @param array  $arrUnique       The array of unique fields.
-     *
-     * @param array  $arrDatepicker   Datapicker information.
-     *
-     * @param array  $arrColorpicker  Colorpicker information.
-     *
-     * @param string $strHidden       Hidden information.
-     *
-     * @param array  $arrItems        List of items.
-     *
-     * @param array  $arrHiddenHeader List of hidden headers.
-     *
-     * @param bool   $onlyRows        Flag if the only want some rows.
-     *
-     * @return string
-     *
-     * @deprecated Will be removed in Version 4.0.0
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    protected function generateTable(
-        $arrUnique,
-        $arrDatepicker,
-        $arrColorpicker,
-        $strHidden,
-        $arrItems,
-        $arrHiddenHeader = array(),
-        $onlyRows = false
-    ) {
-
-        return $this->generateOutput(
-            $arrUnique,
-            $arrDatepicker,
-            $arrColorpicker,
-            $strHidden,
-            $arrItems,
-            $arrHiddenHeader,
-            $onlyRows
-        );
-
-        $return = '';
-
-        if ($onlyRows == false) {
-            // Generate header fields.
-            foreach ($this->columnFields as $strKey => $arrField) {
-                if ($arrField['eval']['columnPos']) {
-                    $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
-                } else {
-                    $strHeaderItem = (key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
-
-                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="hidden">' : '';
-                    $strHeaderItem .=
-                    (
-                        (is_array($arrField['label']))
-                            ? $arrField['label'][0]
-                            : (
-                                ($arrField['label'] != null)
-                                    ? $arrField['label']
-                                    : $strKey
-                              )
-                    );
-                    $strHeaderItem .=
-                    (
-                        (is_array($arrField['label']) && $arrField['label'][1] != '')
-                            ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>'
-                            : ''
-                    );
-                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
-
-                    $arrHeaderItems[] = $strHeaderItem . '</th>';
-                }
-            }
-
-            $return = \sprintf(
-                '<table %s' .
-                ' data-operations="maxCount[%s] minCount[%s] unique[%s] datepicker[%s]' .
-                ' colorpicker[%s]"' .
-                ' data-name="%s"' .
-                ' id="ctrl_%s"' .
-                ' class="tl_modulewizard multicolumnwizard">',
-                (($this->style) ? (\sprintf('style="%s"', $this->style)) : ('')),
-                ($this->maxCount ? $this->maxCount : '0'),
-                ($this->minCount ? $this->minCount : '0'),
-                implode(',', $arrUnique),
-                implode(',', $arrDatepicker),
-                implode(',', $arrColorpicker),
-                $this->name,
-                $this->strId
-            );
-
-            if ($this->columnTemplate == '' && is_array($arrHeaderItems)) {
-                $return .= \sprintf('<thead><tr>%s<th></th></tr></thead>', implode("\n      ", $arrHeaderItems));
-            }
-
-            $return .= '<tbody>';
-        } else {
-            $return .= '<table>';
-        }
-
-        foreach ($arrItems as $k => $arrValue) {
-            $return .= \sprintf('<tr data-rowId="%s">', $k);
-            foreach ($arrValue as $itemValue) {
-                if ($itemValue['hide'] == true) {
-                    $itemValue['tl_class'] .= ' hidden';
-                }
-
-                $return .= '<td'
-                    . ($itemValue['valign'] != '' ? ' valign="' . $itemValue['valign'] . '"' : '')
-                    . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '')
-                    . '>'
-                    . $itemValue['entry']
-                    . '</td>';
-            }
-
-            // insert buttons at the very end
-            $return .= '<td class="operations col_last"'
-                . (($this->buttonPos != '') ? ' valign="' . $this->buttonPos . '" ' : '')
-                . '>'
-                . $strHidden;
-            $return .= $this->generateButtonString($k);
-            $return .= '</td>';
-            $return .= '</tr>';
-        }
-
-        if ($onlyRows == false) {
-            $return .= '</tbody></table>';
-            $return .= $this->generateScriptBlock($this->strId, $this->maxCount, $this->minCount);
-        } else {
-            $return .= '</table>';
-        }
-
-        return $return;
-    }
-
-    /**
      * Generates the javascript block for the mcw.
      *
      * @param string $strId    The html id of the element.
@@ -1643,151 +1547,6 @@ SCRIPT;
     }
 
     /**
-     * Generates a formatted MCW based on an template.
-     *
-     * @param array  $arrUnique      The array of unique fields.
-     *
-     * @param array  $arrDatepicker  Datapicker information.
-     *
-     * @param array  $arrColorpicker Colorpicker information.
-     *
-     * @param string $strHidden      Hidden information.
-     *
-     * @param array  $arrItems       List of items.
-     *
-     * @return string
-     *
-     * @deprecated Will be removed in Version 4.0.0
-     *
-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     */
-    protected function generateTemplateOutput($arrUnique, $arrDatepicker, $arrColorpicker, $strHidden, $arrItems)
-    {
-        return $this->generateOutput(
-            $arrUnique,
-            $arrDatepicker,
-            $arrColorpicker,
-            $strHidden,
-            $arrItems
-        );
-
-        $objTemplate        = new BackendTemplate($this->columnTemplate);
-        $objTemplate->items = $arrItems;
-
-        $arrButtons = array();
-        foreach (array_keys($arrItems) as $k) {
-            $arrButtons[$k] = $this->generateButtonString($k);
-        }
-        $objTemplate->buttons = $arrButtons;
-
-        return $objTemplate->parse();
-    }
-
-    /**
-     * Generates a div formatted MCW
-     *
-     * @param array  $arrUnique       The array of unique fields.
-     *
-     * @param array  $arrDatepicker   Datapicker information.
-     *
-     * @param array  $arrColorpicker  Colorpicker information.
-     *
-     * @param string $strHidden       Hidden information.
-     *
-     * @param array  $arrItems        List of items.
-     *
-     * @param array  $arrHiddenHeader List of hidden headers.
-     *
-     * @return string
-     *
-     * @deprecated Will be removed in Version 4.0.0
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     * @SuppressWarnings(PHPMD.NPathComplexity)
-     */
-    protected function generateDiv(
-        $arrUnique,
-        $arrDatepicker,
-        $arrColorpicker,
-        $strHidden,
-        $arrItems,
-        $arrHiddenHeader = array()
-    ) {
-        return $this->generateOutput(
-            $arrUnique,
-            $arrDatepicker,
-            $arrColorpicker,
-            $strHidden,
-            $arrItems,
-            $arrHiddenHeader
-        );
-
-        // generate header fields
-        foreach ($this->columnFields as $strKey => $arrField) {
-            if (key_exists($strKey, $arrHiddenHeader)) {
-                $strKey = $strKey . ' hidden';
-            }
-
-            $arrHeaderItems[] = sprintf(
-                '<div class="%s">%s</div>',
-                $strKey,
-                ($arrField['label'][0] ? $arrField['label'][0] : $strKey)
-            );
-        }
-
-        $return  = '<div'
-            . (($this->style) ? (' style="' . $this->style . '"') : '')
-            . ' data-operations="maxCount['
-            . ($this->maxCount ? $this->maxCount : '0')
-            . '] minCount['
-            . ($this->minCount ? $this->minCount : '0')
-            . '] unique['
-            . implode(
-                ',',
-                $arrUnique
-            )
-            . '] datepicker['
-            . implode(
-                ',',
-                $arrDatepicker
-            )
-            . '] colorpicker['
-            . implode(
-                ',',
-                $arrColorpicker
-            )
-            . ']" id="ctrl_'
-            . $this->strId
-            . '" class="tl_modulewizard multicolumnwizard">';
-        $return .= '<div class="header_fields">' . implode('', $arrHeaderItems) . '</div>';
-
-
-        // new array for items so we get rid of the ['entry'] and ['valign']
-        $arrReturnItems = array();
-
-        foreach ($arrItems as $itemKey => $itemValue) {
-            if ($itemValue['hide']) {
-                $itemValue['tl_class'] .= ' hidden';
-            }
-
-            $arrReturnItems[$itemKey] = '<div'
-                . ($itemValue['tl_class'] != '' ? ' class="' . $itemValue['tl_class'] . '"' : '')
-                . '>'
-                . $itemValue['entry']
-                . '</div>';
-        }
-
-        $return .= implode('', $arrReturnItems);
-
-
-        $return .= '<div class="col_last buttons">' . $this->generateButtonString($strKey) . '</div>';
-
-        $return .= $strHidden;
-
-        return $return . '</div>';
-    }
-
-    /**
      * Generate the HTML for the operation buttons, as string.
      *
      * @param int $level The level.
@@ -1806,7 +1565,7 @@ SCRIPT;
             }
 
             $btnName = \sprintf('tw_r%s', StringUtil::specialchars($button));
-            $return .=
+            $return  .=
                 \sprintf(
                     '<a data-operations="%s" href="%s" class="widgetImage" title="%s" onclick="return false;">%s</a> ',
                     $button,
