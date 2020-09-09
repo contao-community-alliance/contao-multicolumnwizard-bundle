@@ -820,6 +820,16 @@ class MultiColumnWizard extends Widget
                         $objWidget->parse(),
                         implode('', $additionalCode)
                     );
+
+                    // See: https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/80
+                    // https://github.com/contao/core-bundle/blob/d6a89/src/Resources/contao/widgets/SelectMenu.php#L158
+                    if ($objWidget->multiple) {
+                        $strWidget = \str_replace(
+                            '<input type="hidden" name="' . \substr($objWidget->name, 0, -3) . '"',
+                            '<input type="hidden" name="' . \substr($objWidget->name, 0, -2) . '"',
+                            $strWidget
+                        );
+                    }
                 }
 
                 // Contao changed the name for FileTree and PageTree widgets
