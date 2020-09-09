@@ -8,6 +8,7 @@
  * @package     MultiColumnWizard
  * @license     GNU/LGPL
  * @info        tab is set to 4 whitespaces
+ * @info        Compressed with https://prepros.io/
  */
 
 var MultiColumnWizard = new Class(
