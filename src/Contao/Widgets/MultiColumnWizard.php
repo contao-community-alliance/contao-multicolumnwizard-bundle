@@ -1581,7 +1581,8 @@ SCRIPT;
             $btnName = \sprintf('tw_r%s', StringUtil::specialchars($button));
             $return .=
                 \sprintf(
-                    '<a data-operations="%s" href="%s" class="widgetImage" title="%s" onclick="return false;">%s</a> ',
+                    '<a data-operations="%s" href="%s" class="widgetImage op-%s" title="%s"
+                         onclick="return false;">%s</a>',
                     $button,
                     $this->addToUrl(
                         \sprintf(
@@ -1592,6 +1593,7 @@ SCRIPT;
                             $this->currentRecord
                         )
                     ),
+                    $button,
                     $GLOBALS['TL_LANG']['MSC'][$btnName],
                     Image::getHtml(
                         $image,
