@@ -562,9 +562,9 @@ class MultiColumnWizard extends Widget
 
                         try {
                             $varValue = $this->{$callback[0]}->{$callback[1]}($varValue, $this);
-                        } catch (\Exception $e) {
+                        } catch (\Exception $exception) {
                             $objWidget->class = 'error';
-                            $objWidget->addError($e->getMessage());
+                            $objWidget->addError($exception->getMessage());
                         }
                     }
                 }
@@ -1025,8 +1025,9 @@ class MultiColumnWizard extends Widget
                 $this->import($arrField['input_field_callback'][0]);
             }
 
-            return $this->{$arrField['input_field_callback'][0]}->{$arrField['input_field_callback'][1]}($this,
-                $xlabel);
+            return $this
+                ->{$arrField['input_field_callback'][0]}
+                ->{$arrField['input_field_callback'][1]}($this, $xlabel);
         }
 
         $strClass = $GLOBALS[(TL_MODE == 'BE' ? 'BE_FFL' : 'TL_FFL')][$arrField['inputType']];
