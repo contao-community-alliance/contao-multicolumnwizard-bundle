@@ -1,7 +1,7 @@
 ignore:
 
 exclude:
-  src/Resources/contao/languages
+  - /^src\/Resources\/contao\/languages/
 
 mapping:
   "Andreas Isaak <info@andreas-isaak.de>": "Andreas Isaak <andy.jared@googlemail.com>"

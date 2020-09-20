@@ -30,7 +30,9 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * This tests the color picker event listener.
+ * This class test the overwrite of the older namespace of previous versions.
+ *
+ * @coversNothing
  */
 class DeprecatedAutoloaderTest extends TestCase
 {

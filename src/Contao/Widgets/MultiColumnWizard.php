@@ -562,9 +562,9 @@ class MultiColumnWizard extends Widget
 
                         try {
                             $varValue = $this->{$callback[0]}->{$callback[1]}($varValue, $this);
-                        } catch (\Exception $e) {
+                        } catch (\Exception $exception) {
                             $objWidget->class = 'error';
-                            $objWidget->addError($e->getMessage());
+                            $objWidget->addError($exception->getMessage());
                         }
                     }
                 }
@@ -1025,8 +1025,9 @@ class MultiColumnWizard extends Widget
                 $this->import($arrField['input_field_callback'][0]);
             }
 
-            return $this->{$arrField['input_field_callback'][0]}->{$arrField['input_field_callback'][1]}($this,
-                $xlabel);
+            return $this
+                ->{$arrField['input_field_callback'][0]}
+                ->{$arrField['input_field_callback'][1]}($this, $xlabel);
         }
 
         $strClass = $GLOBALS[(TL_MODE == 'BE' ? 'BE_FFL' : 'TL_FFL')][$arrField['inputType']];
@@ -1581,7 +1582,8 @@ SCRIPT;
             $btnName = \sprintf('tw_r%s', StringUtil::specialchars($button));
             $return .=
                 \sprintf(
-                    '<a data-operations="%s" href="%s" class="widgetImage" title="%s" onclick="return false;">%s</a> ',
+                    '<a data-operations="%s" href="%s" class="widgetImage op-%s" title="%s"
+                         onclick="return false;">%s</a>',
                     $button,
                     $this->addToUrl(
                         \sprintf(
@@ -1592,6 +1594,7 @@ SCRIPT;
                             $this->currentRecord
                         )
                     ),
+                    $button,
                     $GLOBALS['TL_LANG']['MSC'][$btnName],
                     Image::getHtml(
                         $image,
