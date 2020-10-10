@@ -66,7 +66,45 @@ class ExecutePostActions extends BaseListener
     }
 
     /**
-     * Create a new row.
+     * We have to clear the data, because contao set for some widgets a default hidden input with a empty value.
+     * This force the system to set a empty value in the post and the controller knows there is an empty value.
+     * But since we use mootools to get the post data out of the form, this input makes some trouble.
+     *
+     * So we must check if the widget data are an array and have more than one value. If yes and the first value
+     * is a empty string we have to remove it and reset the key count.
+     *
+     * @param string $widgetName The name of the widget. Used for the post lookup.
+     *
+     * @return void
+     */
+    private function clearPostForCopyCommand($widgetName)
+    {
+        if (empty($widgetName)) {
+            return;
+        }
+
+        $widgetData = Input::post($widgetName);
+
+        foreach ($widgetData as $rowId => $row) {
+            foreach ($row as $fieldName => $value) {
+                // See the php function doc, why this is okay.
+                if (!is_array($value) || 1 === count($value)) {
+                    continue;
+                }
+
+                if ($value[0] === '') {
+                    unset($value[0]);
+                    $widgetData[$rowId][$fieldName] = array_values($value);
+                }
+            }
+        }
+
+        Input::setPost($widgetName, $widgetData);
+    }
+
+    /**
+     * Create a new row or make a copy from the given post data.
+     *
      * Will call the event men-at-work.multi-column-wizard-bundle.create-widget to get the widget.
      *
      * @param string        $action    The action.
@@ -81,7 +119,8 @@ class ExecutePostActions extends BaseListener
     public function handleRowCreation($action, $container)
     {
         // Check the context.
-        if ('mcwCreateNewRow' != $action) {
+        if ('mcwCreateNewRow' !== $action
+            && 'mcwCopyNewRow' !== $action) {
             return;
         }
 
@@ -90,7 +129,8 @@ class ExecutePostActions extends BaseListener
         if (!$container instanceof General) {
             $container->inputName = $fieldName;
         }
-        if (Input::get('act') == 'editAll') {
+
+        if ('editAll' === Input::get('act')) {
             $fieldName = \preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $fieldName);
         }
 
@@ -126,7 +166,28 @@ class ExecutePostActions extends BaseListener
             $maxRowCount = 0;
         }
 
-        throw new ResponseException($this->convertToResponse($widget->generate(($maxRowCount + 1), true)));
+        // Handle the run. Since we check at the start which action it is, we don't need a else part.
+        $return = null;
+        if ('mcwCreateNewRow' === $action) {
+            $return = $widget->generate(($maxRowCount + 1), true);
+        }
+
+        if ('mcwCopyNewRow' === $action) {
+            $name = Input::post('name');
+            $this->clearPostForCopyCommand($name);
+            $widget->validate();
+            if ($widget->hasErrors()) {
+                // ToDo handle them.
+            }
+
+            $return = $widget->generate(($maxRowCount + 1), true, true);
+        }
+
+        if ($return === null) {
+            throw new BadRequestHttpException('Bad request');
+        }
+
+        throw new ResponseException($this->convertToResponse($return));
     }
 
     /**

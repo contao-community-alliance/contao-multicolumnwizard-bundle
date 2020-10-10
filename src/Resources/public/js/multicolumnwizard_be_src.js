@@ -635,62 +635,88 @@ Object.append(MultiColumnWizard,
             }
         },
 
-
         /**
-         * Operation "new" - click
-         * @param Element the icon element
-         * @param Element the row
+         * Call PHP/Contao/Widget to get a new row.
+         *
+         * @param el The button.
+         *
+         * @param row The tr of the table.
+         *
+         * @return void
          */
-        newClick: function(el, row)
-        {
-            this.killAllTinyMCE(el, row);
+        copyNewElement: function (el, row) {
+            // Check if already a run is running.
+            if (this.asyncBlock === true) {
+                return;
+            }
+            this.asyncBlock = true;
+            el.addClass('rotate');
 
-            var rowCount = row.getSiblings().length + 1;
+            // First try to make a form from it and get a usable query string.
+            let newEl = new Element('form');
+            $(newEl).set('html', $(row).get('html'));
+            let queryString = $(newEl).toQueryString().parseQueryString()
 
-            // check maxCount for an inject
-            if (this.options.maxCount == 0 || (this.options.maxCount > 0 && rowCount < this.options.maxCount))
-            {
-                var copy = row.clone(true,true);
-
-                // clear all elements
-                copy.getElements('input,select,textarea').each(function(el){
-                    MultiColumnWizard.clearElementValue(el);
-                });
-
-                // get the current level of the row
-                level = row.getAllPrevious().length;
-
-                // update the row attributes
-                copy = this.updateRowAttributes(++level, copy);
-                copy.inject(row, 'after');
-
-                // update tooltips
-                copy.getElements('a[data-operations]').each(function(el) {
-                    $$(el).set('title', $$(el).getElement('img').get('alt'));
-                    new Tips.Contao($$(el).filter(function(i) {
-                        return i.title != '';
-                    }), {
-                        offset: {x:0, y:26}
-                    });
-                });
-
-                // exec script
-                if (copy.getElements('script').length > 0)
-                {
-                    copy.getElements('script').each(function(script){
-                        Browser.exec(script.get('html'));
-                    });
-                }
-
-                // update the row attribute of the following rows
-                var that = this;
-                copy.getAllNext().each(function(row){
-                    that.updateRowAttributes(++level, row);
-                });
+            // Define some more information.
+            let parentMcw = $(row).getParent('.tl_modulewizard.multicolumnwizard');
+            let fieldName = $(parentMcw).getAttribute('data-name');
+            let rows = $(parentMcw).getElements('tr');
+            let maxRowId = 0;
+            for (let i = 0; i < rows.length; i++) {
+                maxRowId = Math.max(maxRowId, ($(rows[i]).getAttribute('data-rowid')));
             }
 
-            this.reinitTinyMCE(el, row, false);
-            this.reinitStylect();
+            // Add al missing query parameter.
+            queryString.action = 'mcwCopyNewRow';
+            queryString.name = fieldName;
+            queryString.maxRowId = maxRowId;
+            queryString.REQUEST_TOKEN = Contao.request_token;
+
+            // Setup request.
+            let self = this;
+            new Request.Contao({
+                evalScripts: false,
+                onSuccess: function (txt, json) {
+                    el.removeClass('rotate');
+                    // Text to html.
+                    let newEl = new Element('div', {
+                        html: json.content
+                    });
+                    // Inject it on the right place.
+                    let newRow = $(newEl).getElement('tr')
+                    newRow.inject(row, 'after');
+                    // Execute the JS from widgets.
+                    json.javascript && Browser.exec(json.javascript);
+                    // Rebind the events.
+                    newRow.getElements('td.operations a').each(function (operation) {
+                        let key = operation.get('data-operations');
+
+                        // call static load callbacks
+                        if (MultiColumnWizard.operationLoadCallbacks[key]) {
+                            MultiColumnWizard.operationLoadCallbacks[key].each(function (callback) {
+                                callback.pass([operation, el], self)();
+                            });
+                        }
+
+                        // call instance load callbacks
+                        if (MultiColumnWizard.operationLoadCallbacks[key]) {
+                            MultiColumnWizard.operationLoadCallbacks[key].each(function (callback) {
+                                callback.pass([operation, el], self)();
+                            });
+                        }
+                    });
+                    // Add init chosen if tl_chosen defined in select for the new row.
+                    if (Elements.chosen !== undefined) {
+                        newRow.getElements('select.tl_chosen').chosen();
+                    }
+                    self.updateOperations();
+                    self.asyncBlock = false;
+                },
+                onFailure: function (xhr) {
+                    el.removeClass('rotate');
+                    self.asyncBlock = false;
+                }
+            }).post(queryString);
         },
 
         /**
@@ -698,15 +724,13 @@ Object.append(MultiColumnWizard,
          * @param Element the icon element
          * @param Element the row
          */
-        copyUpdate: function(el, row)
-        {
+        copyUpdate: function (el, row) {
             var rowCount = row.getSiblings().length + 1;
 
             // remove the copy possibility if we have already reached maxCount
-            if (this.options.maxCount > 0 && rowCount >= this.options.maxCount)
-            {
+            if (this.options.maxCount > 0 && rowCount >= this.options.maxCount) {
                 el.setStyle('display', 'none');
-            }else{
+            } else {
                 el.setStyle('display', 'inline');
             }
         },
@@ -882,14 +906,16 @@ Object.append(MultiColumnWizard,
 /**
  * Register default callbacks
  */
-// MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.newClick);
-// MultiColumnWizard.addOperationUpdateCallback('copy', MultiColumnWizard.copyUpdate);
-// MultiColumnWizard.addOperationClickCallback('copy', MultiColumnWizard.copyClick);
-
+// New callback.
 MultiColumnWizard.addOperationUpdateCallback('new', MultiColumnWizard.newUpdate);
 MultiColumnWizard.addOperationClickCallback('new', MultiColumnWizard.insertNewElement);
+// Copy callback.
+MultiColumnWizard.addOperationUpdateCallback('copy', MultiColumnWizard.copyUpdate);
+MultiColumnWizard.addOperationClickCallback('copy', MultiColumnWizard.copyNewElement);
+// Delete callback.
 MultiColumnWizard.addOperationUpdateCallback('delete', MultiColumnWizard.deleteUpdate);
 MultiColumnWizard.addOperationClickCallback('delete', MultiColumnWizard.deleteClick);
+// Movements.
 MultiColumnWizard.addOperationClickCallback('up', MultiColumnWizard.upClick);
 MultiColumnWizard.addOperationClickCallback('down', MultiColumnWizard.downClick);
 
