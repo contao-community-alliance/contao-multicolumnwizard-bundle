@@ -85,7 +85,7 @@
   },
   "replace": {
     "contao-legacy/multicolumnwizard": "*",
-    "menatwork/contao-multicolumnwizard": ">=3.3.4 <3.4.0"
+    "menatwork/contao-multicolumnwizard": ">=3.3.4 <4.0"
   },
   "extra": {
     "contao-manager-plugin": "MenAtWork\\MultiColumnWizardBundle\\ContaoManager\\Plugin",
