@@ -12,13 +12,15 @@ http://de.contaowiki.org/MultiColumnWizard
 
 ## Install
 
-You can install the Multicolumnwizard via the Contao-Manager - search for `contao-multicolumnwizard-bundle` - or with the Composer via the call
+The Multicolumnwizard is usually installed via an extension. If it is necessary to install Multicolumnwizard yourself, please use the console with the composer via the call
 
 `composer require menatwork/contao-multicolumnwizard-bundle`
+
 or
+
 `web/contao-manager.phar.php composer require menatwork/contao-multicolumnwizard-bundle`
 
-Developers can add the Multicolumnwizard to their `composer.json` as a dependent package.
+Developers should add the Multicolumnwizard to their `composer.json` as a dependent package.
 
 ## Usages
 
