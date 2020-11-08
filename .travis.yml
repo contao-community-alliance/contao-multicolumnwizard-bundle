@@ -28,8 +28,12 @@ matrix:
   allow_failures:
     - env: CONTAO_VERSION=~4.10.0
 
-before_script:
-  - echo "memory_limit=-1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+sudo: false
+
+before_install:
+  - echo "memory_limit = -1" > travis.php.ini && phpenv config-add travis.php.ini
+
+install:
   - travis_retry composer self-update && composer --version
   - travis_retry composer require contao/core-bundle $CONTAO_VERSION --no-update
   - >
