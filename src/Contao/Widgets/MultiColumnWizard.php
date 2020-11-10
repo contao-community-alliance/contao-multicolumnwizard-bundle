@@ -306,6 +306,23 @@ class MultiColumnWizard extends Widget
     }
 
     /**
+     * Generate the label and return it as string
+     *
+     * @return string The label markup
+     */
+    public function generateLabel()
+    {
+        foreach ($this->columnFields as $arrField) {
+            if ($arrField['eval']['mandatory']) {
+                $this->addAttribute('mandatory', true);
+                break;
+            }
+        }
+
+        return parent::generateLabel();
+    }
+
+    /**
      * Trigger the event men-at-work.multi-column-wizard-bundle.get-tiny-mce
      * Try to get help for generating the TinyMceScript.
      *
@@ -1296,6 +1313,7 @@ class MultiColumnWizard extends Widget
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
     protected function generateTable(
         $arrUnique,
@@ -1318,6 +1336,11 @@ class MultiColumnWizard extends Widget
                     $strHeaderItem = (key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
 
                     $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="hidden">' : '';
+                    if ($arrField['eval']['mandatory']) {
+                        $strHeaderItem .= '<span class="invisible">'
+                        . $GLOBALS['TL_LANG']['MSC']['mandatory']
+                        . ' </span>';
+                    }
                     $strHeaderItem .=
                     (
                         (is_array($arrField['label']))
@@ -1328,6 +1351,9 @@ class MultiColumnWizard extends Widget
                                     : $strKey
                               )
                     );
+                    if ($arrField['eval']['mandatory']) {
+                        $strHeaderItem .= '<span class="mandatory">*</span>';
+                    }
                     $strHeaderItem .=
                     (
                         (is_array($arrField['label']) && $arrField['label'][1] != '')
