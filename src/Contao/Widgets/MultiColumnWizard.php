@@ -149,6 +149,7 @@ class MultiColumnWizard extends Widget
      */
     protected $arrButtons = [
         'new'    => 'new.gif',
+        'copy'   => 'copy.gif',
         'delete' => 'delete.gif',
         'move'   => 'drag.gif'
     ];
@@ -611,6 +612,11 @@ class MultiColumnWizard extends Widget
         if ($blnHasError) {
             $this->blnSubmitInput = false;
             $this->addError($GLOBALS['TL_LANG']['ERR']['general']);
+            foreach ($this->arrWidgetErrors as $key => $rows) {
+                foreach ($rows as $rowNumber => $msg) {
+                    $this->addError(sprintf('Row: %s | Widget: %s | Error: %s', $rowNumber, $key, $msg));
+                }
+            }
         }
 
         // Rebuild the order.
@@ -643,9 +649,11 @@ class MultiColumnWizard extends Widget
      *
      * @param bool     $onlyRows               If true, only row's will be output.
      *
-     * @return string The HTML code of the widget.
+     * @param bool     $copyRow                Flag to use the first row in the list for copy. If u use the validator
+     *                                         function and have only one row, the validate function will set it as
+     *                                         first value e.g. on key zero.
      *
-     * @throws \Exception If something went wrong.
+     * @return string The HTML code of the widget.
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -653,11 +661,14 @@ class MultiColumnWizard extends Widget
      * @SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.ShortVariable)
      */
-    public function generate($overwriteRowCurrentRow = null, $onlyRows = false)
-    {
+    public function generate(
+        $overwriteRowCurrentRow = null,
+        $onlyRows = false,
+        $copyRow = false
+    ) {
         /*
          * Load the callback data if there's any
-         * (do not do this in __set() already because then we don't have access to currentRecord)
+         * (do not do this in __set() already, because then we don't have access to currentRecord)
          */
 
         if (is_array($this->arrCallback)) {
@@ -743,7 +754,12 @@ class MultiColumnWizard extends Widget
                     $arrField = array_merge($arrField, $this->arrRowSpecificData[$i][$strKey]);
                 }
 
-                $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
+                // Switch to use a valid copy row or the current data.
+                if ($overwriteRowCurrentRow !== null && $copyRow === true) {
+                    $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[0][$strKey]);
+                } else {
+                    $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
+                }
 
                 // load errors if there are any
                 if (!empty($this->arrWidgetErrors[$strKey][$i])) {
