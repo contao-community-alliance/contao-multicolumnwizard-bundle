@@ -11,6 +11,8 @@
  * This project is provided in good faith and hope to be usable by anyone.
  *
  * @package    menatwork/contao-multicolumnwizard-bundle
+ * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2019 MEN AT WORK
@@ -18,11 +20,7 @@
  * @filesource
  */
 
-$GLOBALS['TL_LANG']['ERR']['mcwMinCount']
-    = 'Bitte füllen Sie mindestens %s Zeilen aus!';
-$GLOBALS['TL_LANG']['ERR']['mcwMaxCount']
-    = 'Es dürfen höchstens %s Zeilen ausgefüllt werden!';
-$GLOBALS['TL_LANG']['MSC']['tw_rnew']
-    = 'Eine neue Reihe erstellen.';
-$GLOBALS['TL_LANG']['MSC']['tw_rmove']
-    = 'Die Reihe verschieben.';
+$GLOBALS['TL_LANG']['ERR']['mcwMinCount'] = 'Bitte füllen Sie mindestens %s Zeilen aus!';
+$GLOBALS['TL_LANG']['ERR']['mcwMaxCount'] = 'Es dürfen höchstens %s Zeilen ausgefüllt werden!';
+$GLOBALS['TL_LANG']['MSC']['tw_rnew']     = 'Eine neue Reihe erstellen.';
+$GLOBALS['TL_LANG']['MSC']['tw_rmove']    = 'Die Reihe verschieben.';

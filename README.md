@@ -12,13 +12,15 @@ http://de.contaowiki.org/MultiColumnWizard
 
 ## Install
 
-You can install the Multicolumnwizard via the Contao-Manager - search for `contao-multicolumnwizard-bundle` - or with the Composer via the call
+The Multicolumnwizard is usually installed via an extension. If it is necessary to install Multicolumnwizard yourself, please use the console with the composer via the call
 
 `composer require menatwork/contao-multicolumnwizard-bundle`
+
 or
+
 `web/contao-manager.phar.php composer require menatwork/contao-multicolumnwizard-bundle`
 
-Developers can add the Multicolumnwizard to their `composer.json` as a dependent package.
+Developers should add the Multicolumnwizard to their `composer.json` as a dependent package.
 
 ## Usages
 
@@ -93,6 +95,42 @@ $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
     'eval'      => [
         // add this line for use the up and down arrows
         'dragAndDrop'  => false,
+        'columnFields' => [
+            'ts_client_browser' => [
+                'label'     => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_browser'],
+                'exclude'   => true,
+                'inputType' => 'text',
+                'eval'      => [ 'style' => 'width:180px' ],
+            ],
+        ],
+    ],
+    'sql'       => 'blob NULL',
+];
+
+?>
+```
+
+### Hide buttons
+
+```php
+<?php
+
+$GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
+    'label'     => &$GLOBALS['TL_LANG']['tl_theme']['templateSelection'],
+    'exclude'   => true,
+    'inputType' => 'multiColumnWizard',
+    'eval'      => [
+        // add this line for hide one or all buttons
+        'buttons'      =>
+        [
+            'new'    => false,
+            'copy'   => false,
+            'delete' => false,
+            'up'     => false,
+            'down'   => false
+        ],
+        // as alternative to hide all buttons use the next line
+        //'hideButtons'  => true,
         'columnFields' => [
             'ts_client_browser' => [
                 'label'     => &$GLOBALS['TL_LANG']['tl_theme']['ts_client_browser'],

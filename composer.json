@@ -60,7 +60,7 @@
   },
   "require-dev": {
     "phpcq/all-tasks": "~1.2",
-    "contao/manager-bundle": "~4.4"
+    "contao/manager-bundle": "^4.4"
   },
   "autoload": {
     "psr-4": {
@@ -85,7 +85,7 @@
   },
   "replace": {
     "contao-legacy/multicolumnwizard": "*",
-    "menatwork/contao-multicolumnwizard": "self.version"
+    "menatwork/contao-multicolumnwizard": ">=3.3.4 <4.0"
   },
   "extra": {
     "contao-manager-plugin": "MenAtWork\\MultiColumnWizardBundle\\ContaoManager\\Plugin",

@@ -17,3 +17,6 @@ vendor/
 
 # build
 build/
+src/Resources/public/js/prepros.config
+.phpunit.result.cache
+composer.lock

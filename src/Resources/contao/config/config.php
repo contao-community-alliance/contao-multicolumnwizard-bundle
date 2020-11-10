@@ -61,4 +61,3 @@ if (TL_MODE == 'BE') {
         ? 'bundles/multicolumnwizard/css/multicolumnwizard_src.css'
         : 'bundles/multicolumnwizard/css/multicolumnwizard.css';
 }
-

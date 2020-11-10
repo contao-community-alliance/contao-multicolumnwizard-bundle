@@ -3,7 +3,7 @@
 /**
  * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * (c) 2012-2019 MEN AT WORK.
+ * (c) 2012-2020 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,10 +12,12 @@
  *
  * @package    menatwork/contao-multicolumnwizard-bundle
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
+ * @author     Julian Aziz Haslinger <me@aziz.wtf>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Sven Baumann <baumann.sv@gmail.com>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
- * @copyright  2013-2019 MEN AT WORK
+ * @copyright  2013-2020 MEN AT WORK
  * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -31,7 +33,14 @@ use Contao\Input;
 use Contao\PageTree;
 use Contao\StringUtil;
 use Contao\System;
+use Contao\Widget;
+use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
+use ContaoCommunityAlliance\DcGeneral\ContaoFrontend\View\WidgetManager;
+use ContaoCommunityAlliance\DcGeneral\DataContainerInterface;
+use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\PropertyInterface;
 use ContaoCommunityAlliance\DcGeneral\DC\General;
+use ContaoCommunityAlliance\DcGeneral\Exception\DcGeneralRuntimeException;
 use FilesModel;
 use FileTree;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
@@ -155,29 +164,54 @@ class ExecutePostActions extends BaseListener
         }
 
         $intId    = \Input::get('id');
-        $strField = $container->inputName = \Input::post('name');
+        $strField = $this->getInputName($container);
+        // Contao changed the name for FileTree and PageTree widgets
+        // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
+        $contaoVersion = VERSION . '.' . BUILD;
+        $vNameCheck    = (version_compare($contaoVersion, '4.4.41', '>=') &&
+                          version_compare($contaoVersion, '4.5.0', '<')) ||
+                         version_compare($contaoVersion, '4.7.7', '>=');
 
-        // Get the field name parts.
-        $fieldParts = preg_split('/_row[0-9]*_/i', $strField);
-        preg_match('/_row[0-9]*_/i', $strField, $arrRow);
-        $intRow = substr(substr($arrRow[0], 4), 0, -1);
+        $containerField = '';
+        if ($vNameCheck) {
+            $fieldParts      = preg_split('/[\[,]|[]\[,]+/', $strField);
+            $containerField  = $strField;
+            $mcwBaseName     = $fieldParts[0];
+            $intRow          = $fieldParts[1];
+            $mcwSupFieldName = $fieldParts[2];
+        } else {
+            // Get the field name parts.
+            $fieldParts = preg_split('/_row[0-9]*_/i', $strField);
+            preg_match('/_row[0-9]*_/i', $strField, $arrRow);
+            $intRow = substr(substr($arrRow[0], 4), 0, -1);
 
-        // Rebuild field name.
-        $mcwFieldName    = $fieldParts[0] . '[' . $intRow . '][' . $fieldParts[1] . ']';
-        $mcwBaseName     = $fieldParts[0];
-        $mcwSupFieldName = $fieldParts[1];
+            // Rebuild field name.
+            $containerField  = $fieldParts[0] . '[' . $intRow . '][' . $fieldParts[1] . ']';
+            $mcwBaseName     = $fieldParts[0];
+            $mcwSupFieldName = $fieldParts[1];
+        }
+        if (!($container instanceof DataContainerInterface)) {
+            $container->field = $containerField;
+        }
+
+        $mcwId = $mcwBaseName . '_row' . $intRow . '_' . $mcwSupFieldName;
 
         // Handle the keys in "edit multiple" mode
         if (\Input::get('act') == 'editAll') {
-            $intId    = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $strField);
-            $strField = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $strField);
+            if ($vNameCheck) {
+                $intId       = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $mcwBaseName);
+                $mcwBaseName = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $mcwBaseName);
+            } else {
+                $intId    = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $strField);
+                $strField = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $strField);
+            }
         }
-
-        $container->field = $mcwFieldName;
 
         // Add the sub configuration into the DCA. We need this for contao. Without it is not possible
         // to get the data for the picker.
-        if ($GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard') {
+        if (($GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard')
+            && !($container instanceof DataContainerInterface)
+        ) {
             $GLOBALS['TL_DCA'][$container->table]['fields'][$container->field] =
                 $GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
 
@@ -186,7 +220,9 @@ class ExecutePostActions extends BaseListener
         }
 
         // The field does not exist
-        if (!isset($GLOBALS['TL_DCA'][$container->table]['fields'][$strField])) {
+        if (!(isset($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]))
+            && !($container instanceof DataContainerInterface)
+        ) {
             System::log(
                 'Field "' . $strField . '" does not exist in DCA "' . $container->table . '"',
                 __METHOD__,
@@ -262,26 +298,198 @@ class ExecutePostActions extends BaseListener
             $varValue = serialize($varValue);
         }
 
-        /** @var FileTree|PageTree $strClass */
-        $strClass        = $GLOBALS['BE_FFL'][$strKey];
-        $fieldAttributes = $strClass::getAttributesFromDca(
-            $GLOBALS['TL_DCA'][$container->table]['fields'][$strField],
+        /** @var FileTree|PageTree $objWidget */
+        $objWidget = $this->buildWidget($container, $strKey, $strField, $mcwId, $varValue);
+        $strWidget = $objWidget->generate();
+
+        if ($vNameCheck) {
+            $strWidget = str_replace(['reloadFiletree', 'reloadFiletreeDMA'], 'reloadFiletree_mcw', $strWidget);
+            $strWidget = str_replace(['reloadPagetree', 'reloadPagetreeDMA'], 'reloadPagetree_mcw', $strWidget);
+        }
+
+        throw new ResponseException($this->convertToResponse($strWidget));
+    }
+
+    /**
+     * Get the input for name for the ajax request.
+     *
+     * @param DataContainer $container The data container.
+     *
+     * @return string
+     */
+    private function getInputName(DataContainer $container): string
+    {
+        $inputName = Input::post('name');
+        if (!($container instanceof DataContainerInterface)) {
+            $container->inputName = $inputName;
+            return $inputName;
+        }
+
+        $reflection = new \ReflectionProperty(DcCompat::class, 'propertyName');
+        $reflection->setAccessible(true);
+        $reflection->setValue($container, $inputName);
+
+        $this->addDcGeneralProperty($container);
+
+        return $inputName;
+    }
+
+    /**
+     * Add the property for the dc general.
+     *
+     * @param DcCompat $container The data container.
+     *
+     * @return void
+     *
+     * @throws BadRequestHttpException Throws the exception if the column not exist in property definition.
+     */
+    private function addDcGeneralProperty(DcCompat $container): void
+    {
+        $definition = $container->getEnvironment()->getDataDefinition();
+        $properties = $definition->getPropertiesDefinition();
+
+        // Convert the property name for find the property in the definition.
+        $search       = array('/([\[][0-9]{1,}[\]])/', '/[\[\]]/');
+        $replace      = array('__', '');
+        $propertyName = \trim(\preg_replace($search, $replace, $container->getPropertyName()), '__');
+        if (!$properties->hasProperty($propertyName)) {
+            System::log(
+                \sprintf(
+                    'The property "%s" does not exist in the property definition of "%s"',
+                    $container->getPropertyName(),
+                    $definition->getName()
+                ),
+                __METHOD__,
+                TL_ERROR
+            );
+            throw new BadRequestHttpException('Bad request');
+        }
+
+        $columnProperty = $properties->getProperty($propertyName);
+        $propertyClass  = new \ReflectionClass($columnProperty);
+
+        /** @var PropertyInterface $property */
+        $property = $propertyClass->newInstance($container->getPropertyName());
+        $property
+            ->setLabel($columnProperty->getLabel())
+            ->setWidgetType($columnProperty->getWidgetType())
+            ->setExtra($columnProperty->getExtra())
+            ->setDescription($columnProperty->getDescription())
+            ->setDefaultValue($columnProperty->getDefaultValue())
+            ->setOptions($columnProperty->getOptions());
+        $properties->addProperty($property);
+    }
+
+    /**
+     * Build the widget.
+     *
+     * @param DataContainer $container    The data container.
+     * @param string        $formFieldKey The backend form field key.
+     * @param string        $propertyName The property name.
+     * @param string        $mcwId        The mcw id.
+     * @param mixed         $value        The property value.
+     *
+     * @return Widget|FileTree|PageTree
+     */
+    private function buildWidget(
+        DataContainer $container,
+        string $formFieldKey,
+        string $propertyName,
+        string $mcwId,
+        $value
+    ) {
+        if ($container instanceof DataContainerInterface) {
+            return $this->buildWidgetForDcg($container, $value);
+        }
+
+        return $this->buildWidgetNonDcg($container, $formFieldKey, $propertyName, $mcwId, $value);
+    }
+
+    /**
+     * Build the widget for the dc general.
+     *
+     * @param DataContainerInterface|DcCompat $container The data container.
+     * @param mixed                           $value     The property value.
+     *
+     * @return Widget|FileTree|PageTree
+     *
+     * @throws DcGeneralRuntimeException Throws if a property does not exist in the property definition.
+     */
+    private function buildWidgetForDcg(DataContainerInterface $container, $value): Widget
+    {
+        $environment  = $container->getEnvironment();
+        $definition   = $environment->getDataDefinition();
+        $properties   = $definition->getPropertiesDefinition();
+        $dataProvider = $environment->getDataProvider();
+
+        if (!$properties->hasProperty($container->getPropertyName())) {
+            throw new DcGeneralRuntimeException(
+                \sprintf(
+                    'The property "%s" does not exist in the property definition of "%s"',
+                    $container->getPropertyName(),
+                    $definition->getName()
+                )
+            );
+        }
+        $property = $properties->getProperty($container->getPropertyName());
+
+        $model = $dataProvider->getEmptyModel();
+        $model->setId('mcw_' . $container->getPropertyName());
+        $model->setProperty($property->getName(), $value);
+
+        if (TL_MODE === 'FE') {
+            $manager = new WidgetManager($environment, $model);
+        } else {
+            $manager = new ContaoWidgetManager($environment, $model);
+        }
+
+        $widget = $manager->getWidget($property->getName());
+
+        $properties->removeProperty($property);
+
+        return $widget;
+    }
+
+    /**
+     * Build the widget for the legacy data container.
+     *
+     * @param DataContainer $container    The data container.
+     * @param string        $formFieldKey The backend form field key.
+     * @param string        $propertyName The property name.
+     * @param string        $mcwId        The mcw id.
+     * @param mixed         $value        The property value.
+     *
+     * @return Widget|FileTree|PageTree
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    private function buildWidgetNonDcg(
+        DataContainer $container,
+        string $formFieldKey,
+        string $propertyName,
+        string $mcwId,
+        $value
+    ): Widget {
+        /** @var FileTree|PageTree $widgetClass */
+        $widgetClass     = $GLOBALS['BE_FFL'][$formFieldKey];
+        $fieldAttributes = $widgetClass::getAttributesFromDca(
+            $GLOBALS['TL_DCA'][$container->table]['fields'][$propertyName],
             $container->inputName,
-            $varValue,
-            $strField,
+            $value,
+            $propertyName,
             $container->table,
             $container
         );
 
-        $fieldAttributes['id']       = \Input::post('name');
-        $fieldAttributes['name']     = $mcwFieldName;
-        $fieldAttributes['value']    = $varValue;
+        $fieldAttributes['id']       = $mcwId;
+        $fieldAttributes['name']     = $container->field;
+        $fieldAttributes['value']    = $value;
         $fieldAttributes['strTable'] = $container->table;
-        $fieldAttributes['strField'] = $strField;
+        $fieldAttributes['strField'] = $formFieldKey;
 
-        /** @var FileTree|PageTree $objWidget */
-        $objWidget = new $strClass($fieldAttributes);
+        /** @var FileTree|PageTree $widget */
+        $widget = new $widgetClass($fieldAttributes);
 
-        throw new ResponseException($this->convertToResponse($objWidget->generate()));
+        return $widget;
     }
 }
