@@ -190,6 +190,7 @@ class ExecutePostActions extends BaseListener
             $mcwBaseName     = $fieldParts[0];
             $mcwSupFieldName = $fieldParts[1];
         }
+
         if (!($container instanceof DataContainerInterface)) {
             $container->field = $containerField;
         }
@@ -207,16 +208,17 @@ class ExecutePostActions extends BaseListener
             }
         }
 
+
         // Add the sub configuration into the DCA. We need this for contao. Without it is not possible
         // to get the data for the picker.
         if (($GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard')
             && !($container instanceof DataContainerInterface)
         ) {
-            $GLOBALS['TL_DCA'][$container->table]['fields'][$container->field] =
-                $GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
+            $widget = MultiColumnWizard::generateSimpleMcw($container->table, $mcwBaseName);
+            $fields = $widget->columnFields;
 
-            $GLOBALS['TL_DCA'][$container->table]['fields'][$strField] =
-                $GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['eval']['columnFields'][$mcwSupFieldName];
+            $GLOBALS['TL_DCA'][$container->table]['fields'][$container->field] = $fields[$mcwSupFieldName];
+            $GLOBALS['TL_DCA'][$container->table]['fields'][$strField]         = $fields[$mcwSupFieldName];
         }
 
         // The field does not exist
