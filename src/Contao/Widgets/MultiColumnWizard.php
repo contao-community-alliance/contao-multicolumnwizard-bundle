@@ -47,7 +47,6 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
 
-use Contao\BackendTemplate;
 use Contao\Date;
 use Contao\Image;
 use Contao\Input;
@@ -338,12 +337,10 @@ class MultiColumnWizard extends Widget
      * Get the name of the mcw.
      *
      * @return string
-     *
-     * @throws \JsonException
      */
     public function getName(): string
     {
-        return json_encode($this->strId, JSON_THROW_ON_ERROR);
+        return json_encode($this->strId);
     }
 
     /**
@@ -439,6 +436,62 @@ class MultiColumnWizard extends Widget
     }
 
     /**
+     * Get a list of the field keys.
+     *
+     * @return array
+     */
+    public function getFieldKeys(): array
+    {
+        return array_keys($this->columnFields);
+    }
+
+    /**
+     * Get the header meta information.
+     *
+     * @param string $field Key of the field.
+     *
+     * @return array|null The array with the data or false if the field is unknown.
+     */
+    public function getHeaderFor($field)
+    {
+        if (!isset($this->columnFields[$field])) {
+            return null;
+        }
+
+        $field  = $this->columnFields[$field];
+        $return = [
+            'mandatory'   => false,
+            'isHidden'    => false,
+            'title'       => '',
+            'description' => ''
+        ];
+
+        if ($field['eval']['mandatory']) {
+            $return['mandatory'] = true;
+        }
+
+        if (true === $field['eval']['isHidden']) {
+            $return['isHidden'] = true;
+        }
+
+        $return['title'] =
+            ((is_array($field['label']))
+                ? $field['label'][0]
+                : (($field['label'] != null)
+                    ? $field['label']
+                    : $field)
+            );
+
+        $return['description'] =
+            ((is_array($field['label']) && $field['label'][1] != '')
+                ? $field['label'][1]
+                : ''
+            );
+
+        return $return;
+    }
+
+    /**
      * Get the widget data for the template.
      *
      * @param string $field Name of field.
@@ -447,7 +500,7 @@ class MultiColumnWizard extends Widget
      *
      * @return array|null
      */
-    protected function getRawWidgetFor($field, $row): ?array
+    public function getRawWidgetFor($field, $row)
     {
         if (!isset($this->columnFields[$field])) {
             return null;

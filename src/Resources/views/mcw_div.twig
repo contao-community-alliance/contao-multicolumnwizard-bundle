@@ -1,36 +1,17 @@
-<style>
-    .multicolumnwizard .mcw-header,
-    .multicolumnwizard .mcw-body .mcw-row {
-        display: flex;
-        
-    }
+{% set fields = mcw.getFieldKeys() %}
+{{ dump(fields) }}
 
-    .multicolumnwizard .mcw-body .mcw-row label {
-        display: none;
-    }
-
-    .multicolumnwizard .mcw-body .mcw-row .tl_checkbox_single_container label{
-        display: block;
-    }
-</style>
-<div id="{{ mcw.id }}"
+<div id="{{ mcw.getId }}"
      class="tl_modulewizard multicolumnwizard mcw-wrapper"
-     {% if mcw.style is not empty %}style="{{ mcw.style }}"{% endif %}
-     data-operations="maxCount[{{ mcw.max }}] minCount[{{ mcw.min }}] unique[{{ mcw.uniqueList | join(',') }}] datepicker[{{ mcw.datepickerList | join(',') }}] colorpicker[{{ mcw.colorpickerList | join(',') }}]"
-     data-name="{{ mcw.name }}"
-     data-max="{{ mcw.max }}"
-     data-min="{{ mcw.min }}"
-     data-unique="{{ mcw.uniqueList | join(',') }}"
-     data-datepicker="{{ mcw.datepickerList }}"
-     data-colorpicker="{{ mcw.colorpickerList | join(',') }}">
+>
     <div class="mcw-header">
-        {% for item in header %}
-            {% if item.isHidden == true %}
+        {% for field in fields %}
+            {% if field.isHidden == true %}
                 <div class="mwc-header-column isHidden">
                     &nbsp;
                 </div>
             {% else %}
-                <div class="mwc-header-column{% if item.hasDescription == true %} hasDescription{% endif %}">
+                <div class="mwc-header-column{% if field.hasDescription == true %} hasDescription{% endif %}">
                     {{ item.label }}
                     {% if item.hasDescription == true %}
                         <span title="{{ item.description }}">
@@ -41,40 +22,6 @@
             {% endif %}
         {% endfor %}
     </div>
-    <div class="mcw-body">
-        {% for row in items %}
-            <div class="mcw-row" data-row="{{ row.rowId }}">
-                {% for field in row.fields %}
-                    <div class="mcw-column mcw-widget{% if field.isHidden == true %}isHidden{% endif %}">
-                        {% if field.isHidden == true %}
-                            &nbsp;
-                        {% else %}
-                            {{ field.value|raw }}
-                        {% endif %}
-                    </div>
-                {% endfor %}
-                <div class="mcw-column mcw-opperations">
-                    {% for operation in row.operations %}
-                        <a data-operations="{{ operation.name }}"
-                           href="{{ operation.url }}"
-                           class="widgetImage"
-                           title="{{ operation.label }}"
-                           onclick="return false;">
-                            <img src="{{ operation.image.path }}"
-                                 width="16"
-                                 height="16"
-                                 alt="{{ operation.image.label }}"
-                                 class="tl_listwizard_img">
-                        </a>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endfor %}
-    </div>
 </div>
-
-
-
-
 
 
