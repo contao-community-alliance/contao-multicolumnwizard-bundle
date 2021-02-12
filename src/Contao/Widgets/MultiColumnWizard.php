@@ -587,16 +587,13 @@ class MultiColumnWizard extends Widget
                 }
 
                 // Convert binary UUIDs for DC_File driver (see contao#6893)
-                if ($arrField['inputType'] == 'fileTree' && 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] === \DC_File::class)
-                {
+                if ($arrField['inputType'] == 'fileTree'
+                    && 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] === \DC_File::class) {
                     $varValue = StringUtil::deserialize($varValue);
 
-                    if (!\is_array($varValue))
-                    {
+                    if (!\is_array($varValue)) {
                         $varValue = StringUtil::binToUuid($varValue);
-                    }
-                    else
-                    {
+                    } else {
                         $varValue = serialize(array_map('StringUtil::binToUuid', $varValue));
                     }
                 }
