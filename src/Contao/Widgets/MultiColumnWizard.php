@@ -38,6 +38,7 @@
  * @author     w3scout <info@w3scouts.com>
  * @author     Yanick Witschi <yanick.witschi@terminal42.ch>
  * @author     Andreas Dziemba <adziemba@web.de>
+ * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2020 MEN AT WORK
@@ -1364,38 +1365,40 @@ class MultiColumnWizard extends Widget
         $return = '';
 
         if ($onlyRows == false) {
-            // Generate header fields.
-            foreach ($this->columnFields as $strKey => $arrField) {
-                if ($arrField['eval']['columnPos']) {
-                    $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
-                } else {
-                    $strHeaderItem = (key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
-
-                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="hidden">' : '';
-                    if ($arrField['eval']['mandatory']) {
-                        $strHeaderItem .= '<span class="invisible">'
+            // Generate header fields if not all are hidden.
+            if (count($this->columnFields) !== count($arrHiddenHeader)) {
+                foreach ($this->columnFields as $strKey => $arrField) {
+                    if ($arrField['eval']['columnPos']) {
+                        $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
+                    } else {
+                        $strHeaderItem = '<th>' . (key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
+                        if ($arrField['eval']['mandatory']) {
+                            $strHeaderItem .= '<span class="invisible">'
                             . $GLOBALS['TL_LANG']['MSC']['mandatory']
                             . ' </span>';
-                    }
-                    $strHeaderItem .=
-                        ((is_array($arrField['label']))
-                            ? $arrField['label'][0]
-                            : (($arrField['label'] != null)
-                                ? $arrField['label']
-                                : $strKey
-                            )
+                        }
+                        $strHeaderItem .=
+                        (
+                            (is_array($arrField['label']))
+                                ? $arrField['label'][0]
+                                : (
+                                    ($arrField['label'] != null)
+                                        ? $arrField['label']
+                                        : $strKey
+                                )
                         );
-                    if ($arrField['eval']['mandatory']) {
-                        $strHeaderItem .= '<span class="mandatory">*</span>';
-                    }
-                    $strHeaderItem .=
-                        ((is_array($arrField['label']) && $arrField['label'][1] != '')
-                            ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>'
-                            : ''
+                        if ($arrField['eval']['mandatory']) {
+                            $strHeaderItem .= '<span class="mandatory">*</span>';
+                        }
+                        $strHeaderItem .=
+                        (
+                            (is_array($arrField['label']) && $arrField['label'][1] != '')
+                                ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>'
+                                : ''
                         );
-                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
-
-                    $arrHeaderItems[] = $strHeaderItem . '</th>';
+                        $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
+                        $arrHeaderItems[] = $strHeaderItem . '</th>';
+                    }
                 }
             }
 
