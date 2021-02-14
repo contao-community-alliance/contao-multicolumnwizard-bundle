@@ -1403,13 +1403,13 @@ class MultiColumnWizard extends Widget
                         if ($arrField['eval']['mandatory']) {
                             $strHeaderItem .= '<span class="mandatory">*</span>';
                         }
-                        $strHeaderItem .=
+                        $strHeaderItem   .=
                         (
                             (is_array($arrField['label']) && $arrField['label'][1] != '')
                                 ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>'
                                 : ''
                         );
-                        $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
+                        $strHeaderItem   .= (array_key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
                         $arrHeaderItems[] = $strHeaderItem . '</th>';
                     }
                 }
