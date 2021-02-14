@@ -312,6 +312,11 @@ class MultiColumnWizard extends Widget
      */
     public function generateLabel()
     {
+        if (is_array($this->arrCallback)) {
+            $this->import($this->arrCallback[0]);
+            $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
+        }
+
         foreach ($this->columnFields as $arrField) {
             if ($arrField['eval']['mandatory']) {
                 $this->addAttribute('mandatory', true);
