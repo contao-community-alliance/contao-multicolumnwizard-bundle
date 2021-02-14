@@ -38,6 +38,8 @@
  * @author     w3scout <info@w3scouts.com>
  * @author     Yanick Witschi <yanick.witschi@terminal42.ch>
  * @author     Andreas Dziemba <adziemba@web.de>
+ * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
+ * @author     doishub <daniele@oveleon.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2020 MEN AT WORK
@@ -164,6 +166,7 @@ class MultiColumnWizard extends Widget
         if (!class_exists('MultiColumnWizard', false)) {
             class_alias(self::class, 'MultiColumnWizard');
         }
+
         parent::__construct($arrAttributes);
 
         if (TL_MODE == 'FE') {
@@ -172,6 +175,16 @@ class MultiColumnWizard extends Widget
         }
 
         $this->eventDispatcher = \System::getContainer()->get('event_dispatcher');
+
+        /*
+         * Load the callback data if there's any
+         * (do not do this in __set() already because then we don't have access to currentRecord)
+         */
+
+        if (is_array($this->arrCallback)) {
+            $this->import($this->arrCallback[0]);
+            $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
+        }
     }
 
     /**
@@ -303,6 +316,37 @@ class MultiColumnWizard extends Widget
             default:
                 return parent::__get($strKey);
         }
+    }
+
+    /**
+     * Helper function, which will init the mcw with a minimal setting.
+     *
+     * @param string $table The name of the table.
+     *
+     * @param string $field The name of the field.
+     *
+     * @return self
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
+     */
+    public static function generateSimpleMcw($table, $field)
+    {
+        if (!isset($GLOBALS['TL_DCA'][$table]['fields'][$field])) {
+            return null;
+        }
+
+        $dcaData = $GLOBALS['TL_DCA'][$table]['fields'][$field];
+
+        return new self(
+            self::getAttributesFromDca(
+                $dcaData,
+                $field,
+                null,
+                $field,
+                $table,
+                null
+            )
+        );
     }
 
     /**
@@ -586,6 +630,18 @@ class MultiColumnWizard extends Widget
                     }
                 }
 
+                // Convert binary UUIDs for DC_File driver (see contao#6893)
+                if ($arrField['inputType'] == 'fileTree'
+                    && 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] === \DC_File::class) {
+                    $varValue = StringUtil::deserialize($varValue);
+
+                    if (!\is_array($varValue)) {
+                        $varValue = StringUtil::binToUuid($varValue);
+                    } else {
+                        $varValue = serialize(array_map('StringUtil::binToUuid', $varValue));
+                    }
+                }
+
                 $varInput[$i][$strKey] = $varValue;
 
                 // Do not submit if there are errors
@@ -655,16 +711,6 @@ class MultiColumnWizard extends Widget
      */
     public function generate($overwriteRowCurrentRow = null, $onlyRows = false)
     {
-        /*
-         * Load the callback data if there's any
-         * (do not do this in __set() already because then we don't have access to currentRecord)
-         */
-
-        if (is_array($this->arrCallback)) {
-            $this->import($this->arrCallback[0]);
-            $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
-        }
-
         $this->strCommand = 'cmd_' . $this->strField;
         $arrUnique        = array();
         $arrDatepicker    = array();
@@ -787,11 +833,12 @@ class MultiColumnWizard extends Widget
 
                     // Tiny MCE.
                     if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
-                        $additionalCode['tinyMce']     = $this->getMcWTinyMCEString(
+                        $additionalCode['tinyMce'] = $this->getMcWTinyMCEString(
                             $objWidget->id,
                             $arrField,
                             $this->strTable
                         );
+
                         $arrField['eval']['tl_class'] .= ' tinymce';
                     }
 
@@ -841,10 +888,13 @@ class MultiColumnWizard extends Widget
 
                 // Contao changed the name for FileTree and PageTree widgets
                 // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
-                $contaoVersion = VERSION.'.'.BUILD;
-                if ((version_compare($contaoVersion, '4.4.41', '>=') &&
-                    version_compare($contaoVersion, '4.5.0', '<')) ||
-                   version_compare($contaoVersion, '4.7.7', '>=')) {
+                $contaoVersion = VERSION . '.' . BUILD;
+                if ((
+                        version_compare($contaoVersion, '4.4.41', '>=')
+                        && version_compare($contaoVersion, '4.5.0', '<')
+                    )
+                    || version_compare($contaoVersion, '4.7.7', '>=')
+                ) {
                     $strWidget = str_replace(['reloadFiletree', 'reloadFiletreeDMA'], 'reloadFiletree_mcw', $strWidget);
                     $strWidget = str_replace(['reloadPagetree', 'reloadPagetreeDMA'], 'reloadPagetree_mcw', $strWidget);
                 }
@@ -1328,41 +1378,40 @@ class MultiColumnWizard extends Widget
         $return = '';
 
         if ($onlyRows == false) {
-            // Generate header fields.
-            foreach ($this->columnFields as $strKey => $arrField) {
-                if ($arrField['eval']['columnPos']) {
-                    $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
-                } else {
-                    $strHeaderItem = (key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
-
-                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '<div class="hidden">' : '';
-                    if ($arrField['eval']['mandatory']) {
-                        $strHeaderItem .= '<span class="invisible">'
-                        . $GLOBALS['TL_LANG']['MSC']['mandatory']
-                        . ' </span>';
+            // Generate header fields if not all are hidden.
+            if (count($this->columnFields) !== count($arrHiddenHeader)) {
+                foreach ($this->columnFields as $strKey => $arrField) {
+                    if ($arrField['eval']['columnPos']) {
+                        $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
+                    } else {
+                        $strHeaderItem = '<th>' . (key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
+                        if ($arrField['eval']['mandatory']) {
+                            $strHeaderItem .= '<span class="invisible">'
+                            . $GLOBALS['TL_LANG']['MSC']['mandatory']
+                            . ' </span>';
+                        }
+                        $strHeaderItem .=
+                        (
+                            (is_array($arrField['label']))
+                                ? $arrField['label'][0]
+                                : (
+                                    ($arrField['label'] != null)
+                                        ? $arrField['label']
+                                        : $strKey
+                                )
+                        );
+                        if ($arrField['eval']['mandatory']) {
+                            $strHeaderItem .= '<span class="mandatory">*</span>';
+                        }
+                        $strHeaderItem   .=
+                        (
+                            (is_array($arrField['label']) && $arrField['label'][1] != '')
+                                ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>'
+                                : ''
+                        );
+                        $strHeaderItem   .= (array_key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
+                        $arrHeaderItems[] = $strHeaderItem . '</th>';
                     }
-                    $strHeaderItem .=
-                    (
-                        (is_array($arrField['label']))
-                            ? $arrField['label'][0]
-                            : (
-                                ($arrField['label'] != null)
-                                    ? $arrField['label']
-                                    : $strKey
-                              )
-                    );
-                    if ($arrField['eval']['mandatory']) {
-                        $strHeaderItem .= '<span class="mandatory">*</span>';
-                    }
-                    $strHeaderItem .=
-                    (
-                        (is_array($arrField['label']) && $arrField['label'][1] != '')
-                            ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>'
-                            : ''
-                    );
-                    $strHeaderItem .= (key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
-
-                    $arrHeaderItems[] = $strHeaderItem . '</th>';
                 }
             }
 
