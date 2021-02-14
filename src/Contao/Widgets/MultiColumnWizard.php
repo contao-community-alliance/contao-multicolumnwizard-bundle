@@ -39,6 +39,7 @@
  * @author     Yanick Witschi <yanick.witschi@terminal42.ch>
  * @author     Andreas Dziemba <adziemba@web.de>
  * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
+ * @author     doishub <daniele@oveleon.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2020 MEN AT WORK
@@ -626,6 +627,18 @@ class MultiColumnWizard extends Widget
                             $objWidget->class = 'error';
                             $objWidget->addError($exception->getMessage());
                         }
+                    }
+                }
+
+                // Convert binary UUIDs for DC_File driver (see contao#6893)
+                if ($arrField['inputType'] == 'fileTree'
+                    && 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] === \DC_File::class) {
+                    $varValue = StringUtil::deserialize($varValue);
+
+                    if (!\is_array($varValue)) {
+                        $varValue = StringUtil::binToUuid($varValue);
+                    } else {
+                        $varValue = serialize(array_map('StringUtil::binToUuid', $varValue));
                     }
                 }
 
