@@ -38,6 +38,7 @@
  * @author     w3scout <info@w3scouts.com>
  * @author     Yanick Witschi <yanick.witschi@terminal42.ch>
  * @author     Andreas Dziemba <adziemba@web.de>
+ * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2020 MEN AT WORK
