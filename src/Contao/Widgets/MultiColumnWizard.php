@@ -789,7 +789,7 @@ class MultiColumnWizard extends Widget
                     $arrField = array_merge($arrField, $this->arrRowSpecificData[$i][$strKey]);
                 }
 
-                $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
+                $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey] ?? null);
 
                 // load errors if there are any
                 if (!empty($this->arrWidgetErrors[$strKey][$i])) {
