@@ -73,9 +73,11 @@ class CreateWidget
             );
             throw new BadRequestHttpException('Bad request');
         }
+        
+        $inputType = $GLOBALS['TL_DCA'][$dcDriver->table]['fields'][$fieldName]['inputType'];
 
         /** @var string $widgetClassName */
-        $widgetClassName = $GLOBALS['BE_FFL']['multiColumnWizard'];
+        $widgetClassName = $GLOBALS['BE_FFL'][$inputType];
 
         /** @var MultiColumnWizard $widget */
         $widget = new $widgetClassName(
