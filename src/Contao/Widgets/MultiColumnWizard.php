@@ -3,7 +3,7 @@
 /**
  * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * (c) 2012-2020 MEN AT WORK.
+ * (c) 2012-2021 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -42,7 +42,7 @@
  * @author     doishub <daniele@oveleon.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
- * @copyright  2013-2020 MEN AT WORK
+ * @copyright  2013-2021 MEN AT WORK
  * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -1384,7 +1384,11 @@ class MultiColumnWizard extends Widget
                     if ($arrField['eval']['columnPos']) {
                         $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
                     } else {
-                        $strHeaderItem = '<th>' . (key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
+                        if ((true === $arrField['eval']['hideBody']) && (true === $arrField['eval']['hideHead'])) {
+                            $strHeaderItem = (key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
+                        } else {
+                            $strHeaderItem = '<th>' . (key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
+                        }
                         if ($arrField['eval']['mandatory']) {
                             $strHeaderItem .= '<span class="invisible">'
                             . $GLOBALS['TL_LANG']['MSC']['mandatory']
