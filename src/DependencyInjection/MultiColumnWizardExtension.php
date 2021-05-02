@@ -3,7 +3,7 @@
 /**
  * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * (c) 2012-2019 MEN AT WORK.
+ * (c) 2012-2021 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,7 +16,7 @@
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
- * @copyright  2013-2019 MEN AT WORK
+ * @copyright  2013-2021 MEN AT WORK
  * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -24,15 +24,14 @@
 namespace MenAtWork\MultiColumnWizardBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
-use Contao\CoreBundle\DependencyInjection\Configuration;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\HttpKernel\DependencyInjection\ConfigurableExtension;
 
 /**
  * Class MultiColumnWizardExtension
  */
-class MultiColumnWizardExtension extends ConfigurableExtension
+class MultiColumnWizardExtension extends Extension
 {
     /**
      * The config files.
@@ -55,23 +54,7 @@ class MultiColumnWizardExtension extends ConfigurableExtension
     /**
      * {@inheritdoc}
      */
-    public function getConfiguration(array $config, ContainerBuilder $container)
-    {
-        // Add the resource to the container
-        parent::getConfiguration($config, $container);
-
-        return new Configuration(
-            $container->getParameter('kernel.debug'),
-            $container->getParameter('kernel.project_dir'),
-            $container->getParameter('kernel.root_dir'),
-            $container->getParameter('kernel.default_locale')
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function loadInternal(array $mergedConfig, ContainerBuilder $container)
+    public function load(array $mergedConfig, ContainerBuilder $container)
     {
         $loader = new YamlFileLoader(
             $container,
