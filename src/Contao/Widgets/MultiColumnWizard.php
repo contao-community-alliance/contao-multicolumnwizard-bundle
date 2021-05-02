@@ -804,6 +804,27 @@ class MultiColumnWizard extends Widget
                     }
                 }
 
+                if ((null !== $objWidget) && isset($arrField['wizard'])) {
+                    $wizard = '';
+
+                    $dc               = $this->getDcDriver();
+                    $dc->field        = $strKey;
+                    $dc->inputName    = $objWidget->id;
+                    $dc->strInputName = $objWidget->id;
+                    $dc->value        = $objWidget->value;
+
+                    if (is_array($arrField['wizard'])) {
+                        foreach ($arrField['wizard'] as $callback) {
+                            $this->import($callback[0]);
+                            $wizard .= $this->{$callback[0]}->{$callback[1]}($dc, $objWidget);
+                        }
+                    } elseif (is_callable($arrField['wizard'])) {
+                        $wizard .= $arrField['wizard']($dc, $objWidget);
+                    }
+
+                    $objWidget->wizard = $wizard;
+                }
+
                 if ($objWidget === null) {
                     continue;
                 } elseif (is_string($objWidget)) {
@@ -855,27 +876,6 @@ class MultiColumnWizard extends Widget
                         $arrField,
                         $this->strTable
                     );
-
-                    if ($arrField['wizard']) {
-                        $wizard = '';
-
-                        $dc               = $this->getDcDriver();
-                        $dc->field        = $strKey;
-                        $dc->inputName    = $objWidget->id;
-                        $dc->strInputName = $objWidget->id;
-                        $dc->value        = $objWidget->value;
-
-                        if (is_array($arrField['wizard'])) {
-                            foreach ($arrField['wizard'] as $callback) {
-                                $this->import($callback[0]);
-                                $wizard .= $this->{$callback[0]}->{$callback[1]}($dc, $objWidget);
-                            }
-                        } elseif (is_callable($arrField['wizard'])) {
-                            $wizard .= $arrField['wizard']($dc, $objWidget);
-                        }
-
-                        $objWidget->wizard = $wizard;
-                    }
 
                     // Remove empty elements.
                     $additionalCode = array_filter(
