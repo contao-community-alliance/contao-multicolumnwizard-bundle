@@ -40,6 +40,7 @@
  * @author     Andreas Dziemba <adziemba@web.de>
  * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
  * @author     doishub <daniele@oveleon.de>
+ * @author     info@e-spin.de <info@e-spin.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2021 MEN AT WORK
@@ -789,7 +790,12 @@ class MultiColumnWizard extends Widget
                     $arrField = array_merge($arrField, $this->arrRowSpecificData[$i][$strKey]);
                 }
 
-                $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey] ?? null);
+                $objWidget = $this->initializeWidget(
+                    $arrField,
+                    $i,
+                    $strKey,
+                    ($this->varValue[$i][$strKey] ?? null)
+                );
 
                 // load errors if there are any
                 if (!empty($this->arrWidgetErrors[$strKey][$i])) {
@@ -1387,7 +1393,8 @@ class MultiColumnWizard extends Widget
                         if ((true === $arrField['eval']['hideBody']) && (true === $arrField['eval']['hideHead'])) {
                             $strHeaderItem = (key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
                         } else {
-                            $strHeaderItem = '<th>' . (key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
+                            $strHeaderItem = '<th>'
+                                . (key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
                         }
                         if ($arrField['eval']['mandatory']) {
                             $strHeaderItem .= '<span class="invisible">'
