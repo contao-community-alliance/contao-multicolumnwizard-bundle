@@ -1391,10 +1391,10 @@ class MultiColumnWizard extends Widget
                         $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
                     } else {
                         if ((true === $arrField['eval']['hideBody']) && (true === $arrField['eval']['hideHead'])) {
-                            $strHeaderItem = (key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
+                            $strHeaderItem = (array_key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
                         } else {
                             $strHeaderItem = '<th>'
-                                . (key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
+                                . (array_key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
                         }
                         if ($arrField['eval']['mandatory']) {
                             $strHeaderItem .= '<span class="invisible">'
@@ -1584,7 +1584,7 @@ SCRIPT;
     ) {
         // generate header fields
         foreach ($this->columnFields as $strKey => $arrField) {
-            if (key_exists($strKey, $arrHiddenHeader)) {
+            if (array_key_exists($strKey, $arrHiddenHeader)) {
                 $strKey = $strKey . ' hidden';
             }
 
