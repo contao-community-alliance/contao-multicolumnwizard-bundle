@@ -3,7 +3,7 @@
 /**
  * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * (c) 2012-2020 MEN AT WORK.
+ * (c) 2012-2021 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,9 +40,10 @@
  * @author     Andreas Dziemba <adziemba@web.de>
  * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
  * @author     doishub <daniele@oveleon.de>
+ * @author     info@e-spin.de <info@e-spin.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
- * @copyright  2013-2020 MEN AT WORK
+ * @copyright  2013-2021 MEN AT WORK
  * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -789,13 +790,39 @@ class MultiColumnWizard extends Widget
                     $arrField = array_merge($arrField, $this->arrRowSpecificData[$i][$strKey]);
                 }
 
-                $objWidget = $this->initializeWidget($arrField, $i, $strKey, $this->varValue[$i][$strKey]);
+                $objWidget = $this->initializeWidget(
+                    $arrField,
+                    $i,
+                    $strKey,
+                    ($this->varValue[$i][$strKey] ?? null)
+                );
 
                 // load errors if there are any
                 if (!empty($this->arrWidgetErrors[$strKey][$i])) {
                     foreach ($this->arrWidgetErrors[$strKey][$i] as $strErrorMsg) {
                         $objWidget->addError($strErrorMsg);
                     }
+                }
+
+                if ((null !== $objWidget) && isset($arrField['wizard'])) {
+                    $wizard = '';
+
+                    $dc               = $this->getDcDriver();
+                    $dc->field        = $strKey;
+                    $dc->inputName    = $objWidget->id;
+                    $dc->strInputName = $objWidget->id;
+                    $dc->value        = $objWidget->value;
+
+                    if (is_array($arrField['wizard'])) {
+                        foreach ($arrField['wizard'] as $callback) {
+                            $this->import($callback[0]);
+                            $wizard .= $this->{$callback[0]}->{$callback[1]}($dc, $objWidget);
+                        }
+                    } elseif (is_callable($arrField['wizard'])) {
+                        $wizard .= $arrField['wizard']($dc, $objWidget);
+                    }
+
+                    $objWidget->wizard = $wizard;
                 }
 
                 if ($objWidget === null) {
@@ -849,27 +876,6 @@ class MultiColumnWizard extends Widget
                         $arrField,
                         $this->strTable
                     );
-
-                    if ($arrField['wizard']) {
-                        $wizard = '';
-
-                        $dc               = $this->getDcDriver();
-                        $dc->field        = $strKey;
-                        $dc->inputName    = $objWidget->id;
-                        $dc->strInputName = $objWidget->id;
-                        $dc->value        = $objWidget->value;
-
-                        if (is_array($arrField['wizard'])) {
-                            foreach ($arrField['wizard'] as $callback) {
-                                $this->import($callback[0]);
-                                $wizard .= $this->{$callback[0]}->{$callback[1]}($dc, $objWidget);
-                            }
-                        } elseif (is_callable($arrField['wizard'])) {
-                            $wizard .= $arrField['wizard']($dc, $objWidget);
-                        }
-
-                        $objWidget->wizard = $wizard;
-                    }
 
                     // Remove empty elements.
                     $additionalCode = array_filter(
@@ -1384,7 +1390,12 @@ class MultiColumnWizard extends Widget
                     if ($arrField['eval']['columnPos']) {
                         $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
                     } else {
-                        $strHeaderItem = '<th>' . (key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
+                        if ((true === $arrField['eval']['hideBody']) && (true === $arrField['eval']['hideHead'])) {
+                            $strHeaderItem = (array_key_exists($strKey, $arrHiddenHeader)) ? '<th class="hidden">' : '<th>';
+                        } else {
+                            $strHeaderItem = '<th>'
+                                . (array_key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
+                        }
                         if ($arrField['eval']['mandatory']) {
                             $strHeaderItem .= '<span class="invisible">'
                             . $GLOBALS['TL_LANG']['MSC']['mandatory']
@@ -1573,7 +1584,7 @@ SCRIPT;
     ) {
         // generate header fields
         foreach ($this->columnFields as $strKey => $arrField) {
-            if (key_exists($strKey, $arrHiddenHeader)) {
+            if (array_key_exists($strKey, $arrHiddenHeader)) {
                 $strKey = $strKey . ' hidden';
             }
 
