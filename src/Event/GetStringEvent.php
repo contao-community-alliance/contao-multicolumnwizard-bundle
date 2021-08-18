@@ -22,7 +22,7 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This is the abstract base for events returning a string.

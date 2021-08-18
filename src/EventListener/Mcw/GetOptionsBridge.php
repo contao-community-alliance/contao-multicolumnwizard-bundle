@@ -70,7 +70,7 @@ class GetOptionsBridge
             $event->getWidget(),
             $event->getOptions()
         );
-        $this->eventDispatcher->dispatch($eventOld::NAME, $eventOld);
+        $this->eventDispatcher->dispatch($eventOld, $eventOld::NAME);
 
         if ($eventOld->getOptions() !== $event->getOptions()) {
             $event->setOptions($eventOld->getOptions());

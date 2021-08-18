@@ -97,7 +97,7 @@ class MultiColumnWizardHelper extends \Contao\System
             $fieldConfiguration,
             $container->inputName
         );
-        $eventDispatcher->dispatch($event::NAME, $event);
+        $eventDispatcher->dispatch($event, $event::NAME);
 
         return $event->getWizard();
     }
