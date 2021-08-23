@@ -392,7 +392,7 @@ class MultiColumnWizard extends Widget
             $tableName,
             $fieldConfiguration
         );
-        $this->eventDispatcher->dispatch($event::NAME, $event);
+        $this->eventDispatcher->dispatch($event, $event::NAME);
 
         // Return the result.
         return $event->getTinyMce();
@@ -447,7 +447,7 @@ class MultiColumnWizard extends Widget
             $fieldName,
             $fieldConfiguration['eval']['rgxp']
         );
-        $this->eventDispatcher->dispatch($event::NAME, $event);
+        $this->eventDispatcher->dispatch($event, $event::NAME);
 
         // Return the result.
         return $event->getDatePicker();
@@ -484,7 +484,7 @@ class MultiColumnWizard extends Widget
             $fieldConfiguration,
             $fieldName
         );
-        $this->eventDispatcher->dispatch($event::NAME, $event);
+        $this->eventDispatcher->dispatch($event, $event::NAME);
 
         // Return the result.
         return $event->getColorPicker();
@@ -523,7 +523,7 @@ class MultiColumnWizard extends Widget
             $fieldConfiguration,
             $fieldName
         );
-        $this->eventDispatcher->dispatch($event::NAME, $event);
+        $this->eventDispatcher->dispatch($event, $event::NAME);
 
         // Return the result.
         return $event->getWizard();
@@ -1321,7 +1321,7 @@ class MultiColumnWizard extends Widget
                 $this,
                 (array_key_exists('options', $arrData) ? $arrData['options'] : null)
             );
-            $environment->getEventDispatcher()->dispatch($event::NAME, $event);
+            $environment->getEventDispatcher()->dispatch($event, $event::NAME);
 
             if ($event->getOptions() !== $arrData['options']) {
                 $arrData['options'] = $event->getOptions();

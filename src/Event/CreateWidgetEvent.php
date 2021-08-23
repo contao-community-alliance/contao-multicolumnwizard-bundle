@@ -24,7 +24,7 @@ namespace MenAtWork\MultiColumnWizardBundle\Event;
 
 use Contao\DataContainer;
 use Contao\Widget;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class CreateWidgetEvent

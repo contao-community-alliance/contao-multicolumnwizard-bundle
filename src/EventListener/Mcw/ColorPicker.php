@@ -26,7 +26,7 @@ use Contao\CoreBundle\Framework\Adapter;
 use Contao\Image;
 use Contao\StringUtil;
 use MenAtWork\MultiColumnWizardBundle\Event\GetColorPickerStringEvent;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Class ColorPicker

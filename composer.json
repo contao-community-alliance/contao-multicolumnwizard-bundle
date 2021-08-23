@@ -55,8 +55,14 @@
   },
   "require": {
     "php": "^5.6 || ^7.0",
-    "contao/core-bundle": "^4.4.8",
-    "contao-community-alliance/translator": "^2.1"
+    "contao/core-bundle": "^4.9",
+    "symfony/config": "^4.4 || ^5.1",
+    "symfony/console": "^4.4 || ^5.1",
+    "symfony/dependency-injection": "^4.4 || ^5.1",
+    "symfony/event-dispatcher": "^4.4 || ^5.1",
+    "symfony/http-foundation": "^4.4 || ^5.1",
+    "symfony/http-kernel": "^4.4 || ^5.1",
+    "symfony/translation": "^4.4 || ^5.1"
   },
   "require-dev": {
     "phpcq/all-tasks": "~1.2",

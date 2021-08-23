@@ -104,7 +104,7 @@ class ExecutePostActions extends BaseListener
 
         // Create a new event and dispatch it. Hope that someone have a good solution.
         $event = new CreateWidgetEvent($container);
-        $this->eventDispatcher->dispatch($event::NAME, $event);
+        $this->eventDispatcher->dispatch($event, $event::NAME);
         /** @var \Widget $widget */
         $widget = $event->getWidget();
 

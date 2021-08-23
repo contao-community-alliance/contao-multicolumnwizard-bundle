@@ -30,7 +30,7 @@ services:
     arguments:
       - '@=service(''contao.framework'').getAdapter(''Contao\\Image'')'
       - '@=service(''contao.framework'').getAdapter(''Contao\\StringUtil'')'
-      - "@contao.translation.translator"
+      - "@translator"
     tags:
       - name: kernel.event_listener
         event: men-at-work.multi-column-wizard-bundle.get-color-picker
