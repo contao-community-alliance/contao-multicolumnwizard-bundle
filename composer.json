@@ -96,9 +96,10 @@
   "extra": {
     "contao-manager-plugin": "MenAtWork\\MultiColumnWizardBundle\\ContaoManager\\Plugin",
     "branch-alias": {
-      "dev-master": "3.4.x-dev",
-      "dev-develop": "3.5.x-dev",
-      "dev-support/contao3": "3.3.x-dev"
+      "dev-master": "3.5.x-dev",
+      "dev-develop": "3.6.x-dev",
+      "dev-support/contao3": "3.3.x-dev",
+      "dev-support/contao4.4": "3.4.x-dev"
     }
   }
 }
