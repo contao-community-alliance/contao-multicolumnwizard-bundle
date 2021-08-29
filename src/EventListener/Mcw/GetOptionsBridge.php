@@ -13,6 +13,7 @@
  * @package    menatwork/contao-multicolumnwizard-bundle
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2019 MEN AT WORK
@@ -70,7 +71,7 @@ class GetOptionsBridge
             $event->getWidget(),
             $event->getOptions()
         );
-        $this->eventDispatcher->dispatch($eventOld::NAME, $eventOld);
+        $this->eventDispatcher->dispatch($eventOld, $eventOld::NAME);
 
         if ($eventOld->getOptions() !== $event->getOptions()) {
             $event->setOptions($eventOld->getOptions());

@@ -13,6 +13,7 @@
  * @package    menatwork/contao-multicolumnwizard-bundle
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2019 MEN AT WORK
@@ -22,7 +23,7 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This is the abstract base for events returning a string.

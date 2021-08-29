@@ -13,6 +13,7 @@
  * @package    menatwork/contao-multicolumnwizard-bundle
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2019 MEN AT WORK
@@ -25,7 +26,7 @@ namespace MenAtWork\MultiColumnWizardBundle\Event;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelInterface;
 use ContaoCommunityAlliance\DcGeneral\EnvironmentInterface;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard as BundleMultiColumnWizard;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * This event is fired when a MultiColumnWizard wants to retrieve the options for a sub widget in dc-general context.

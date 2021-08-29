@@ -24,6 +24,7 @@
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Sven Meierhans <s.meierhans@gmail.com>
  * @author     Tristan Lins <tristan.lins@bit3.de>
+ * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2019 MEN AT WORK
@@ -97,7 +98,7 @@ class MultiColumnWizardHelper extends \Contao\System
             $fieldConfiguration,
             $container->inputName
         );
-        $eventDispatcher->dispatch($event::NAME, $event);
+        $eventDispatcher->dispatch($event, $event::NAME);
 
         return $event->getWizard();
     }
