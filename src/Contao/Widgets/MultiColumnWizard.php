@@ -608,7 +608,7 @@ class MultiColumnWizard extends Widget
                 $varValue = $objWidget->value;
 
                 // Convert date formats into timestamps (check the eval setting first -> #3063)
-                $rgxp = $arrField['eval']['rgxp'];
+                $rgxp = $arrField['eval']['rgxp'] ?? '';
                 if (!$objWidget->hasErrors()
                     && ($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim')
                     && $varValue != ''
@@ -618,7 +618,7 @@ class MultiColumnWizard extends Widget
                 }
 
                 // Save callback
-                if (is_array($arrField['save_callback'])) {
+                if (isset($arrField['save_callback']) && is_array($arrField['save_callback'])) {
                     foreach ($arrField['save_callback'] as $callback) {
                         $this->import($callback[0]);
 
@@ -1150,7 +1150,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Convert date formats into timestamps (check the eval setting first -> #3063)
-        $rgxp               = $arrField['eval']['rgxp'] ?? null;
+        $rgxp               = $arrField['eval']['rgxp'] ?? '';
         $dateFormatErrorMsg = '';
         if (($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '') {
             try {
