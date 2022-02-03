@@ -1112,7 +1112,7 @@ class MultiColumnWizard extends Widget
         $arrField['eval']['required'] = false;
 
         // Use strlen() here (see #3277)
-        if ($arrField['eval']['mandatory']) {
+        if (isset($arrField['eval']['mandatory']) && $arrField['eval']['mandatory']) {
             if (is_array($this->varValue[$intRow][$strKey])) {
                 if (empty($this->varValue[$intRow][$strKey])) {
                     $arrField['eval']['required'] = true;
@@ -1398,7 +1398,7 @@ class MultiColumnWizard extends Widget
                             $strHeaderItem = '<th>'
                                 . (array_key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
                         }
-                        if ($arrField['eval']['mandatory']) {
+                        if (isset($arrField['eval']['mandatory']) && $arrField['eval']['mandatory']) {
                             $strHeaderItem .= '<span class="invisible">'
                             . $GLOBALS['TL_LANG']['MSC']['mandatory']
                             . ' </span>';
@@ -1413,7 +1413,7 @@ class MultiColumnWizard extends Widget
                                         : $strKey
                                 )
                         );
-                        if ($arrField['eval']['mandatory']) {
+                        if (isset($arrField['eval']['mandatory']) && $arrField['eval']['mandatory']) {
                             $strHeaderItem .= '<span class="mandatory">*</span>';
                         }
                         $strHeaderItem   .=
