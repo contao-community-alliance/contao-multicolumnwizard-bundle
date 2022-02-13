@@ -3,6 +3,8 @@
 [![Latest Version on Packagist](http://img.shields.io/packagist/v/menatwork/contao-multicolumnwizard-bundle.svg)](https://packagist.org/packages/menatwork/contao-multicolumnwizard-bundle)
 [![Installations via composer per month](http://img.shields.io/packagist/dm/menatwork/contao-multicolumnwizard-bundle.svg)](https://packagist.org/packages/menatwork/contao-multicolumnwizard-bundle)
 
+The repository of contao-multicolumnwizard-bundle was moved to [contao-community-alliance](https://github.com/contao-community-alliance/contao-multicolumnwizard-bundle). We plan to support this version with bugfixes until the new version from the CCA is released.
+
 # MultiColumnWizard
 
 The MultiColumnWizard is a widget for mapping several fields of the same and/or different type (input type) in a DCA element. The individual fields of the MCW are listed column by column in the backend and can be extended row by row as a group. The arrangement corresponds to a multidimensional array of the form array[rows][fields], which is stored in the database as a serialized array. The widget is almost identical to MultiTextWizard or MultiSelectWizard. It extends the functionality of any widget.
