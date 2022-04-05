@@ -41,6 +41,7 @@
  * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
  * @author     doishub <daniele@oveleon.de>
  * @author     info@e-spin.de <info@e-spin.de>
+ * @author     David Greminger <david.greminger@1up.io>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2021 MEN AT WORK
@@ -421,7 +422,9 @@ class MultiColumnWizard extends Widget
         $tableName = null
     ) {
         // Datepicker
-        if ((isset($fieldConfiguration['eval']['datepicker']) && !$fieldConfiguration['eval']['datepicker']) || !isset($fieldConfiguration['eval']['rgxp'])) {
+        if ((isset($fieldConfiguration['eval']['datepicker']) && !$fieldConfiguration['eval']['datepicker'])
+            || !isset($fieldConfiguration['eval']['rgxp'])
+        ) {
             return '';
         }
 
@@ -608,7 +611,7 @@ class MultiColumnWizard extends Widget
                 $varValue = $objWidget->value;
 
                 // Convert date formats into timestamps (check the eval setting first -> #3063)
-                $rgxp = $arrField['eval']['rgxp'] ?? '';
+                $rgxp = ($arrField['eval']['rgxp'] ?? '');
                 if (!$objWidget->hasErrors()
                     && ($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim')
                     && $varValue != ''
@@ -725,7 +728,7 @@ class MultiColumnWizard extends Widget
             }
 
             // Store date picker fields
-            if (isset ($arrField['eval']['datepicker']) && $arrField['eval']['datepicker']) {
+            if (isset($arrField['eval']['datepicker']) && $arrField['eval']['datepicker']) {
                 $arrDatepicker[] = $strKey;
             }
 
@@ -735,7 +738,9 @@ class MultiColumnWizard extends Widget
             }
 
             // Store tiny mce fields
-            if (isset($arrField['eval']['rte']) && $arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
+            if (isset($arrField['eval']['rte']) && $arrField['eval']['rte']
+                && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0
+            ) {
                 foreach ($this->varValue as $row => $value) {
                     $tinyId = 'ctrl_' . $this->strField . '_row' . $row . '_' . $strKey;
 
@@ -832,7 +837,9 @@ class MultiColumnWizard extends Widget
                 } elseif ($arrField['inputType'] == 'hidden') {
                     $strHidden .= $objWidget->generate();
                     continue;
-                } elseif ((isset($arrField['eval']['hideBody']) && $arrField['eval']['hideBody'] == true) || (isset($arrField['eval']['hideHead']) && $arrField['eval']['hideHead'] == true)) {
+                } elseif ((isset($arrField['eval']['hideBody']) && $arrField['eval']['hideBody'] == true)
+                    || (isset($arrField['eval']['hideHead']) && $arrField['eval']['hideHead'] == true)
+                ) {
                     if ($arrField['eval']['hideBody'] == true) {
                         $blnHiddenBody = true;
                     }
@@ -859,7 +866,10 @@ class MultiColumnWizard extends Widget
                     );
 
                     // Tiny MCE.
-                    if (isset($arrField['eval']['rte']) && $arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
+                    if (isset($arrField['eval']['rte'])
+                        && $arrField['eval']['rte']
+                        && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0
+                    ) {
                         $additionalCode['tinyMce'] = $this->getMcWTinyMCEString(
                             $objWidget->id,
                             $arrField,
@@ -1126,11 +1136,11 @@ class MultiColumnWizard extends Widget
 
         // Hide label except if multiple widgets are in one column
         if (isset($arrField['eval']['columnPos']) && $arrField['eval']['columnPos'] == '') {
-            $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] ?? '' . ' hidelabel');
+            $arrField['eval']['tl_class'] = trim(($arrField['eval']['tl_class'] ?? '') . ' hidelabel');
         }
 
         // add class to enable easy updating of "name" attributes etc.
-        $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] ?? '' . ' mcwUpdateFields');
+        $arrField['eval']['tl_class'] = trim(($arrField['eval']['tl_class'] ?? '') . ' mcwUpdateFields');
 
         // if we have a row class, add that one aswell.
         if (isset($arrField['eval']['rowClasses'][$intRow])) {
@@ -1150,7 +1160,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Convert date formats into timestamps (check the eval setting first -> #3063)
-        $rgxp               = $arrField['eval']['rgxp'] ?? '';
+        $rgxp               = ($arrField['eval']['rgxp'] ?? '');
         $dateFormatErrorMsg = '';
         if (($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '') {
             try {
@@ -1171,7 +1181,7 @@ class MultiColumnWizard extends Widget
         $arrField['activeRow']         = $intRow;
         $arrField['name']              = $this->strName . '[' . $intRow . '][' . $strKey . ']';
         $arrField['id']                = $this->strId . '_row' . $intRow . '_' . $strKey;
-        $arrField['value']             = (null !== $varValue) ? $varValue : $arrField['default'] ?? null;
+        $arrField['value']             = ((null !== $varValue) ? $varValue : ($arrField['default'] ?? null));
         $arrField['eval']['tableless'] = true;
 
         $arrData = $this->handleDcGeneral($arrField, $strKey);
@@ -1211,7 +1221,7 @@ class MultiColumnWizard extends Widget
             $arrData,
             $arrField['name'],
             $arrField['value'],
-            $arrField['strField'] ?? null,
+            ($arrField['strField'] ?? null),
             $this->strTable,
             $this
         ));
@@ -1390,7 +1400,11 @@ class MultiColumnWizard extends Widget
                     if (isset($arrField['eval']['columnPos']) && $arrField['eval']['columnPos']) {
                         $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
                     } else {
-                        if ((isset($arrField['eval']['hideBody']) && true === $arrField['eval']['hideBody']) && (isset($arrField['eval']['hideHead']) && true === $arrField['eval']['hideHead'])) {
+                        if ((isset($arrField['eval']['hideBody'])
+                            && true === $arrField['eval']['hideBody'])
+                            && (isset($arrField['eval']['hideHead'])
+                            && true === $arrField['eval']['hideHead'])
+                        ) {
                             $strHeaderItem = (array_key_exists($strKey, $arrHiddenHeader))
                                 ? '<th class="hidden">'
                                 : '<th>';
