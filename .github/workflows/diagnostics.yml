@@ -10,9 +10,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        php: [7.3, 7.4]
-        contao: [~4.9.0]
+        php: [7.2, 7.3, 7.4, 8.0, 8.1]
+        contao: [~4.4.0, ~4.9.0, ~4.13.0]
+        exclude:
+            - contao: ~4.4.0
+              php: [8.0, 8.1]
+            - contao: ~4.13.0
+              php: [7.2, 7.3]
 
     steps:
       - name: PHP ${{ matrix.php }} ${{ matrix.contao }} Pull source
