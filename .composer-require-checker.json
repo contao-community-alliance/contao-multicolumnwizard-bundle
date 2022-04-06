@@ -1,0 +1,25 @@
+{
+  "symbol-whitelist" : [
+    "null", "true", "false",
+    "self", "parent",
+    "array", "string", "int", "float", "bool", "iterable", "callable", "void", "object",
+    "ContaoCommunityAlliance\\DcGeneral\\ContaoFrontend\\View\\WidgetManager",
+    "ContaoCommunityAlliance\\DcGeneral\\Contao\\Compatibility\\DcCompat",
+    "ContaoCommunityAlliance\\DcGeneral\\Contao\\View\\Contao2BackendView\\ContaoWidgetManager",
+    "ContaoCommunityAlliance\\DcGeneral\\DC\\General",
+    "ContaoCommunityAlliance\\DcGeneral\\DataContainerInterface",
+    "ContaoCommunityAlliance\\DcGeneral\\DataDefinition\\Definition\\PropertiesDefinitionInterface",
+    "ContaoCommunityAlliance\\DcGeneral\\DataDefinition\\Definition\\Properties\\DefaultProperty",
+    "ContaoCommunityAlliance\\DcGeneral\\DataDefinition\\Definition\\Properties\\PropertyInterface",
+    "ContaoCommunityAlliance\\DcGeneral\\Data\\ModelInterface",
+    "ContaoCommunityAlliance\\DcGeneral\\EnvironmentInterface",
+    "ContaoCommunityAlliance\\DcGeneral\\Exception\\DcGeneralRuntimeException",
+    "ContaoCommunityAlliance\\DcGeneral\\Factory\\Event\\BuildDataDefinitionEvent",
+    "Contao\\ManagerBundle\\ContaoManagerBundle",
+    "Contao\\ManagerPlugin\\Bundle\\BundlePluginInterface",
+    "Contao\\ManagerPlugin\\Bundle\\Config\\BundleConfig",
+    "Contao\\ManagerPlugin\\Bundle\\Parser\\ParserInterface",
+    "Contao\\ManagerPlugin\\Config\\ConfigPluginInterface",
+    "Contao\\ManagerPlugin\\Routing\\RoutingPluginInterface"
+  ]
+}

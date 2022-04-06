@@ -1,14 +1,13 @@
 {
   "name": "menatwork/contao-multicolumnwizard-bundle",
-  "type": "contao-bundle",
   "description": "MultiColumWizard for Contao OpenSource CMS",
+  "license": "LGPL-3.0-or-later",
+  "type": "contao-bundle",
   "keywords": [
     "contao",
     "widget",
     "wizard"
   ],
-  "homepage": "http://www.men-at-work.de",
-  "license": "LGPL-3.0-or-later",
   "authors": [
     {
       "name": "Stefan Heimes",
@@ -47,6 +46,7 @@
       "role": "Developer"
     }
   ],
+  "homepage": "http://www.men-at-work.de",
   "support": {
     "issues": "https://github.com/menatwork/MultiColumnWizard/issues",
     "wiki": "http://de.contaowiki.org/MultiColumnWizard",
@@ -65,8 +65,12 @@
     "symfony/translation": "^4.4 || ^5.2"
   },
   "require-dev": {
-    "phpcq/all-tasks": "~1.2",
-    "contao/manager-bundle": "^4.4"
+    "contao/manager-bundle": "^4.9",
+    "phpcq/runner-bootstrap": "^1.0@dev"
+  },
+  "replace": {
+    "contao-legacy/multicolumnwizard": "*",
+    "menatwork/contao-multicolumnwizard": ">=3.3.4 <4.0"
   },
   "autoload": {
     "psr-4": {
@@ -89,17 +93,19 @@
       "tests/contao3-autoloader.php"
     ]
   },
-  "replace": {
-    "contao-legacy/multicolumnwizard": "*",
-    "menatwork/contao-multicolumnwizard": ">=3.3.4 <4.0"
+  "config": {
+    "allow-plugins": {
+      "contao-components/installer": false,
+      "contao/manager-plugin": false
+    }
   },
   "extra": {
-    "contao-manager-plugin": "MenAtWork\\MultiColumnWizardBundle\\ContaoManager\\Plugin",
     "branch-alias": {
-      "dev-master": "3.5.x-dev",
       "dev-develop": "3.6.x-dev",
+      "dev-master": "3.5.x-dev",
       "dev-support/contao3": "3.3.x-dev",
       "dev-support/contao4.4": "3.4.x-dev"
-    }
+    },
+    "contao-manager-plugin": "MenAtWork\\MultiColumnWizardBundle\\ContaoManager\\Plugin"
   }
 }
