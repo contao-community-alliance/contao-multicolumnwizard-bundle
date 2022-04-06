@@ -64,7 +64,7 @@
     "symfony/translation": "^4.4 || ^5.2"
   },
   "require-dev": {
-    "contao/manager-bundle": "^4.9",
+    "contao/manager-plugin": "^2.1",
     "phpcq/runner-bootstrap": "^1.0@dev"
   },
   "replace": {
