@@ -12,49 +12,48 @@
     {
       "name": "Stefan Heimes",
       "email": "stefan_heimes@hotmail.com",
-      "homepage": "http://www.men-at-work.de",
+      "homepage": "https://www.men-at-work.de",
       "role": "Developer"
     },
     {
       "name": "Andreas Isaak",
       "email": "contao@men-at-work.de",
-      "homepage": "http://www.men-at-work.de",
+      "homepage": "https://www.men-at-work.de",
       "role": "Developer"
     },
     {
       "name": "David Maack",
       "email": "contao@men-at-work.de",
-      "homepage": "http://www.men-at-work.de",
+      "homepage": "https://www.men-at-work.de",
       "role": "Developer"
     },
     {
       "name": "Andreas Schempp",
       "email": "andreas.schempp@terminal42.ch",
-      "homepage": "http://www.terminal42.ch",
+      "homepage": "https://www.terminal42.ch",
       "role": "Developer"
     },
     {
       "name": "Yanick Witschi",
       "email": "yanick.witschi@terminal42.ch",
-      "homepage": "http://www.terminal42.ch",
+      "homepage": "https://www.terminal42.ch",
       "role": "Developer"
     },
     {
       "name": "Tristan Lins",
-      "email": "tristan.lins@bit3.de",
-      "homepage": "http://bit3.de",
+      "homepage": "https://github.com/tristanlins",
       "role": "Developer"
     }
   ],
-  "homepage": "http://www.men-at-work.de",
+  "homepage": "https://www.men-at-work.de",
   "support": {
     "issues": "https://github.com/menatwork/MultiColumnWizard/issues",
-    "wiki": "http://de.contaowiki.org/MultiColumnWizard",
+    "wiki": "https://de.contaowiki.org/MultiColumnWizard",
     "irc": "irc://irc.freenode.org/contao.dev",
     "source": "https://github.com/menatwork/MultiColumnWizard"
   },
   "require": {
-    "php": "^7.0 || ^8.0",
+    "php": "^7.4 || ^8.0",
     "contao/core-bundle": "^4.9",
     "symfony/config": "^4.4 || ^5.2",
     "symfony/console": "^4.4 || ^5.2",
