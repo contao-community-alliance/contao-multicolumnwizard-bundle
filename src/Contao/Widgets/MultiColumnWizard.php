@@ -358,7 +358,7 @@ class MultiColumnWizard extends Widget
     public function generateLabel()
     {
         foreach ($this->columnFields as $arrField) {
-            if ($arrField['eval']['mandatory']) {
+            if (isset($arrField['eval']['mandatory'])) {
                 $this->addAttribute('mandatory', true);
                 break;
             }
@@ -720,22 +720,22 @@ class MultiColumnWizard extends Widget
 
         foreach ($this->columnFields as $strKey => $arrField) {
             // Store unique fields
-            if ($arrField['eval']['unique']) {
+            if (isset($arrField['eval']['unique'])) {
                 $arrUnique[] = $strKey;
             }
 
             // Store date picker fields
-            if ($arrField['eval']['datepicker']) {
+            if (isset($arrField['eval']['datepicker'])) {
                 $arrDatepicker[] = $strKey;
             }
 
             // Store color picker fields
-            if ($arrField['eval']['colorpicker']) {
+            if (isset($arrField['eval']['colorpicker'])) {
                 $arrColorpicker[] = $strKey;
             }
 
             // Store tiny mce fields
-            if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
+            if (isset($arrField['eval']['rte']) && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
                 foreach ($this->varValue as $row => $value) {
                     $tinyId = 'ctrl_' . $this->strField . '_row' . $row . '_' . $strKey;
 
@@ -781,7 +781,7 @@ class MultiColumnWizard extends Widget
                 $strWidget     = '';
                 $blnHiddenBody = false;
 
-                if ($arrField['eval']['hideHead'] == true) {
+                if (isset($arrField['eval']['hideHead']) && $arrField['eval']['hideHead'] == true) {
                     $arrHiddenHeader[$strKey] = true;
                 }
 
@@ -1009,7 +1009,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Add the help wizard
-        if ($arrField['eval']['helpwizard']) {
+        if (isset($arrField['eval']['helpwizard'])) {
             $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField
                 . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard'])
                 . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\''
@@ -1093,7 +1093,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Input field callback
-        if (is_array($arrField['input_field_callback'])) {
+        if (isset($arrField['input_field_callback']) && is_array($arrField['input_field_callback'])) {
             if (!is_object($this->{$arrField['input_field_callback'][0]})) {
                 $this->import($arrField['input_field_callback'][0]);
             }
@@ -1112,7 +1112,7 @@ class MultiColumnWizard extends Widget
         $arrField['eval']['required'] = false;
 
         // Use strlen() here (see #3277)
-        if ($arrField['eval']['mandatory']) {
+        if (isset($arrField['eval']['mandatory'])) {
             if (is_array($this->varValue[$intRow][$strKey])) {
                 if (empty($this->varValue[$intRow][$strKey])) {
                     $arrField['eval']['required'] = true;
@@ -1125,12 +1125,12 @@ class MultiColumnWizard extends Widget
         }
 
         // Hide label except if multiple widgets are in one column
-        if ($arrField['eval']['columnPos'] == '') {
+        if (isset($arrField['eval']['columnPos']) && $arrField['eval']['columnPos'] == '') {
             $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' hidelabel');
         }
 
         // add class to enable easy updating of "name" attributes etc.
-        $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' mcwUpdateFields');
+        $arrField['eval']['tl_class'] = isset($arrField['eval']['tl_class'])? trim($arrField['eval']['tl_class'] . ' mcwUpdateFields') : '';
 
         // if we have a row class, add that one aswell.
         if (isset($arrField['eval']['rowClasses'][$intRow])) {
