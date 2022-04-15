@@ -25,28 +25,29 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\EventListener\Contao;
 
+use ContaoCommunityAlliance\DcGeneral\ContaoFrontend\View\WidgetManager;
+use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
+use ContaoCommunityAlliance\DcGeneral\DC\General;
+use ContaoCommunityAlliance\DcGeneral\DataContainerInterface;
+use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\PropertyInterface;
+use ContaoCommunityAlliance\DcGeneral\Exception\DcGeneralRuntimeException;
 use Contao\Config;
 use Contao\CoreBundle\Exception\ResponseException;
-use Contao\Database;
 use Contao\DataContainer;
+use Contao\Database;
 use Contao\Dbafs;
+use Contao\FileTree;
+use Contao\FilesModel;
 use Contao\Input;
 use Contao\PageTree;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
-use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
-use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
-use ContaoCommunityAlliance\DcGeneral\ContaoFrontend\View\WidgetManager;
-use ContaoCommunityAlliance\DcGeneral\DataContainerInterface;
-use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\PropertyInterface;
-use ContaoCommunityAlliance\DcGeneral\DC\General;
-use ContaoCommunityAlliance\DcGeneral\Exception\DcGeneralRuntimeException;
-use FilesModel;
-use FileTree;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
-use MenAtWork\MultiColumnWizardBundle\Event\CreateWidgetEvent;
 use MenAtWork\MultiColumnWizardBundle\EventListener\BaseListener;
+use MenAtWork\MultiColumnWizardBundle\Event\CreateWidgetEvent;
+use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -114,7 +115,7 @@ class ExecutePostActions extends BaseListener
             System::log(
                 'Field "' . $fieldName . '" is not a mcw in "' . $container->table . '"',
                 __METHOD__,
-                TL_ERROR
+                'error'
             );
             throw new BadRequestHttpException('Bad request');
         }
@@ -124,7 +125,7 @@ class ExecutePostActions extends BaseListener
             System::log(
                 'Field "' . $fieldName . '" does not exist in definition "' . $container->table . '"',
                 __METHOD__,
-                TL_ERROR
+                'error'
             );
             throw new BadRequestHttpException('Bad request');
         }
@@ -164,14 +165,15 @@ class ExecutePostActions extends BaseListener
             return;
         }
 
-        $intId    = \Input::get('id');
+        $intId    = Input::get('id');
         $strField = $this->getInputName($container);
         // Contao changed the name for FileTree and PageTree widgets
         // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
         $contaoVersion = VERSION . '.' . BUILD;
-        $vNameCheck    = (version_compare($contaoVersion, '4.4.41', '>=') &&
-                          version_compare($contaoVersion, '4.5.0', '<')) ||
-                         version_compare($contaoVersion, '4.7.7', '>=');
+        $vNameCheck = (
+                version_compare($contaoVersion, '4.4.41', '>=')
+                && version_compare($contaoVersion, '4.5.0', '<')
+            ) || version_compare($contaoVersion, '4.7.7', '>=');
 
         $containerField = '';
         if ($vNameCheck) {
@@ -199,7 +201,7 @@ class ExecutePostActions extends BaseListener
         $mcwId = $mcwBaseName . '_row' . $intRow . '_' . $mcwSupFieldName;
 
         // Handle the keys in "edit multiple" mode
-        if (\Input::get('act') == 'editAll') {
+        if (Input::get('act') == 'editAll') {
             if ($vNameCheck) {
                 $intId       = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $mcwBaseName);
                 $mcwBaseName = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $mcwBaseName);
@@ -212,7 +214,8 @@ class ExecutePostActions extends BaseListener
 
         // Add the sub configuration into the DCA. We need this for contao. Without it is not possible
         // to get the data for the picker.
-        if (($GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard')
+        if (
+            ($GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard')
             && !($container instanceof DataContainerInterface)
         ) {
             $widget = MultiColumnWizard::generateSimpleMcw($container->table, $mcwBaseName);
@@ -223,13 +226,14 @@ class ExecutePostActions extends BaseListener
         }
 
         // The field does not exist
-        if (!(isset($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]))
+        if (
+            !(isset($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]))
             && !($container instanceof DataContainerInterface)
         ) {
             System::log(
                 'Field "' . $strField . '" does not exist in DCA "' . $container->table . '"',
                 __METHOD__,
-                TL_ERROR
+                'error'
             );
             throw new BadRequestHttpException('Bad request');
         }
@@ -251,7 +255,7 @@ class ExecutePostActions extends BaseListener
                     System::log(
                         'A record with the ID "' . $intId . '" does not exist in table "' . $container->table . '"',
                         __METHOD__,
-                        TL_ERROR
+                        'error'
                     );
                     throw new BadRequestHttpException('Bad request');
                 }
@@ -363,7 +367,7 @@ class ExecutePostActions extends BaseListener
                     $definition->getName()
                 ),
                 __METHOD__,
-                TL_ERROR
+                'error'
             );
             throw new BadRequestHttpException('Bad request');
         }

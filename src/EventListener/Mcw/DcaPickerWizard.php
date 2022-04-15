@@ -21,6 +21,7 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\EventListener\Mcw;
 
+use Contao\Backend;
 use MenAtWork\MultiColumnWizardBundle\Event\GetDcaPickerWizardStringEvent;
 
 /**
@@ -50,7 +51,7 @@ class DcaPickerWizard
         }
 
         // Trigger the contao wizard class.
-        $string = \Contao\Backend::getDcaPickerWizard(
+        $string = Backend::getDcaPickerWizard(
             $field['eval']['dcaPicker'],
             $table,
             $fieldId,

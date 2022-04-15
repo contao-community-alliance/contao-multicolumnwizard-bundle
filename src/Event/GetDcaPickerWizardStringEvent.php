@@ -29,7 +29,7 @@ class GetDcaPickerWizardStringEvent extends GetStringEvent
     /**
      * Name of the event.
      */
-    const NAME = 'men-at-work.multi-column-wizard-bundle.get-dca-picker-wizard';
+    public const NAME = 'men-at-work.multi-column-wizard-bundle.get-dca-picker-wizard';
 
     /**
      * The color picker.

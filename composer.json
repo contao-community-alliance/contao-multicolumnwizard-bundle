@@ -54,6 +54,7 @@
   },
   "require": {
     "php": "^7.4 || ^8.0",
+    "ext-json": "*",
     "contao/core-bundle": "^4.9",
     "symfony/config": "^4.4 || ^5.2",
     "symfony/console": "^4.4 || ^5.2",
@@ -64,8 +65,10 @@
     "symfony/translation": "^4.4 || ^5.2"
   },
   "require-dev": {
+    "contao-community-alliance/dc-general": "^2.1",
     "contao/manager-plugin": "^2.1",
-    "phpcq/runner-bootstrap": "^1.0@dev"
+    "phpcq/runner-bootstrap": "^1.0@dev",
+    "roave/security-advisories": "dev-latest"
   },
   "replace": {
     "contao-legacy/multicolumnwizard": "*",
