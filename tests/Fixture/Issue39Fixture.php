@@ -32,6 +32,8 @@ class Issue39Fixture
      * @param \MultiColumnWizard $multiColumnWizard The MCW.
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function testing(\MultiColumnWizard $multiColumnWizard)
     {

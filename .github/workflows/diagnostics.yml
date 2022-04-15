@@ -12,17 +12,39 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [7.2, 7.3, 7.4, 8.0, 8.1]
-        contao: [~4.4.0, ~4.9.0, ~4.13.0]
-        exclude:
-            - contao: ~4.4.0
-              php: 8.0
-            - contao: ~4.4.0
-              php: 8.1
-            - contao: ~4.13.0
-              php: 7.2
-            - contao: ~4.13.0
-              php: 7.3
+        include:
+          - contao:        '~4.9.0'
+            php:           '7.4'
+            phpcq_install: 'update'
+            phpcq_flags:   ''
+          - contao:        '~4.9.0'
+            php:           '8.0'
+            phpcq_install: 'update'
+            phpcq_flags:   ''
+          - contao:        '~4.9.0'
+            php:           '8.1'
+            phpcq_install: 'update'
+            phpcq_flags:   ''
+          - contao:        '~4.9.0'
+            php:           '8.2'
+            phpcq_install: 'update'
+            phpcq_flags:   '--exit-0'
+          - contao:        '~4.13.0'
+            php:           '7.4'
+            phpcq_install: 'update'
+            phpcq_flags:   ''
+          - contao:        '~4.13.0'
+            php:           '8.0'
+            phpcq_install: 'update'
+            phpcq_flags:   ''
+          - contao:        '~4.13.0'
+            php:           '8.1'
+            phpcq_install: 'update'
+            phpcq_flags:   ''
+          - contao:        '~4.13.0'
+            php:           '8.2'
+            phpcq_install: 'update'
+            phpcq_flags:   '--exit-0'
 
     steps:
       - name: PHP ${{ matrix.php }} ${{ matrix.contao }} Pull source
@@ -35,28 +57,41 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          coverage: none
+          coverage:    none
 
       - name: PHP ${{ matrix.php }} ${{ matrix.contao }} Cache composer cache directory
         uses: actions/cache@v1
         env:
-          cache-name: composer-cache-dir
+          cache-name: composer-cache-dir-${{ matrix.php }}-${{ matrix.contao }}
         with:
           path: ~/.cache/composer
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          key:  ${{ runner.os }}-build-${{ env.cache-name }}
 
       - name: PHP ${{ matrix.php }} ${{ matrix.contao }} Cache vendor directory
         uses: actions/cache@v1
         env:
-          cache-name: composer-vendor
+          cache-name: composer-vendor-${{ matrix.php }}-${{ matrix.contao }}
         with:
-          path: vendor
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
+          path:         vendor
+          key:          ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
+                        ${{ runner.os }}-build-${{ env.cache-name }}-
 
       - name: PHP ${{ matrix.php }} ${{ matrix.contao }} Install composer dependencies
-        run: composer update --prefer-dist --no-interaction --no-suggest
+        run:  composer update --no-interaction --no-progress --no-suggest --prefer-dist --prefer-stable
+
+      - name: PHP ${{ matrix.php }} Update phpcq
+        run:  ./vendor/bin/phpcq self-update --unsigned
+
+      - name: PHP ${{ matrix.php }} Install phpcq toolchain
+        run:  ./vendor/bin/phpcq ${{ matrix.phpcq_install }} -v
 
       - name: PHP ${{ matrix.php }} ${{ matrix.contao }} Run tests
-        run: ant -keep-going
+        run:  ./vendor/bin/phpcq run -v -o github-action -o default ${{ matrix.phpcq_flags }}
+
+      - name: PHP ${{ matrix.php }} ${{ matrix.contao }} Upload build directory to artifact
+        uses: actions/upload-artifact@v2
+        if:   ${{ success() }} || ${{ failure() }}
+        with:
+          name: phpcq-builds-php-${{ matrix.php }}-${{ matrix.contao }}
+          path: .phpcq/build/

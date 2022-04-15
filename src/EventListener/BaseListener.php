@@ -73,6 +73,6 @@ class BaseListener extends Controller
      */
     protected function convertToResponse($str)
     {
-        return new Response(\Controller::replaceOldBePaths($str));
+        return new Response(Controller::replaceOldBePaths($str));
     }
 }
