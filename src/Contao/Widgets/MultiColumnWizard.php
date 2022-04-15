@@ -52,6 +52,7 @@
 namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
 
 use Contao\BackendTemplate;
+use Contao\DataContainer;
 use Contao\Date;
 use Contao\DC_File;
 use Contao\Image;
@@ -552,7 +553,11 @@ class MultiColumnWizard extends Widget
      */
     public function getDcDriver()
     {
-        $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
+        if (method_exists(DataContainer::class, 'getDriverForTable')) {
+            $dataContainer = DataContainer::getDriverForTable($this->strTable);
+        } else {
+            $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
+        }
 
         if ($dataContainer == \DC_General::class) {
             $dcgXRequestTemp                  = $_SERVER['HTTP_X_REQUESTED_WITH'];
