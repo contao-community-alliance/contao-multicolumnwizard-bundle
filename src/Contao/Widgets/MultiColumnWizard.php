@@ -427,8 +427,8 @@ class MultiColumnWizard extends Widget
         // Datepicker
         if (
             (
-                isset($fieldConfiguration['eval']['datepicker'])
-                && !$fieldConfiguration['eval']['datepicker']
+                !isset($fieldConfiguration['eval']['datepicker'])
+                || $fieldConfiguration['eval']['datepicker'] != true
             )
             || !isset($fieldConfiguration['eval']['rgxp'])
         ) {
@@ -1158,7 +1158,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Hide label except if multiple widgets are in one column
-        if (isset($arrField['eval']['columnPos']) && $arrField['eval']['columnPos'] == '') {
+        if (!isset($arrField['eval']['columnPos']) || empty($arrField['eval']['columnPos'])) {
             $arrField['eval']['tl_class'] = trim(($arrField['eval']['tl_class'] ?? '') . ' hidelabel');
         }
 
@@ -1219,6 +1219,7 @@ class MultiColumnWizard extends Widget
             $objWidget->addError($e->getMessage());
         }
 
+
         return $objWidget;
     }
 
@@ -1275,7 +1276,12 @@ class MultiColumnWizard extends Widget
 
         $arrField['id'] = $arrField['name'];
 
-        $property->setLabel($arrData['label']);
+        if(is_array($arrData['label'])) {
+            $property->setLabel($arrData['label'][0]);
+        } else {
+            $property->setLabel($arrData['label']);
+        }
+
         $property->setWidgetType($arrField['inputType']);
         if (isset($arrField['eval'])) {
             $property->setExtra($arrField['eval']);
