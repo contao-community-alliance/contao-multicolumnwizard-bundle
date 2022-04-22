@@ -24,8 +24,8 @@ use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard as MultiC
 
 // This hack is to load the "old locations" of the classes.
 spl_autoload_register(
-    function ($class) {
-        static $classes = [
+    static function ($class) {
+        $classes = [
             'MultiColumnWizard' => MultiColumnWizardBundle::class,
         ];
 

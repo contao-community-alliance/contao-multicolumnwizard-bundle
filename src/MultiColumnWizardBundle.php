@@ -33,8 +33,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class MultiColumnWizardBundle extends Bundle
 {
-    const SCOPE_BACKEND  = 'backend';
-    const SCOPE_FRONTEND = 'frontend';
+    public const SCOPE_BACKEND  = 'backend';
+    public const SCOPE_FRONTEND = 'frontend';
 
     /**
      * {@inheritdoc}

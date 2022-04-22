@@ -41,6 +41,7 @@
  * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
  * @author     doishub <daniele@oveleon.de>
  * @author     info@e-spin.de <info@e-spin.de>
+ * @author     David Greminger <david.greminger@1up.io>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
  * @copyright  2013-2021 MEN AT WORK
@@ -51,10 +52,13 @@
 namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
 
 use Contao\BackendTemplate;
+use Contao\DataContainer;
 use Contao\Date;
+use Contao\DC_File;
 use Contao\Image;
 use Contao\Input;
 use Contao\StringUtil;
+use Contao\System;
 use Contao\Widget;
 use ContaoCommunityAlliance\DcGeneral\EnvironmentInterface;
 use MenAtWork\MultiColumnWizardBundle\Event\GetColorPickerStringEvent;
@@ -175,7 +179,7 @@ class MultiColumnWizard extends Widget
             $this->loadDataContainer($arrAttributes['strTable']);
         }
 
-        $this->eventDispatcher = \System::getContainer()->get('event_dispatcher');
+        $this->eventDispatcher = System::getContainer()->get('event_dispatcher');
 
         /*
          * Load the callback data if there's any
@@ -205,7 +209,7 @@ class MultiColumnWizard extends Widget
     {
         switch ($strKey) {
             case 'value':
-                $this->varValue = deserialize($varValue, true);
+                $this->varValue = StringUtil::deserialize($varValue, true);
 
                 /*
                  * reformat array if we have only one field
@@ -358,7 +362,7 @@ class MultiColumnWizard extends Widget
     public function generateLabel()
     {
         foreach ($this->columnFields as $arrField) {
-            if ($arrField['eval']['mandatory']) {
+            if (isset($arrField['eval']['mandatory']) && $arrField['eval']['mandatory']) {
                 $this->addAttribute('mandatory', true);
                 break;
             }
@@ -421,7 +425,13 @@ class MultiColumnWizard extends Widget
         $tableName = null
     ) {
         // Datepicker
-        if (!$fieldConfiguration['eval']['datepicker'] || !isset($fieldConfiguration['eval']['rgxp'])) {
+        if (
+            (
+                !isset($fieldConfiguration['eval']['datepicker'])
+                || $fieldConfiguration['eval']['datepicker'] != true
+            )
+            || !isset($fieldConfiguration['eval']['rgxp'])
+        ) {
             return '';
         }
 
@@ -510,9 +520,13 @@ class MultiColumnWizard extends Widget
         $tableName = null
     ) {
         // Check if we have an configuration.
-        if (!isset($fieldConfiguration['eval']['dcaPicker'])
-            || (!\is_array($fieldConfiguration['eval']['dcaPicker'])
-                && !$fieldConfiguration['eval']['dcaPicker'] === true)) {
+        if (
+            !isset($fieldConfiguration['eval']['dcaPicker'])
+            || (
+                !\is_array($fieldConfiguration['eval']['dcaPicker'])
+                && !$fieldConfiguration['eval']['dcaPicker'] === true
+            )
+        ) {
             return '';
         }
 
@@ -539,7 +553,11 @@ class MultiColumnWizard extends Widget
      */
     public function getDcDriver()
     {
-        $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
+        if (method_exists(DataContainer::class, 'getDriverForTable')) {
+            $dataContainer = DataContainer::getDriverForTable($this->strTable);
+        } else {
+            $dataContainer = 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'];
+        }
 
         if ($dataContainer == \DC_General::class) {
             $dcgXRequestTemp                  = $_SERVER['HTTP_X_REQUESTED_WITH'];
@@ -608,8 +626,9 @@ class MultiColumnWizard extends Widget
                 $varValue = $objWidget->value;
 
                 // Convert date formats into timestamps (check the eval setting first -> #3063)
-                $rgxp = $arrField['eval']['rgxp'];
-                if (!$objWidget->hasErrors()
+                $rgxp = ($arrField['eval']['rgxp'] ?? '');
+                if (
+                    !$objWidget->hasErrors()
                     && ($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim')
                     && $varValue != ''
                 ) {
@@ -618,7 +637,7 @@ class MultiColumnWizard extends Widget
                 }
 
                 // Save callback
-                if (is_array($arrField['save_callback'])) {
+                if (isset($arrField['save_callback']) && is_array($arrField['save_callback'])) {
                     foreach ($arrField['save_callback'] as $callback) {
                         $this->import($callback[0]);
 
@@ -632,8 +651,10 @@ class MultiColumnWizard extends Widget
                 }
 
                 // Convert binary UUIDs for DC_File driver (see contao#6893)
-                if ($arrField['inputType'] == 'fileTree'
-                    && 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] === \DC_File::class) {
+                if (
+                    $arrField['inputType'] == 'fileTree'
+                    && 'DC_' . $GLOBALS['TL_DCA'][$this->strTable]['config']['dataContainer'] === DC_File::class
+                ) {
                     $varValue = StringUtil::deserialize($varValue);
 
                     if (!\is_array($varValue)) {
@@ -720,22 +741,25 @@ class MultiColumnWizard extends Widget
 
         foreach ($this->columnFields as $strKey => $arrField) {
             // Store unique fields
-            if ($arrField['eval']['unique']) {
+            if (isset($arrField['eval']['unique']) && $arrField['eval']['unique']) {
                 $arrUnique[] = $strKey;
             }
 
             // Store date picker fields
-            if ($arrField['eval']['datepicker']) {
+            if (isset($arrField['eval']['datepicker']) && $arrField['eval']['datepicker']) {
                 $arrDatepicker[] = $strKey;
             }
 
             // Store color picker fields
-            if ($arrField['eval']['colorpicker']) {
+            if (isset($arrField['eval']['colorpicker']) && $arrField['eval']['colorpicker']) {
                 $arrColorpicker[] = $strKey;
             }
 
             // Store tiny mce fields
-            if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
+            if (
+                isset($arrField['eval']['rte']) && $arrField['eval']['rte']
+                && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0
+            ) {
                 foreach ($this->varValue as $row => $value) {
                     $tinyId = 'ctrl_' . $this->strField . '_row' . $row . '_' . $strKey;
 
@@ -781,7 +805,7 @@ class MultiColumnWizard extends Widget
                 $strWidget     = '';
                 $blnHiddenBody = false;
 
-                if ($arrField['eval']['hideHead'] == true) {
+                if (isset($arrField['eval']['hideHead']) && $arrField['eval']['hideHead'] == true) {
                     $arrHiddenHeader[$strKey] = true;
                 }
 
@@ -832,7 +856,10 @@ class MultiColumnWizard extends Widget
                 } elseif ($arrField['inputType'] == 'hidden') {
                     $strHidden .= $objWidget->generate();
                     continue;
-                } elseif ($arrField['eval']['hideBody'] == true || $arrField['eval']['hideHead'] == true) {
+                } elseif (
+                    (isset($arrField['eval']['hideBody']) && $arrField['eval']['hideBody'] == true)
+                    || (isset($arrField['eval']['hideHead']) && $arrField['eval']['hideHead'] == true)
+                ) {
                     if ($arrField['eval']['hideBody'] == true) {
                         $blnHiddenBody = true;
                     }
@@ -859,7 +886,11 @@ class MultiColumnWizard extends Widget
                     );
 
                     // Tiny MCE.
-                    if ($arrField['eval']['rte'] && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0) {
+                    if (
+                        isset($arrField['eval']['rte'])
+                        && $arrField['eval']['rte']
+                        && strncmp($arrField['eval']['rte'], 'tiny', 4) === 0
+                    ) {
                         $additionalCode['tinyMce'] = $this->getMcWTinyMCEString(
                             $objWidget->id,
                             $arrField,
@@ -895,7 +926,9 @@ class MultiColumnWizard extends Widget
                 // Contao changed the name for FileTree and PageTree widgets
                 // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
                 $contaoVersion = VERSION . '.' . BUILD;
-                if ((
+
+                if (
+                    (
                         version_compare($contaoVersion, '4.4.41', '>=')
                         && version_compare($contaoVersion, '4.5.0', '<')
                     )
@@ -906,7 +939,7 @@ class MultiColumnWizard extends Widget
                 }
 
                 // Build array of items
-                if ($arrField['eval']['columnPos'] != '') {
+                if (isset($arrField['eval']['columnPos']) && $arrField['eval']['columnPos'] != '') {
                     $arrItems[$i][$objWidget->columnPos]['entry']   .= $strWidget;
                     $arrItems[$i][$objWidget->columnPos]['valign']   = $arrField['eval']['valign'];
                     $arrItems[$i][$objWidget->columnPos]['tl_class'] = $arrField['eval']['tl_class'];
@@ -915,7 +948,7 @@ class MultiColumnWizard extends Widget
                     $arrItems[$i][$strKey] = array
                     (
                         'entry'    => $strWidget,
-                        'valign'   => $arrField['eval']['valign'],
+                        'valign'   => $arrField['eval']['valign'] ?? null,
                         'tl_class' => $arrField['eval']['tl_class'],
                         'hide'     => $blnHiddenBody
                     );
@@ -1009,7 +1042,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Add the help wizard
-        if ($arrField['eval']['helpwizard']) {
+        if (isset($arrField['eval']['helpwizard']) && $arrField['eval']['helpwizard']) {
             $xlabel .= ' <a href="contao/help.php?table=' . $this->strTable . '&amp;field=' . $this->strField
                 . '" title="' . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['helpWizard'])
                 . '" onclick="Backend.openModalIframe({\'width\':735,\'height\':405,\'title\':\''
@@ -1019,7 +1052,7 @@ class MultiColumnWizard extends Widget
                     $arrField['label'][0]
                 ))
                 . '\',\'url\':this.href});return false">'
-                . \Image::getHtml(
+                . Image::getHtml(
                     'about.gif',
                     $GLOBALS['TL_LANG']['MSC']['helpWizard'],
                     'style="vertical-align:text-bottom"'
@@ -1093,7 +1126,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Input field callback
-        if (is_array($arrField['input_field_callback'])) {
+        if (isset($arrField['input_field_callback']) && is_array($arrField['input_field_callback'])) {
             if (!is_object($this->{$arrField['input_field_callback'][0]})) {
                 $this->import($arrField['input_field_callback'][0]);
             }
@@ -1112,7 +1145,7 @@ class MultiColumnWizard extends Widget
         $arrField['eval']['required'] = false;
 
         // Use strlen() here (see #3277)
-        if ($arrField['eval']['mandatory']) {
+        if (isset($arrField['eval']['mandatory']) && $arrField['eval']['mandatory']) {
             if (is_array($this->varValue[$intRow][$strKey])) {
                 if (empty($this->varValue[$intRow][$strKey])) {
                     $arrField['eval']['required'] = true;
@@ -1125,12 +1158,12 @@ class MultiColumnWizard extends Widget
         }
 
         // Hide label except if multiple widgets are in one column
-        if ($arrField['eval']['columnPos'] == '') {
-            $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' hidelabel');
+        if (!isset($arrField['eval']['columnPos']) || empty($arrField['eval']['columnPos'])) {
+            $arrField['eval']['tl_class'] = trim(($arrField['eval']['tl_class'] ?? '') . ' hidelabel');
         }
 
         // add class to enable easy updating of "name" attributes etc.
-        $arrField['eval']['tl_class'] = trim($arrField['eval']['tl_class'] . ' mcwUpdateFields');
+        $arrField['eval']['tl_class'] = trim(($arrField['eval']['tl_class'] ?? '') . ' mcwUpdateFields');
 
         // if we have a row class, add that one aswell.
         if (isset($arrField['eval']['rowClasses'][$intRow])) {
@@ -1140,17 +1173,17 @@ class MultiColumnWizard extends Widget
         }
 
         // load callback
-        if (is_array($arrField['load_callback'])) {
+        if (isset($arrField['load_callback']) && is_array($arrField['load_callback'])) {
             foreach ($arrField['load_callback'] as $callback) {
                 $this->import($callback[0]);
                 $varValue = $this->{$callback[0]}->{$callback[1]}($varValue, $this);
             }
-        } elseif (is_callable($arrField['load_callback'])) {
+        } elseif (isset($arrField['load_callback']) && is_callable($arrField['load_callback'])) {
             $varValue = $arrField['load_callback']($varValue, $this);
         }
 
         // Convert date formats into timestamps (check the eval setting first -> #3063)
-        $rgxp               = $arrField['eval']['rgxp'];
+        $rgxp               = ($arrField['eval']['rgxp'] ?? '');
         $dateFormatErrorMsg = '';
         if (($rgxp == 'date' || $rgxp == 'time' || $rgxp == 'datim') && $varValue != '') {
             try {
@@ -1171,7 +1204,7 @@ class MultiColumnWizard extends Widget
         $arrField['activeRow']         = $intRow;
         $arrField['name']              = $this->strName . '[' . $intRow . '][' . $strKey . ']';
         $arrField['id']                = $this->strId . '_row' . $intRow . '_' . $strKey;
-        $arrField['value']             = (null !== $varValue) ? $varValue : $arrField['default'];
+        $arrField['value']             = ((null !== $varValue) ? $varValue : ($arrField['default'] ?? null));
         $arrField['eval']['tableless'] = true;
 
         $arrData = $this->handleDcGeneral($arrField, $strKey);
@@ -1185,6 +1218,7 @@ class MultiColumnWizard extends Widget
         if (!empty($dateFormatErrorMsg)) {
             $objWidget->addError($e->getMessage());
         }
+
 
         return $objWidget;
     }
@@ -1211,7 +1245,7 @@ class MultiColumnWizard extends Widget
             $arrData,
             $arrField['name'],
             $arrField['value'],
-            $arrField['strField'],
+            ($arrField['strField'] ?? null),
             $this->strTable,
             $this
         ));
@@ -1242,7 +1276,12 @@ class MultiColumnWizard extends Widget
 
         $arrField['id'] = $arrField['name'];
 
-        $property->setLabel($arrData['label']);
+        if(is_array($arrData['label'])) {
+            $property->setLabel($arrData['label'][0]);
+        } else {
+            $property->setLabel($arrData['label']);
+        }
+
         $property->setWidgetType($arrField['inputType']);
         if (isset($arrField['eval'])) {
             $property->setExtra($arrField['eval']);
@@ -1303,7 +1342,7 @@ class MultiColumnWizard extends Widget
             // our options.
             if (is_array($arrData['options_callback'])) {
                 $arrCallback        = $arrData['options_callback'];
-                $arrData['options'] = static::importStatic($arrCallback[0])->{$arrCallback[1]}($this);
+                $arrData['options'] = System::importStatic($arrCallback[0])->{$arrCallback[1]}($this);
                 unset($arrData['options_callback']);
             } elseif (is_callable($arrData['options_callback'])) {
                 $arrData['options'] = $arrData['options_callback']($this);
@@ -1387,10 +1426,15 @@ class MultiColumnWizard extends Widget
             // Generate header fields if not all are hidden.
             if (count($this->columnFields) !== count($arrHiddenHeader)) {
                 foreach ($this->columnFields as $strKey => $arrField) {
-                    if ($arrField['eval']['columnPos']) {
+                    if (isset($arrField['eval']['columnPos']) && $arrField['eval']['columnPos']) {
                         $arrHeaderItems[$arrField['eval']['columnPos']] = '<th></th>';
                     } else {
-                        if ((true === $arrField['eval']['hideBody']) && (true === $arrField['eval']['hideHead'])) {
+                        if (
+                            (isset($arrField['eval']['hideBody'])
+                            && true === $arrField['eval']['hideBody'])
+                            && (isset($arrField['eval']['hideHead'])
+                            && true === $arrField['eval']['hideHead'])
+                        ) {
                             $strHeaderItem = (array_key_exists($strKey, $arrHiddenHeader))
                                 ? '<th class="hidden">'
                                 : '<th>';
@@ -1398,7 +1442,7 @@ class MultiColumnWizard extends Widget
                             $strHeaderItem = '<th>'
                                 . (array_key_exists($strKey, $arrHiddenHeader) ? '<div class="hidden">' : '');
                         }
-                        if ($arrField['eval']['mandatory']) {
+                        if (isset($arrField['eval']['mandatory']) && $arrField['eval']['mandatory']) {
                             $strHeaderItem .= '<span class="invisible">'
                             . $GLOBALS['TL_LANG']['MSC']['mandatory']
                             . ' </span>';
@@ -1413,7 +1457,7 @@ class MultiColumnWizard extends Widget
                                         : $strKey
                                 )
                         );
-                        if ($arrField['eval']['mandatory']) {
+                        if (isset($arrField['eval']['mandatory']) && $arrField['eval']['mandatory']) {
                             $strHeaderItem .= '<span class="mandatory">*</span>';
                         }
                         $strHeaderItem   .=
