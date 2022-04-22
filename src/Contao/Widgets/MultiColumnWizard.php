@@ -1276,7 +1276,7 @@ class MultiColumnWizard extends Widget
 
         $arrField['id'] = $arrField['name'];
 
-        if(is_array($arrData['label'])) {
+        if (is_array($arrData['label'])) {
             $property->setLabel($arrData['label'][0]);
         } else {
             $property->setLabel($arrData['label']);
