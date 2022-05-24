@@ -1362,7 +1362,7 @@ class MultiColumnWizard extends Widget
             );
             $environment->getEventDispatcher()->dispatch($event, $event::NAME);
 
-            if ($event->getOptions() !== $arrData['options']) {
+            if (isset($arrData['options']) && $event->getOptions() !== $arrData['options']) {
                 $arrData['options'] = $event->getOptions();
             }
         }
