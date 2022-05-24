@@ -21,6 +21,7 @@
  */
 
 use Contao\DataContainer;
+use Contao\System;
 use Contao\Template;
 use MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions;
 use MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem;
@@ -79,7 +80,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
         );
 
         /** @var MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ParseTemplate $helper */
-        $helper = \System::getContainer()->get($serviceName);
+        $helper = System::getContainer()->get($serviceName);
         $helper->addScriptsAndStyles($objTemplate);
     }
 
@@ -107,7 +108,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
         );
 
         /** @var MenAtWork\MultiColumnWizardBundle\EventListener\Contao\LoadDataContainer $helper */
-        $helper = \System::getContainer()->get($serviceName);
+        $helper = System::getContainer()->get($serviceName);
         $helper->supportModalSelector($strTable);
     }
 
@@ -133,7 +134,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
         );
 
         /** @var MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem $helper */
-        $helper = \System::getContainer()->get($serviceName);
+        $helper = System::getContainer()->get($serviceName);
         $helper->changeAjaxPostActions();
     }
 
@@ -165,7 +166,7 @@ class MultiColumnWizardHelper extends BundleMultiColumnWizardHelper
         );
 
         /** @var MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions $helper */
-        $helper = \System::getContainer()->get($serviceName);
+        $helper = System::getContainer()->get($serviceName);
         $helper->executePostActions($action, $container);
     }
 

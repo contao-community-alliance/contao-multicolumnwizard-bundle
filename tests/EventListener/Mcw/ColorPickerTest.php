@@ -25,7 +25,7 @@ use Contao\CoreBundle\Framework\Adapter;
 use MenAtWork\MultiColumnWizardBundle\Event\GetColorPickerStringEvent;
 use MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\ColorPicker;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * This tests the color picker event listener.

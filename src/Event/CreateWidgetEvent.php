@@ -35,7 +35,7 @@ class CreateWidgetEvent extends Event
     /**
      * Name of the event.
      */
-    const NAME = 'men-at-work.multi-column-wizard-bundle.create-widget';
+    public const NAME = 'men-at-work.multi-column-wizard-bundle.create-widget';
 
     /**
      * The data container.

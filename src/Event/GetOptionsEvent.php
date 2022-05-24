@@ -36,7 +36,7 @@ class GetOptionsEvent extends Event
     /**
      * Name of this event.
      */
-    const NAME = 'men-at-work.multi-column-wizard-bundle.get-options';
+    public const NAME = 'men-at-work.multi-column-wizard-bundle.get-options';
 
     /**
      * The name of the multi column wizard.

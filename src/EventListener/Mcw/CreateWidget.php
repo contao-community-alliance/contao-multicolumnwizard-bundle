@@ -29,6 +29,7 @@ use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
 use MenAtWork\MultiColumnWizardBundle\Event\CreateWidgetEvent;
+use Psr\Log\LogLevel;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
@@ -70,11 +71,11 @@ class CreateWidget
             System::log(
                 'Field "' . $fieldName . '" does not exist in DCA "' . $dcDriver->table . '"',
                 __METHOD__,
-                TL_ERROR
+                'error'
             );
             throw new BadRequestHttpException('Bad request');
         }
-        
+
         $inputType = $GLOBALS['TL_DCA'][$dcDriver->table]['fields'][$fieldName]['inputType'];
 
         /** @var string $widgetClassName */

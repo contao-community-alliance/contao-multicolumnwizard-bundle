@@ -20,12 +20,10 @@
  */
 
 spl_autoload_register(
-
     /*
      * Mapping between root namespace of contao and the contao namespace.
      * Can map class, interface and trait.
      */
-
     function ($class) {
         if (substr($class, 0, 7) === 'Contao\\') {
             return;

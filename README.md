@@ -1,7 +1,9 @@
-[![Build Status](https://travis-ci.org/menatwork/contao-multicolumnwizard-bundle.png)](https://travis-ci.org/menatwork/contao-multicolumnwizard-bundle)
+[![Build Status](https://github.com/menatwork/contao-multicolumnwizard-bundle/actions/workflows/diagnostics.yml/badge.svg)](https://github.com/menatwork/contao-multicolumnwizard-bundle/actions)
 [![Latest Version tagged](http://img.shields.io/github/tag/menatwork/contao-multicolumnwizard-bundle.svg)](https://github.com/menatwork/contao-multicolumnwizard-bundle/tags)
 [![Latest Version on Packagist](http://img.shields.io/packagist/v/menatwork/contao-multicolumnwizard-bundle.svg)](https://packagist.org/packages/menatwork/contao-multicolumnwizard-bundle)
 [![Installations via composer per month](http://img.shields.io/packagist/dm/menatwork/contao-multicolumnwizard-bundle.svg)](https://packagist.org/packages/menatwork/contao-multicolumnwizard-bundle)
+
+The repository of contao-multicolumnwizard-bundle was moved to [contao-community-alliance](https://github.com/contao-community-alliance/contao-multicolumnwizard-bundle). We plan to support this version with bugfixes until the new version from the CCA is released.
 
 # MultiColumnWizard
 
