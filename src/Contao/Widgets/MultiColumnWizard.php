@@ -1460,14 +1460,18 @@ class MultiColumnWizard extends Widget
                         if (isset($arrField['eval']['mandatory']) && $arrField['eval']['mandatory']) {
                             $strHeaderItem .= '<span class="mandatory">*</span>';
                         }
-                        $strHeaderItem   .=
-                        (
-                            (is_array($arrField['label'] ?? null) && isset($arrField['label'][1]) && $arrField['label'][1] != '')
+
+                        $isDescriptionsSet = is_array($arrField['label'] ?? null)
+                                             && isset($arrField['label'][1])
+                                             && $arrField['label'][1] != '';
+                        $strHeaderItem     .=
+                            (
+                                ($isDescriptionsSet)
                                 ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>'
                                 : ''
-                        );
-                        $strHeaderItem   .= (array_key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
-                        $arrHeaderItems[] = $strHeaderItem . '</th>';
+                            );
+                        $strHeaderItem     .= (array_key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
+                        $arrHeaderItems[]  = $strHeaderItem . '</th>';
                     }
                 }
             }
