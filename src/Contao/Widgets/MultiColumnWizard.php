@@ -3,7 +3,7 @@
 /**
  * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * (c) 2012-2021 MEN AT WORK.
+ * (c) 2012-2022 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -44,7 +44,7 @@
  * @author     David Greminger <david.greminger@1up.io>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
- * @copyright  2013-2021 MEN AT WORK
+ * @copyright  2013-2022 MEN AT WORK
  * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -860,7 +860,7 @@ class MultiColumnWizard extends Widget
                     (isset($arrField['eval']['hideBody']) && $arrField['eval']['hideBody'] == true)
                     || (isset($arrField['eval']['hideHead']) && $arrField['eval']['hideHead'] == true)
                 ) {
-                    if ($arrField['eval']['hideBody'] == true) {
+                    if (($arrField['eval']['hideBody'] ?? false) == true) {
                         $blnHiddenBody = true;
                     }
 
@@ -1196,7 +1196,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Set the translation
-        if (!isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey]['label'])) {
+        if (!isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey]['label']) && isset($arrField['label'])) {
             $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey]['label'] = $arrField['label'];
         }
 
@@ -1340,11 +1340,11 @@ class MultiColumnWizard extends Widget
         if (is_subclass_of($this->objDca, 'ContaoCommunityAlliance\DcGeneral\EnvironmentAwareInterface')) {
             // If options-callback registered, call that one first as otherwise \Widget::getAttributesFromDca will kill
             // our options.
-            if (is_array($arrData['options_callback'])) {
+            if (isset($arrData['options_callback']) && is_array($arrData['options_callback'])) {
                 $arrCallback        = $arrData['options_callback'];
                 $arrData['options'] = System::importStatic($arrCallback[0])->{$arrCallback[1]}($this);
                 unset($arrData['options_callback']);
-            } elseif (is_callable($arrData['options_callback'])) {
+            } elseif (isset($arrData['options_callback']) && is_callable($arrData['options_callback'])) {
                 $arrData['options'] = $arrData['options_callback']($this);
                 unset($arrData['options_callback']);
             }
@@ -1362,7 +1362,7 @@ class MultiColumnWizard extends Widget
             );
             $environment->getEventDispatcher()->dispatch($event, $event::NAME);
 
-            if ($event->getOptions() !== $arrData['options']) {
+            if ($event->getOptions() !== ($arrData['options'] ?? null)) {
                 $arrData['options'] = $event->getOptions();
             }
         }
@@ -1449,10 +1449,10 @@ class MultiColumnWizard extends Widget
                         }
                         $strHeaderItem .=
                         (
-                            (is_array($arrField['label']))
+                            (is_array($arrField['label'] ?? null))
                                 ? $arrField['label'][0]
                                 : (
-                                    ($arrField['label'] != null)
+                                    (isset($arrField['label']) && $arrField['label'] != null)
                                         ? $arrField['label']
                                         : $strKey
                                 )
@@ -1460,14 +1460,18 @@ class MultiColumnWizard extends Widget
                         if (isset($arrField['eval']['mandatory']) && $arrField['eval']['mandatory']) {
                             $strHeaderItem .= '<span class="mandatory">*</span>';
                         }
-                        $strHeaderItem   .=
-                        (
-                            (is_array($arrField['label']) && $arrField['label'][1] != '')
+
+                        $isDescriptionsSet = is_array($arrField['label'] ?? null)
+                                             && isset($arrField['label'][1])
+                                             && $arrField['label'][1] != '';
+                        $strHeaderItem     .=
+                            (
+                                ($isDescriptionsSet)
                                 ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>'
                                 : ''
-                        );
-                        $strHeaderItem   .= (array_key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
-                        $arrHeaderItems[] = $strHeaderItem . '</th>';
+                            );
+                        $strHeaderItem     .= (array_key_exists($strKey, $arrHiddenHeader)) ? '</div>' : '';
+                        $arrHeaderItems[]  = $strHeaderItem . '</th>';
                     }
                 }
             }
