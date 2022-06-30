@@ -860,7 +860,7 @@ class MultiColumnWizard extends Widget
                     (isset($arrField['eval']['hideBody']) && $arrField['eval']['hideBody'] == true)
                     || (isset($arrField['eval']['hideHead']) && $arrField['eval']['hideHead'] == true)
                 ) {
-                    if ($arrField['eval']['hideBody'] == true) {
+                    if (($arrField['eval']['hideBody'] ?? false) == true) {
                         $blnHiddenBody = true;
                     }
 
@@ -1196,7 +1196,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Set the translation
-        if (!isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey]['label'])) {
+        if (!isset($GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey]['label']) && isset($arrField['label'])) {
             $GLOBALS['TL_DCA'][$this->strTable]['fields'][$strKey]['label'] = $arrField['label'];
         }
 
@@ -1449,10 +1449,10 @@ class MultiColumnWizard extends Widget
                         }
                         $strHeaderItem .=
                         (
-                            (is_array($arrField['label']))
+                            (is_array($arrField['label'] ?? null))
                                 ? $arrField['label'][0]
                                 : (
-                                    ($arrField['label'] != null)
+                                    (isset($arrField['label']) && $arrField['label'] != null)
                                         ? $arrField['label']
                                         : $strKey
                                 )
@@ -1462,7 +1462,7 @@ class MultiColumnWizard extends Widget
                         }
                         $strHeaderItem   .=
                         (
-                            (is_array($arrField['label']) && $arrField['label'][1] != '')
+                            (is_array($arrField['label'] ?? null) && isset($arrField['label'][1]) && $arrField['label'][1] != '')
                                 ? '<span title="' . $arrField['label'][1] . '"><sup>(?)</sup></span>'
                                 : ''
                         );
