@@ -609,7 +609,7 @@ class MultiColumnWizard extends Widget
 
             // Walk every column
             foreach ($this->columnFields as $strKey => $arrField) {
-                $objWidget = $this->initializeWidget($arrField, $i, $strKey, $varInput[$i][$strKey]);
+                $objWidget = $this->initializeWidget($arrField, $i, $strKey, $varInput[$i][$strKey] ?? null);
 
                 // can be null on error, or a string on input_field_callback
                 if (!is_object($objWidget)) {
