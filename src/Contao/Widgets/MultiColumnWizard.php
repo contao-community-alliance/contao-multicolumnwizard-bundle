@@ -772,10 +772,6 @@ class MultiColumnWizard extends Widget
 
                 $arrTinyMCE[] = $strKey;
             }
-
-            if ($arrField['inputType'] == 'hidden') {
-                continue;
-            }
         }
 
         $intNumberOfRows = max(count($this->varValue), 1);
@@ -1025,7 +1021,7 @@ class MultiColumnWizard extends Widget
         $arrField['activeRecord'] = $this->activeRecord;
 
         // Toggle line wrap (textarea)
-        if ($arrField['inputType'] == 'textarea' && $arrField['eval']['rte'] == '') {
+        if (($arrField['inputType'] ?? null) == 'textarea' && $arrField['eval']['rte'] == '') {
             $xlabel .= ' '
                 . Image::getHtml(
                     'wrap.gif',
@@ -1060,7 +1056,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Add the popup file manager
-        if ($arrField['inputType'] == 'fileTree' || $arrField['inputType'] == 'pageTree') {
+        if (($arrField['inputType'] ?? null) == 'fileTree' || ($arrField['inputType'] ?? null) == 'pageTree') {
             $path = '';
 
             if (isset($arrField['eval']['path'])) {
@@ -1082,7 +1078,7 @@ class MultiColumnWizard extends Widget
             // Add title at modal window.
             $GLOBALS['TL_DCA'][$this->strTable]['fields'][$arrField['strField']]['label'][0] =
                 (is_array($arrField['label']) && $arrField['label'][0] != '') ? $arrField['label'][0] : $strKey;
-        } elseif ($arrField['inputType'] == 'tableWizard') {
+        } elseif (($arrField['inputType'] ?? null) == 'tableWizard') {
             // Add the table import wizard
             $xlabel .= ' <a href="'
                 . $this->addToUrl('key=table')
@@ -1111,7 +1107,7 @@ class MultiColumnWizard extends Widget
                     . StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['tw_expand'])
                     . '" style="vertical-align:text-bottom; cursor:pointer;" onclick="Backend.tableWizardResize(1.1);"'
                 );
-        } elseif ($arrField['inputType'] == 'listWizard') {
+        } elseif (($arrField['inputType'] ?? null) == 'listWizard') {
             // Add the list import wizard
             $xlabel .= ' <a href="'
                 . $this->addToUrl('key=list')
