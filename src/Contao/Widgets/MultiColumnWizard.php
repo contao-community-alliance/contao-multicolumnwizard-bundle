@@ -940,9 +940,9 @@ class MultiColumnWizard extends Widget
 
                 // Build array of items
                 if (isset($arrField['eval']['columnPos']) && $arrField['eval']['columnPos'] != '') {
-                    $arrItems[$i][$objWidget->columnPos]['entry']   .= $strWidget;
-                    $arrItems[$i][$objWidget->columnPos]['valign']   = $arrField['eval']['valign'];
-                    $arrItems[$i][$objWidget->columnPos]['tl_class'] = $arrField['eval']['tl_class'];
+                    $arrItems[$i][$objWidget->columnPos]['entry']    = ($arrItems[$i][$objWidget->columnPos]['entry'] ?? '') . $strWidget;
+                    $arrItems[$i][$objWidget->columnPos]['valign']   = ($arrField['eval']['valign'] ?? '');
+                    $arrItems[$i][$objWidget->columnPos]['tl_class'] = ($arrField['eval']['tl_class'] ?? '');
                     $arrItems[$i][$objWidget->columnPos]['hide']     = $blnHiddenBody;
                 } else {
                     $arrItems[$i][$strKey] = array
