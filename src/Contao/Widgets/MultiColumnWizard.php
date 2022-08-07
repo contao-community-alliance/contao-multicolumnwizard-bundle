@@ -1140,17 +1140,16 @@ class MultiColumnWizard extends Widget
         }
 
         $arrField['eval']['required'] = false;
-
-        // Use strlen() here (see #3277)
-        if (isset($arrField['eval']['mandatory']) && $arrField['eval']['mandatory']) {
-            if (is_array($this->varValue[$intRow][$strKey])) {
-                if (empty($this->varValue[$intRow][$strKey])) {
-                    $arrField['eval']['required'] = true;
-                }
-            } else {
-                if (!strlen($this->varValue[$intRow][$strKey])) {
-                    $arrField['eval']['required'] = true;
-                }
+        if (
+            isset($arrField['eval']['mandatory'])
+            && $arrField['eval']['mandatory']
+            && array_key_exists($intRow, $this->varValue)
+            && array_key_exists($strKey, $this->varValue[$intRow])
+        ) {
+            if (is_array($this->varValue[$intRow][$strKey]) && empty($this->varValue[$intRow][$strKey])) {
+                $arrField['eval']['required'] = true;
+            } else if('' === $this->varValue[$intRow][$strKey]){
+                $arrField['eval']['required'] = true;
             }
         }
 
