@@ -1493,7 +1493,7 @@ class MultiColumnWizard extends Widget
                 $this->strId
             );
 
-            if ($this->columnTemplate == '' && is_array($arrHeaderItems)) {
+            if ($this->columnTemplate == '' && isset($arrHeaderItems) && is_array($arrHeaderItems)) {
                 $return .= \sprintf('<thead><tr>%s<th></th></tr></thead>', implode("\n      ", $arrHeaderItems));
             }
 
