@@ -1142,6 +1142,21 @@ class MultiColumnWizard extends Widget
             return null;
         }
 
+        $arrField['eval']['required'] = false;
+
+        // Use strlen() here (see #3277)
+        if (isset($arrField['eval']['mandatory']) && $arrField['eval']['mandatory']) {
+            if (is_array($this->varValue[$intRow][$strKey])) {
+                if (empty($this->varValue[$intRow][$strKey])) {
+                    $arrField['eval']['required'] = true;
+                }
+            } else {
+                if (!strlen($this->varValue[$intRow][$strKey])) {
+                    $arrField['eval']['required'] = true;
+                }
+            }
+        }
+
         // Hide label except if multiple widgets are in one column
         if (!isset($arrField['eval']['columnPos']) || empty($arrField['eval']['columnPos'])) {
             $arrField['eval']['tl_class'] = trim(($arrField['eval']['tl_class'] ?? '') . ' hidelabel');
