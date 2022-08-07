@@ -1148,7 +1148,7 @@ class MultiColumnWizard extends Widget
         ) {
             if (is_array($this->varValue[$intRow][$strKey]) && empty($this->varValue[$intRow][$strKey])) {
                 $arrField['eval']['required'] = true;
-            } else if('' === $this->varValue[$intRow][$strKey]){
+            } elseif ('' === $this->varValue[$intRow][$strKey]) {
                 $arrField['eval']['required'] = true;
             }
         }
