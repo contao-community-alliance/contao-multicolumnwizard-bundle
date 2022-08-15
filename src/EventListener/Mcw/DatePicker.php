@@ -69,7 +69,7 @@ class DatePicker
         $strOnSelect = '';
 
         // Trigger the auto-submit function (see #8603)
-        if ($fieldConfiguration['eval']['submitOnChange']) {
+        if ($fieldConfiguration['eval']['submitOnChange'] ?? null) {
             $strOnSelect = ",\n        onSelect: function() { Backend.autoSubmit(\"" . $table . '"); }';
         }
 
