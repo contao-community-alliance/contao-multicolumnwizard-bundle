@@ -129,7 +129,8 @@ $GLOBALS['TL_DCA']['tl_theme']['fields']['templateSelection'] = [
             'copy'   => false,
             'delete' => false,
             'up'     => false,
-            'down'   => false
+            'down'   => false,
+            'move'   => false
         ],
         // as alternative to hide all buttons use the next line
         //'hideButtons'  => true,
