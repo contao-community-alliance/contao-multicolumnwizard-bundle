@@ -22,13 +22,25 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\EventListener\Contao;
 
+use Contao\System;
 use Contao\Template;
+use MenAtWork\MultiColumnWizardBundle\Service\ContaoApiService;
 
 /**
  * Class ParseTemplate
  */
 class ParseTemplate
 {
+    /**
+     * @var ContaoApiService
+     */
+    private ContaoApiService $contaoApi;
+
+    public function __construct()
+    {
+        $this->contaoApi = System::getContainer()->get(ContaoApiService::class);
+    }
+
     /**
      * Add the scripts and stylesheet to the passed template.
      *
@@ -39,15 +51,19 @@ class ParseTemplate
      * @@SuppressWarnings(PHPMD.Superglobals)
      * @SuppressWarnings(PHPMD.CamelCaseVariableName)
      */
-    public function addVersion(&$objTemplate)
+    public function addVersion(Template &$objTemplate): void
     {
-        // do not allow version information to be leaked in the backend login and install tool (#184)
-        if ($objTemplate->getName() != 'be_login' && $objTemplate->getName() != 'be_install') {
-            $objTemplate->ua .= ' version_' . str_replace('.', '-', VERSION) . '-' . str_replace(
-                '.',
-                '-',
-                BUILD
-            );
+        // Do not allow version information to be leaked in the backend login and install tool (#184)
+        if ('be_login' === $objTemplate->getName() || 'be_install' === $objTemplate->getName()) {
+            return;
         }
+
+        // Only run for the backend. I don't know if we need this information in the FE as well.
+        // ToDo: Check if we need this in FE, if so we should add this information other, 'cause of security.
+        if (!$this->contaoApi->isBackend()) {
+            return;
+        }
+
+        $objTemplate->ua .= ' version_' . str_replace('.', '-', $this->contaoApi->getContaoVersion());
     }
 }

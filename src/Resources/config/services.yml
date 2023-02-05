@@ -3,12 +3,22 @@ services:
     public: true
     arguments:
       - '@event_dispatcher'
+      - '@MenAtWork\MultiColumnWizardBundle\Service\ContaoApiService'
+      - '@monolog.logger.contao'
 
   MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem:
     public: true
+    arguments:
+      - '@MenAtWork\MultiColumnWizardBundle\Service\ContaoApiService'
 
   MenAtWork\MultiColumnWizardBundle\EventListener\Contao\LoadDataContainer:
     public: true
 
   MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ParseTemplate:
     public: true
+
+  MenAtWork\MultiColumnWizardBundle\Service\ContaoApiService:
+    public: true
+    arguments:
+      - '@request_stack'
+      - '@contao.routing.scope_matcher'

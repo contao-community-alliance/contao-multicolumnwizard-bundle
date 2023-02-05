@@ -26,38 +26,20 @@
  * @filesource
  */
 
-$GLOBALS['BE_FFL']['multiColumnWizard'] = '\MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard';
+use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
+use MenAtWork\MultiColumnWizardBundle\EventListener\Contao\LoadDataContainer;
+use MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem;
+use MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions;
 
-$GLOBALS['TL_HOOKS']['loadDataContainer'][]  = array(
-    'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\LoadDataContainer',
-    'supportModalSelector'
-);
-$GLOBALS['TL_HOOKS']['initializeSystem'][]   = array(
-    'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem',
-    'changeAjaxPostActions'
-);
-$GLOBALS['TL_HOOKS']['executePostActions'][] = array(
-    'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions',
-    'executePostActions'
-);
-$GLOBALS['TL_HOOKS']['executePostActions'][] = array(
-    'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ExecutePostActions',
-    'handleRowCreation'
-);
+$GLOBALS['BE_FFL']['multiColumnWizard'] = MultiColumnWizard::class;
 
-if (TL_MODE == 'BE') {
-    $GLOBALS['TL_HOOKS']['parseTemplate'][] = array(
-        'MenAtWork\MultiColumnWizardBundle\EventListener\Contao\ParseTemplate',
-        'addVersion'
-    );
+$GLOBALS['TL_HOOKS']['loadDataContainer'][]  = [LoadDataContainer::class, 'supportModalSelector'];
+$GLOBALS['TL_HOOKS']['initializeSystem'][]   = [InitializeSystem::class, 'addSystemNecessaryThings'];
+$GLOBALS['TL_HOOKS']['initializeSystem'][]   = [InitializeSystem::class, 'changeAjaxPostActions'];
+$GLOBALS['TL_HOOKS']['executePostActions'][] = [ExecutePostActions::class, 'executePostActions'];
+$GLOBALS['TL_HOOKS']['executePostActions'][] = [ExecutePostActions::class, 'handleRowCreation'];
 
-    // Add the JS.
-    $GLOBALS['TL_JAVASCRIPT']['multicolumnwizard'] = $GLOBALS['TL_CONFIG']['debugMode']
-        ? 'bundles/multicolumnwizard/js/multicolumnwizard_be_src.js'
-        : 'bundles/multicolumnwizard/js/multicolumnwizard_be.js';
-
-    // Add the css.
-    $GLOBALS['TL_CSS']['multicolumnwizard'] = $GLOBALS['TL_CONFIG']['debugMode']
-        ? 'bundles/multicolumnwizard/css/multicolumnwizard_src.css'
-        : 'bundles/multicolumnwizard/css/multicolumnwizard.css';
-}
+/*
+ * All Hooks for the BE are moved to the following function:
+ * \MenAtWork\MultiColumnWizardBundle\EventListener\Contao\InitializeSystem::addSystemNecessaryThings
+ */

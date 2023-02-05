@@ -24,12 +24,51 @@ namespace MenAtWork\MultiColumnWizardBundle\EventListener\Contao;
 
 use Contao\Environment;
 use Contao\Input;
+use Contao\System;
+use MenAtWork\MultiColumnWizardBundle\Service\ContaoApiService;
 
 /**
  * Class InitializeSystem
  */
 class InitializeSystem
 {
+    /**
+     * @var ContaoApiService
+     */
+    private ContaoApiService $contaoApi;
+
+    /**
+     * @param ContaoApiService $contaoApi
+     */
+    public function __construct(ContaoApiService $contaoApi)
+    {
+        $this->contaoApi = $contaoApi;
+    }
+
+    /**
+     * Check the scope and add some more information.
+     *
+     * @return void
+     */
+    public function addSystemNecessaryThings(): void
+    {
+        if (!$this->contaoApi->isBackend()) {
+            return;
+        }
+
+        $GLOBALS['TL_HOOKS']['parseTemplate'][] = [ParseTemplate::class, 'addVersion'];
+
+        // Add the JS.
+        $GLOBALS['TL_JAVASCRIPT']['multicolumnwizard'] = $GLOBALS['TL_CONFIG']['debugMode']
+            ? 'bundles/multicolumnwizard/js/multicolumnwizard_be_src.js'
+            : 'bundles/multicolumnwizard/js/multicolumnwizard_be.js';
+
+        // Add the css.
+        $GLOBALS['TL_CSS']['multicolumnwizard'] = $GLOBALS['TL_CONFIG']['debugMode']
+            ? 'bundles/multicolumnwizard/css/multicolumnwizard_src.css'
+            : 'bundles/multicolumnwizard/css/multicolumnwizard.css';
+    }
+
     /**
      * The MCW use some strange construction from point of contao.
      * Contao will rewrite the [rowId][fieldname]. This will cause a problem in the validate function
@@ -38,7 +77,7 @@ class InitializeSystem
      *
      * @return void
      */
-    public function changeAjaxPostActions()
+    public function changeAjaxPostActions(): void
     {
         if (!Environment::get('isAjaxRequest')) {
             return;
