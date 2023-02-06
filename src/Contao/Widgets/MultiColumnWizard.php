@@ -3,7 +3,7 @@
 /**
  * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * (c) 2012-2022 MEN AT WORK.
+ * (c) 2012-2023 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,11 +40,10 @@
  * @author     Andreas Dziemba <adziemba@web.de>
  * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
  * @author     doishub <daniele@oveleon.de>
- * @author     info@e-spin.de <info@e-spin.de>
  * @author     David Greminger <david.greminger@1up.io>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
- * @copyright  2013-2022 MEN AT WORK
+ * @copyright  2013-2023 MEN AT WORK
  * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -1026,7 +1025,9 @@ class MultiColumnWizard extends Widget
         }
 
         // pass activeRecord to widget
-        $arrField['activeRecord'] = $this->activeRecord;
+        if (isset($this->activeRecord)) {
+            $arrField['activeRecord'] = $this->activeRecord;
+        }
 
         // Toggle line wrap (textarea)
         if (($arrField['inputType'] ?? null) == 'textarea' && $arrField['eval']['rte'] == '') {
