@@ -3,7 +3,7 @@
 /**
  * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * (c) 2012-2019 MEN AT WORK.
+ * (c) 2012-2023 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,9 +13,10 @@
  * @package    menatwork/contao-multicolumnwizard-bundle
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
+ * @author     Ingolf Steinhardt <info@e-spin.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
- * @copyright  2013-2019 MEN AT WORK
+ * @copyright  2013-2023 MEN AT WORK
  * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -59,12 +60,12 @@ class InitializeSystem
         $GLOBALS['TL_HOOKS']['parseTemplate'][] = [ParseTemplate::class, 'addVersion'];
 
         // Add the JS.
-        $GLOBALS['TL_JAVASCRIPT']['multicolumnwizard'] = $GLOBALS['TL_CONFIG']['debugMode']
+        $GLOBALS['TL_JAVASCRIPT']['multicolumnwizard'] = System::getContainer()->get('kernel')->isDebug()
             ? 'bundles/multicolumnwizard/js/multicolumnwizard_be_src.js'
             : 'bundles/multicolumnwizard/js/multicolumnwizard_be.js';
 
         // Add the css.
-        $GLOBALS['TL_CSS']['multicolumnwizard'] = $GLOBALS['TL_CONFIG']['debugMode']
+        $GLOBALS['TL_CSS']['multicolumnwizard'] = System::getContainer()->get('kernel')->isDebug()
             ? 'bundles/multicolumnwizard/css/multicolumnwizard_src.css'
             : 'bundles/multicolumnwizard/css/multicolumnwizard.css';
     }
