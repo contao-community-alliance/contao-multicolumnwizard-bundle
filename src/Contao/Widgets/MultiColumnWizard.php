@@ -941,7 +941,7 @@ class MultiColumnWizard extends Widget
                 }
 
                 // Build array of items
-                if (isset($arrField['eval']['columnPos']) && $arrField['eval']['columnPos'] != '') {
+                if (!empty($arrField['eval']['columnPos'])) {
                     $arrItems[$i][$objWidget->columnPos]['entry']    =
                         ($arrItems[$i][$objWidget->columnPos]['entry'] ?? '') . $strWidget;
                     $arrItems[$i][$objWidget->columnPos]['valign']   = ($arrField['eval']['valign'] ?? '');
@@ -952,7 +952,7 @@ class MultiColumnWizard extends Widget
                     (
                         'entry'    => $strWidget,
                         'valign'   => $arrField['eval']['valign'] ?? null,
-                        'tl_class' => $arrField['eval']['tl_class'],
+                        'tl_class' => $arrField['eval']['tl_class'] ?? null,
                         'hide'     => $blnHiddenBody
                     );
                 }
@@ -1030,7 +1030,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Toggle line wrap (textarea)
-        if (($arrField['inputType'] ?? null) == 'textarea' && $arrField['eval']['rte'] == '') {
+        if (($arrField['inputType'] ?? null) == 'textarea' && empty($arrField['eval']['rte'])) {
             $xlabel .= ' '
                 . Image::getHtml(
                     'wrap.gif',
@@ -1141,9 +1141,9 @@ class MultiColumnWizard extends Widget
                 ->{$arrField['input_field_callback'][1]}($this, $xlabel);
         }
 
-        $strClass = $GLOBALS[($this->contaoApi->isBackend() ? 'BE_FFL' : 'TL_FFL')][$arrField['inputType']];
+        $strClass = $GLOBALS[($this->contaoApi->isBackend() ? 'BE_FFL' : 'TL_FFL')][$arrField['inputType'] ?? null] ?? null;
 
-        if ($strClass == '' || !class_exists($strClass)) {
+        if (empty($strClass) || !class_exists($strClass)) {
             return null;
         }
 
