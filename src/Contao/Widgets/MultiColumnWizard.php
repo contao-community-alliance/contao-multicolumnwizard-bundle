@@ -1131,14 +1131,21 @@ class MultiColumnWizard extends Widget
         }
 
         // Input field callback
-        if (isset($arrField['input_field_callback']) && is_array($arrField['input_field_callback'])) {
-            if (!is_object($this->{$arrField['input_field_callback'][0]})) {
-                $this->import($arrField['input_field_callback'][0]);
+        if (isset($arrField['input_field_callback'])) {
+            if (is_array($arrField['input_field_callback'])) {
+                if (!is_object($this->{$arrField['input_field_callback'][0]})) {
+                    $this->import($arrField['input_field_callback'][0]);
+                }
+
+                return $this
+                    ->{$arrField['input_field_callback'][0]}
+                    ->{$arrField['input_field_callback'][1]}($this, $xlabel)
+                ;
             }
 
-            return $this
-                ->{$arrField['input_field_callback'][0]}
-                ->{$arrField['input_field_callback'][1]}($this, $xlabel);
+            if (\is_callable($arrField['input_field_callback'])) {
+                return $arrField['input_field_callback']($this, $xlabel);
+            }
         }
 
         $strClass = $GLOBALS[($this->contaoApi->isBackend() ? 'BE_FFL' : 'TL_FFL')][$arrField['inputType']];
