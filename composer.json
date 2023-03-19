@@ -1,112 +1,113 @@
 {
-  "name": "menatwork/contao-multicolumnwizard-bundle",
-  "description": "MultiColumWizard for Contao OpenSource CMS",
-  "license": "LGPL-3.0-or-later",
-  "type": "contao-bundle",
-  "keywords": [
-    "contao",
-    "widget",
-    "wizard"
-  ],
-  "authors": [
-    {
-      "name": "Stefan Heimes",
-      "email": "stefan_heimes@hotmail.com",
-      "homepage": "https://www.men-at-work.de",
-      "role": "Developer"
-    },
-    {
-      "name": "Andreas Isaak",
-      "email": "contao@men-at-work.de",
-      "homepage": "https://www.men-at-work.de",
-      "role": "Developer"
-    },
-    {
-      "name": "David Maack",
-      "email": "contao@men-at-work.de",
-      "homepage": "https://www.men-at-work.de",
-      "role": "Developer"
-    },
-    {
-      "name": "Andreas Schempp",
-      "email": "andreas.schempp@terminal42.ch",
-      "homepage": "https://www.terminal42.ch",
-      "role": "Developer"
-    },
-    {
-      "name": "Yanick Witschi",
-      "email": "yanick.witschi@terminal42.ch",
-      "homepage": "https://www.terminal42.ch",
-      "role": "Developer"
-    },
-    {
-      "name": "Tristan Lins",
-      "homepage": "https://github.com/tristanlins",
-      "role": "Developer"
-    }
-  ],
-  "homepage": "https://www.men-at-work.de",
-  "support": {
-    "issues": "https://github.com/menatwork/MultiColumnWizard/issues",
-    "wiki": "https://de.contaowiki.org/MultiColumnWizard",
-    "irc": "irc://irc.freenode.org/contao.dev",
-    "source": "https://github.com/menatwork/MultiColumnWizard"
-  },
-  "require": {
-    "php": "^7.4 || ^8.0",
-    "ext-json": "*",
-    "contao/core-bundle": "^4.9",
-    "symfony/config": "^4.4 || ^5.2",
-    "symfony/console": "^4.4 || ^5.2",
-    "symfony/dependency-injection": "^4.4 || ^5.2",
-    "symfony/event-dispatcher": "^4.4 || ^5.2",
-    "symfony/http-foundation": "^4.4 || ^5.2",
-    "symfony/http-kernel": "^4.4 || ^5.2",
-    "symfony/translation": "^4.4 || ^5.2"
-  },
-  "require-dev": {
-    "contao/manager-plugin": "^2.1",
-    "phpcq/runner-bootstrap": "^1.0@dev",
-    "roave/security-advisories": "dev-latest"
-  },
-  "replace": {
-    "contao-legacy/multicolumnwizard": "*",
-    "menatwork/contao-multicolumnwizard": ">=3.3.4 <4.0"
-  },
-  "autoload": {
-    "psr-4": {
-      "MenAtWork\\MultiColumnWizardBundle\\": "src",
-      "MenAtWork\\MultiColumnWizard\\": "legacy_layer/psr-4-maw",
-      "MultiColumnWizard\\": "legacy_layer/psr-4-mcw"
-    },
-    "classmap": [
-      "legacy_layer/classmap"
+    "name": "menatwork/contao-multicolumnwizard-bundle",
+    "description": "MultiColumWizard for Contao OpenSource CMS",
+    "license": "LGPL-3.0-or-later",
+    "type": "contao-bundle",
+    "keywords": [
+        "contao",
+        "widget",
+        "wizard"
     ],
-    "files": [
-      "src/deprecated-autoload.php"
-    ]
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "MenAtWork\\MultiColumnWizardBundle\\Test\\": "tests"
+    "authors": [
+        {
+            "name": "Stefan Heimes",
+            "email": "stefan_heimes@hotmail.com",
+            "homepage": "https://www.men-at-work.de",
+            "role": "Developer"
+        },
+        {
+            "name": "Andreas Isaak",
+            "email": "contao@men-at-work.de",
+            "homepage": "https://www.men-at-work.de",
+            "role": "Developer"
+        },
+        {
+            "name": "David Maack",
+            "email": "contao@men-at-work.de",
+            "homepage": "https://www.men-at-work.de",
+            "role": "Developer"
+        },
+        {
+            "name": "Andreas Schempp", 
+            "email": "andreas.schempp@terminal42.ch",
+            "homepage": "https://www.terminal42.ch",
+            "role": "Developer"
+        },
+        {
+            "name": "Yanick Witschi",
+            "email": "yanick.witschi@terminal42.ch",
+            "homepage": "https://www.terminal42.ch",
+            "role": "Developer"
+        },
+        {
+            "name": "Tristan Lins",
+            "homepage": "https://github.com/tristanlins",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://www.men-at-work.de",
+    "support": {
+        "issues": "https://github.com/menatwork/MultiColumnWizard/issues",
+        "wiki": "https://de.contaowiki.org/MultiColumnWizard",
+        "irc": "irc://irc.freenode.org/contao.dev",
+        "source": "https://github.com/menatwork/MultiColumnWizard"
     },
-    "files": [
-      "tests/contao3-autoloader.php"
-    ]
-  },
-  "config": {
-    "allow-plugins": {
-      "contao-components/installer": false,
-      "contao/manager-plugin": false
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*",
+        "contao/core-bundle": "^4.13 || ^5.0",
+        "symfony/config": "^5.4 || ^6.0",
+        "symfony/console": "^5.4 || ^6.0",
+        "symfony/dependency-injection": "^5.4 || ^6.0",
+        "symfony/event-dispatcher": "^5.4 || ^6.0",
+        "symfony/http-foundation": "^5.4 || ^6.0",
+        "symfony/http-kernel": "^5.4 || ^6.0",
+        "symfony/translation": "^5.4 || ^6.0"
+    },
+    "require-dev": {
+        "contao/manager-plugin": "^2.1",
+        "phpcq/runner-bootstrap": "^1.0@dev",
+        "roave/security-advisories": "dev-latest"
+    },
+    "replace": {
+        "contao-legacy/multicolumnwizard": "*",
+        "menatwork/contao-multicolumnwizard": ">=3.3.4 <4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "MenAtWork\\MultiColumnWizardBundle\\": "src",
+            "MenAtWork\\MultiColumnWizard\\": "legacy_layer/psr-4-maw",
+            "MultiColumnWizard\\": "legacy_layer/psr-4-mcw"
+        },
+        "classmap": [
+            "legacy_layer/classmap"
+        ],
+        "files": [
+            "src/deprecated-autoload.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MenAtWork\\MultiColumnWizardBundle\\Test\\": "tests"
+        },
+        "files": [
+            "tests/contao3-autoloader.php"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "contao-components/installer": false,
+            "contao/manager-plugin": false,
+            "php-http/discovery": false
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-develop": "3.7.x-dev",
+            "dev-master": "3.6.x-dev",
+            "dev-support/contao3": "3.3.x-dev",
+            "dev-support/contao4.4": "3.4.x-dev"
+        },
+        "contao-manager-plugin": "MenAtWork\\MultiColumnWizardBundle\\ContaoManager\\Plugin"
     }
-  },
-  "extra": {
-    "branch-alias": {
-      "dev-develop": "3.6.x-dev",
-      "dev-master": "3.5.x-dev",
-      "dev-support/contao3": "3.3.x-dev",
-      "dev-support/contao4.4": "3.4.x-dev"
-    },
-    "contao-manager-plugin": "MenAtWork\\MultiColumnWizardBundle\\ContaoManager\\Plugin"
-  }
 }

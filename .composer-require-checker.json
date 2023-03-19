@@ -3,7 +3,7 @@
     "null", "true", "false",
     "self", "parent",
     "array", "string", "int", "float", "bool", "iterable", "callable", "void", "object",
-    "BUILD", "VERSION",
+    "BUILD", "VERSION", "TL_MODE",
     "Symfony\\Contracts\\EventDispatcher\\Event",
     "DC_General",
     "ContaoCommunityAlliance\\DcGeneral\\ContaoFrontend\\View\\WidgetManager",
@@ -23,6 +23,10 @@
     "Contao\\ManagerPlugin\\Bundle\\Config\\BundleConfig",
     "Contao\\ManagerPlugin\\Bundle\\Parser\\ParserInterface",
     "Contao\\ManagerPlugin\\Config\\ConfigPluginInterface",
-    "Contao\\ManagerPlugin\\Routing\\RoutingPluginInterface"
+    "Contao\\ManagerPlugin\\Routing\\RoutingPluginInterface",
+    "Composer\\InstalledVersions",
+    "Monolog\\Logger",
+    "Psr\\Log\\LogLevel",
+    ""
   ]
 }

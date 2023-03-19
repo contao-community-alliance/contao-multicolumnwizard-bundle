@@ -43,6 +43,8 @@ services:
         method: executeEvent
 
   MenAtWork\MultiColumnWizardBundle\EventListener\Mcw\CreateWidget:
+    arguments:
+      - '@monolog.logger.contao'
     tags:
       - name: kernel.event_listener
         event: men-at-work.multi-column-wizard-bundle.create-widget

@@ -51,6 +51,7 @@
 namespace MenAtWork\MultiColumnWizardBundle\Contao\Widgets;
 
 use Contao\BackendTemplate;
+use Contao\Controller;
 use Contao\DataContainer;
 use Contao\Date;
 use Contao\DC_File;
@@ -65,6 +66,7 @@ use MenAtWork\MultiColumnWizardBundle\Event\GetDatePickerStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetOptionsEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetTinyMceStringEvent;
 use MenAtWork\MultiColumnWizardBundle\Event\GetDcaPickerWizardStringEvent;
+use MenAtWork\MultiColumnWizardBundle\Service\ContaoApiService;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -158,13 +160,17 @@ class MultiColumnWizard extends Widget
         'delete' => 'delete.gif',
         'move'   => 'drag.gif'
     ];
+    /**
+     * @var ContaoApiService
+     */
+    private ContaoApiService $contaoApi;
 
     /**
      * Initialize the object
      *
-     * @param bool $arrAttributes The attributes for the widget.
+     * @param array $arrAttributes The attributes for the widget.
      */
-    public function __construct($arrAttributes = false)
+    public function __construct($arrAttributes = [])
     {
         // Ensure we have aliased the deprecated class - circumvent issue #39 but can not trigger deprecation then. :/
         if (!class_exists('MultiColumnWizard', false)) {
@@ -173,18 +179,19 @@ class MultiColumnWizard extends Widget
 
         parent::__construct($arrAttributes);
 
-        if (TL_MODE == 'FE') {
-            $this->strTemplate = 'form_widget';
-            $this->loadDataContainer($arrAttributes['strTable']);
-        }
-
+        $this->contaoApi       = System::getContainer()->get(ContaoApiService::class);
         $this->eventDispatcher = System::getContainer()->get('event_dispatcher');
+
+        // Frontend handling.
+        if (!empty($arrAttributes['strTable']) && $this->contaoApi->isFrontend()) {
+            $this->strTemplate = 'form_widget';
+            Controller::loadDataContainer($arrAttributes['strTable']);
+        }
 
         /*
          * Load the callback data if there's any
          * (do not do this in __set() already because then we don't have access to currentRecord)
          */
-
         if (is_array($this->arrCallback)) {
             $this->import($this->arrCallback[0]);
             $this->columnFields = $this->{$this->arrCallback[0]}->{$this->arrCallback[1]}($this);
@@ -920,7 +927,7 @@ class MultiColumnWizard extends Widget
 
                 // Contao changed the name for FileTree and PageTree widgets
                 // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
-                $contaoVersion = VERSION . '.' . BUILD;
+                $contaoVersion = $this->contaoApi->getContaoVersion();
 
                 if (
                     (
@@ -934,7 +941,7 @@ class MultiColumnWizard extends Widget
                 }
 
                 // Build array of items
-                if (isset($arrField['eval']['columnPos']) && $arrField['eval']['columnPos'] != '') {
+                if (!empty($arrField['eval']['columnPos'])) {
                     $arrItems[$i][$objWidget->columnPos]['entry']    =
                         ($arrItems[$i][$objWidget->columnPos]['entry'] ?? '') . $strWidget;
                     $arrItems[$i][$objWidget->columnPos]['valign']   = ($arrField['eval']['valign'] ?? '');
@@ -945,7 +952,7 @@ class MultiColumnWizard extends Widget
                     (
                         'entry'    => $strWidget,
                         'valign'   => $arrField['eval']['valign'] ?? null,
-                        'tl_class' => $arrField['eval']['tl_class'],
+                        'tl_class' => $arrField['eval']['tl_class'] ?? null,
                         'hide'     => $blnHiddenBody
                     );
                 }
@@ -1023,7 +1030,7 @@ class MultiColumnWizard extends Widget
         }
 
         // Toggle line wrap (textarea)
-        if (($arrField['inputType'] ?? null) == 'textarea' && $arrField['eval']['rte'] == '') {
+        if (($arrField['inputType'] ?? null) == 'textarea' && empty($arrField['eval']['rte'])) {
             $xlabel .= ' '
                 . Image::getHtml(
                     'wrap.gif',
@@ -1124,19 +1131,27 @@ class MultiColumnWizard extends Widget
         }
 
         // Input field callback
-        if (isset($arrField['input_field_callback']) && is_array($arrField['input_field_callback'])) {
-            if (!is_object($this->{$arrField['input_field_callback'][0]})) {
-                $this->import($arrField['input_field_callback'][0]);
+        if (isset($arrField['input_field_callback'])) {
+            if (is_array($arrField['input_field_callback'])) {
+                if (!is_object($this->{$arrField['input_field_callback'][0]})) {
+                    $this->import($arrField['input_field_callback'][0]);
+                }
+
+                return $this
+                    ->{$arrField['input_field_callback'][0]}
+                    ->{$arrField['input_field_callback'][1]}($this, $xlabel)
+                ;
             }
 
-            return $this
-                ->{$arrField['input_field_callback'][0]}
-                ->{$arrField['input_field_callback'][1]}($this, $xlabel);
+            if (\is_callable($arrField['input_field_callback'])) {
+                return $arrField['input_field_callback']($this, $xlabel);
+            }
         }
 
-        $strClass = $GLOBALS[(TL_MODE == 'BE' ? 'BE_FFL' : 'TL_FFL')][$arrField['inputType']];
+        $widgetMode = ($this->contaoApi->isBackend() ? 'BE_FFL' : 'TL_FFL');
+        $strClass   = $GLOBALS[$widgetMode][$arrField['inputType'] ?? null] ?? null;
 
-        if ($strClass == '' || !class_exists($strClass)) {
+        if (empty($strClass) || !class_exists($strClass)) {
             return null;
         }
 

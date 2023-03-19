@@ -24,6 +24,7 @@ namespace MenAtWork\MultiColumnWizardBundle;
 
 use MenAtWork\MultiColumnWizardBundle\DependencyInjection\MultiColumnWizardExtension;
 use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -33,22 +34,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class MultiColumnWizardBundle extends Bundle
 {
-    public const SCOPE_BACKEND  = 'backend';
-    public const SCOPE_FRONTEND = 'frontend';
-
     /**
      * {@inheritdoc}
      */
-    public function getContainerExtension()
+    public function getContainerExtension(): ?ExtensionInterface
     {
         return new MultiColumnWizardExtension();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function registerCommands(Application $application)
-    {
-        // disable automatic command registration
     }
 }

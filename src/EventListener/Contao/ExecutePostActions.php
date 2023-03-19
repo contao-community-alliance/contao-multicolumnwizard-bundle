@@ -26,6 +26,7 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\EventListener\Contao;
 
+use Contao\CoreBundle\Monolog\ContaoContext;
 use ContaoCommunityAlliance\DcGeneral\ContaoFrontend\View\WidgetManager;
 use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
@@ -45,9 +46,12 @@ use Contao\PageTree;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
+use Doctrine\ORM\Mapping as ORM;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
 use MenAtWork\MultiColumnWizardBundle\EventListener\BaseListener;
 use MenAtWork\MultiColumnWizardBundle\Event\CreateWidgetEvent;
+use MenAtWork\MultiColumnWizardBundle\Service\ContaoApiService;
+use Monolog\Logger;
 use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -62,18 +66,37 @@ class ExecutePostActions extends BaseListener
      *
      * @var EventDispatcherInterface
      */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
+
+    /**
+     * @var ContaoApiService
+     */
+    private ContaoApiService $contaoApi;
+
+    /**
+     * @var Logger
+     */
+    private Logger $logger;
 
     /**
      * ExecutePostActions constructor.
      *
      * @param EventDispatcherInterface $eventDispatcher The event dispatcher.
+     *
+     * @param ContaoApiService         $contaoApi       Bridge to Contao. Replacement for the deprecated functions.
+     *
+     * @param Logger                   $logger          Logging ;).
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        ContaoApiService $contaoApi,
+        Logger $logger
+    ) {
         parent::__construct();
 
+        $this->contaoApi       = $contaoApi;
         $this->eventDispatcher = $eventDispatcher;
+        $this->logger          = $logger;
     }
 
     /**
@@ -108,25 +131,34 @@ class ExecutePostActions extends BaseListener
         // Create a new event and dispatch it. Hope that someone have a good solution.
         $event = new CreateWidgetEvent($container);
         $this->eventDispatcher->dispatch($event, $event::NAME);
-        /** @var \Widget $widget */
         $widget = $event->getWidget();
 
         // Check the instance.
         if (!($widget instanceof MultiColumnWizard)) {
-            System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 'Field "' . $fieldName . '" is not a mcw in "' . $container->table . '"',
-                __METHOD__,
-                'error'
+                [
+                    'contao' => new ContaoContext(
+                        __CLASS__ . '::' . __FUNCTION__,
+                        'MCW Execute Post Action'
+                    )
+                ]
             );
             throw new BadRequestHttpException('Bad request');
         }
 
         // The field does not exist
         if (empty($widget)) {
-            System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 'Field "' . $fieldName . '" does not exist in definition "' . $container->table . '"',
-                __METHOD__,
-                'error'
+                [
+                    'contao' => new ContaoContext(
+                        __CLASS__ . '::' . __FUNCTION__,
+                        'MCW Execute Post Action'
+                    )
+                ]
             );
             throw new BadRequestHttpException('Bad request');
         }
@@ -170,8 +202,8 @@ class ExecutePostActions extends BaseListener
         $strField = $this->getInputName($container);
         // Contao changed the name for FileTree and PageTree widgets
         // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
-        $contaoVersion = VERSION . '.' . BUILD;
-        $vNameCheck = (
+        $contaoVersion = $this->contaoApi->getContaoVersion();
+        $vNameCheck    = (
                 version_compare($contaoVersion, '4.4.41', '>=')
                 && version_compare($contaoVersion, '4.5.0', '<')
             ) || version_compare($contaoVersion, '4.7.7', '>=');
@@ -231,10 +263,15 @@ class ExecutePostActions extends BaseListener
             !(isset($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]))
             && !($container instanceof DataContainerInterface)
         ) {
-            System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 'Field "' . $strField . '" does not exist in DCA "' . $container->table . '"',
-                __METHOD__,
-                'error'
+                [
+                    'contao' => new ContaoContext(
+                        __CLASS__ . '::' . __FUNCTION__,
+                        'MCW Execute Post Action'
+                    )
+                ]
             );
             throw new BadRequestHttpException('Bad request');
         }
@@ -253,10 +290,15 @@ class ExecutePostActions extends BaseListener
 
                 // The record does not exist
                 if ($objRow->numRows < 1) {
-                    System::log(
+                    $this->logger->log(
+                        LogLevel::ERROR,
                         'A record with the ID "' . $intId . '" does not exist in table "' . $container->table . '"',
-                        __METHOD__,
-                        'error'
+                        [
+                            'contao' => new ContaoContext(
+                                __CLASS__ . '::' . __FUNCTION__,
+                                'MCW Execute Post Action'
+                            )
+                        ]
                     );
                     throw new BadRequestHttpException('Bad request');
                 }
@@ -333,6 +375,7 @@ class ExecutePostActions extends BaseListener
         $inputName = Input::post('name');
         if (!($container instanceof DataContainerInterface)) {
             $container->inputName = $inputName;
+
             return $inputName;
         }
 
@@ -364,14 +407,19 @@ class ExecutePostActions extends BaseListener
         $replace      = array('__', '');
         $propertyName = \trim(\preg_replace($search, $replace, $container->getPropertyName()), '__');
         if (!$properties->hasProperty($propertyName)) {
-            System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 \sprintf(
                     'The property "%s" does not exist in the property definition of "%s"',
                     $container->getPropertyName(),
                     $definition->getName()
                 ),
-                __METHOD__,
-                'error'
+                [
+                    'contao' => new ContaoContext(
+                        __CLASS__ . '::' . __FUNCTION__,
+                        'MCW Execute Post Action'
+                    )
+                ]
             );
             throw new BadRequestHttpException('Bad request');
         }
@@ -448,7 +496,7 @@ class ExecutePostActions extends BaseListener
         $model->setId('mcw_' . $container->getPropertyName());
         $model->setProperty($property->getName(), $value);
 
-        if (TL_MODE === 'FE') {
+        if ($this->contaoApi->isFrontend()) {
             $manager = new WidgetManager($environment, $model);
         } else {
             $manager = new ContaoWidgetManager($environment, $model);

@@ -23,12 +23,14 @@
 
 namespace MenAtWork\MultiColumnWizardBundle\EventListener\Mcw;
 
+use Contao\CoreBundle\Monolog\ContaoContext;
 use Contao\Input;
 use Contao\System;
 use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
 use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
 use MenAtWork\MultiColumnWizardBundle\Event\CreateWidgetEvent;
+use Monolog\Logger;
 use Psr\Log\LogLevel;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -37,6 +39,16 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
  */
 class CreateWidget
 {
+    /**
+     * @var Logger
+     */
+    private Logger $logger;
+
+    public function __construct(Logger $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * Create a widget for Contao context.
      *
@@ -68,10 +80,15 @@ class CreateWidget
 
         // The field does not exist
         if (!isset($GLOBALS['TL_DCA'][$dcDriver->table]['fields'][$fieldName])) {
-            System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 'Field "' . $fieldName . '" does not exist in DCA "' . $dcDriver->table . '"',
-                __METHOD__,
-                'error'
+                [
+                    'contao' => new ContaoContext(
+                        __CLASS__ . '::' . __FUNCTION__,
+                        'MCW Execute Post Action'
+                    )
+                ]
             );
             throw new BadRequestHttpException('Bad request');
         }
@@ -82,6 +99,7 @@ class CreateWidget
         $widgetClassName = $GLOBALS['BE_FFL'][$inputType];
 
         /** @var MultiColumnWizard $widget */
+        /** @var MultiColumnWizard $widgetClassName */
         $widget = new $widgetClassName(
             $widgetClassName::getAttributesFromDca(
                 $GLOBALS['TL_DCA'][$dcDriver->table]['fields'][$fieldName],
