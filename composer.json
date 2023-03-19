@@ -28,7 +28,7 @@
             "role": "Developer"
         },
         {
-            "name": "Andreas Schempp",
+            "name": "Andreas Schempp", 
             "email": "andreas.schempp@terminal42.ch",
             "homepage": "https://www.terminal42.ch",
             "role": "Developer"
@@ -103,8 +103,8 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "3.6.x-dev",
-            "dev-master": "3.5.x-dev",
+            "dev-develop": "3.7.x-dev",
+            "dev-master": "3.6.x-dev",
             "dev-support/contao3": "3.3.x-dev",
             "dev-support/contao4.4": "3.4.x-dev"
         },
