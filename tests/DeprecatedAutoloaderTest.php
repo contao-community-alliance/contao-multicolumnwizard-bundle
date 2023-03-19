@@ -25,6 +25,7 @@ namespace MenAtWork\MultiColumnWizardBundle\Test;
 use Contao\System;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard as MultiColumnWizardBundle;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
+use MenAtWork\MultiColumnWizardBundle\Service\ContaoApiService;
 use MenAtWork\MultiColumnWizardBundle\Test\Fixture\Issue39Fixture;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -98,6 +99,15 @@ class DeprecatedAutoloaderTest extends TestCase
                         $locator = $this->getMockBuilder(\stdClass::class)->setMethods(['locate'])->getMock();
                         $locator->method('locate')->willReturn([]);
                         return $locator;
+                    case ContaoApiService::class:
+                        $contaoService = $this
+                            ->getMockBuilder(ContaoApiService::class)
+                            ->disableOriginalConstructor()
+                            ->getMock();
+                        $contaoService->method('isBackend')->willReturn(true);
+                        $contaoService->method('isFrontend')->willReturn(false);
+                        $contaoService->method('getContaoVersion')->willReturn('3.9.0');
+                        return $contaoService;
                     case 'event_dispatcher':
                     default:
                         return null;

@@ -1148,7 +1148,8 @@ class MultiColumnWizard extends Widget
             }
         }
 
-        $strClass = $GLOBALS[($this->contaoApi->isBackend() ? 'BE_FFL' : 'TL_FFL')][$arrField['inputType'] ?? null] ?? null;
+        $widgetMode = ($this->contaoApi->isBackend() ? 'BE_FFL' : 'TL_FFL');
+        $strClass   = $GLOBALS[$widgetMode][$arrField['inputType'] ?? null] ?? null;
 
         if (empty($strClass) || !class_exists($strClass)) {
             return null;

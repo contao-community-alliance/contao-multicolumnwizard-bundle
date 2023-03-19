@@ -50,6 +50,8 @@ class InitializeSystem
      * Check the scope and add some more information.
      *
      * @return void
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function addSystemNecessaryThings(): void
     {
