@@ -86,7 +86,7 @@ class InitializeSystem
             return;
         }
 
-        $name = Input::post('name');
+        $name = (string) Input::post('name');
         if (!\preg_match('/_row[0-9]*_/i', $name)) {
             return;
         }
