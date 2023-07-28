@@ -179,8 +179,17 @@ class MultiColumnWizard extends Widget
 
         parent::__construct($arrAttributes);
 
-        $this->contaoApi       = System::getContainer()->get(ContaoApiService::class);
-        $this->eventDispatcher = System::getContainer()->get('event_dispatcher');
+        $api = System::getContainer()->get(ContaoApiService::class);
+        if (!$api instanceof ContaoApiService) {
+            throw new \RuntimeException('Invalid API service.');
+        }
+        $this->contaoApi = $api;
+
+        $dispatcher = System::getContainer()->get('event_dispatcher');
+        if (!$dispatcher instanceof EventDispatcherInterface) {
+            throw new \RuntimeException('Invalid event dispatcher service.');
+        }
+        $this->eventDispatcher = $dispatcher;
 
         // Frontend handling.
         if (!empty($arrAttributes['strTable']) && $this->contaoApi->isFrontend()) {
@@ -224,10 +233,12 @@ class MultiColumnWizard extends Widget
                  */
 
                 if ($this->flatArray) {
-                    $arrNew = array();
+                    $arrNew = [];
+                    $key    = key($this->columnFields);
+                    assert(null !== $key);
 
                     foreach ($this->varValue as $val) {
-                        $arrNew[] = array(key($this->columnFields) => $val);
+                        $arrNew[] = array($key => $val);
                     }
 
                     $this->varValue = $arrNew;
