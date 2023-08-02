@@ -29,6 +29,7 @@ use MenAtWork\MultiColumnWizardBundle\Service\ContaoApiService;
 use MenAtWork\MultiColumnWizardBundle\Test\Fixture\Issue39Fixture;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * This class test the overwrite of the older namespace of previous versions.
@@ -109,6 +110,13 @@ class DeprecatedAutoloaderTest extends TestCase
                         $contaoService->method('getContaoVersion')->willReturn('3.9.0');
                         return $contaoService;
                     case 'event_dispatcher':
+                        $contaoEventDispatcher = $this
+                            ->getMockBuilder(EventDispatcher::class)
+                            ->disableOriginalConstructor()
+                            ->getMock();
+                        $contaoEventDispatcher->method('dispatch')->willReturn((object) 'test');
+                        $contaoEventDispatcher->method('getListeners')->willReturn([]);
+                        return $contaoEventDispatcher;
                     default:
                         return null;
                 }
