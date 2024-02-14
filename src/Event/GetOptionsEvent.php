@@ -3,7 +3,7 @@
 /**
  * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * (c) 2012-2019 MEN AT WORK.
+ * (c) 2012-2024 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,9 +14,10 @@
  * @author     Christian Schiffler <c.schiffler@cyberspectrum.de>
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
+ * @author     Ingolf Steinhardt <info@e-spin.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
- * @copyright  2013-2019 MEN AT WORK
+ * @copyright  2013-2024 MEN AT WORK
  * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
@@ -26,6 +27,7 @@ namespace MenAtWork\MultiColumnWizardBundle\Event;
 use ContaoCommunityAlliance\DcGeneral\Data\ModelInterface;
 use ContaoCommunityAlliance\DcGeneral\EnvironmentInterface;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard as BundleMultiColumnWizard;
+use MultiColumnWizard;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
@@ -36,10 +38,10 @@ class GetOptionsEvent extends Event
     /**
      * Name of this event.
      */
-    const NAME = 'men-at-work.multi-column-wizard-bundle.get-options';
+    public const NAME = 'men-at-work.multi-column-wizard-bundle.get-options';
 
     /**
-     * The name of the multi column wizard.
+     * The name of the multi-column wizard.
      *
      * @var string
      */
@@ -67,33 +69,28 @@ class GetOptionsEvent extends Event
     protected $model;
 
     /**
-     * The multi column wizard.
+     * The multi-column wizard.
      *
-     * @var \MultiColumnWizard
+     * @var MultiColumnWizard
      */
     protected $widget;
 
     /**
      * The options array.
      *
-     * @var array
+     * @var array|null
      */
     protected $options;
 
     /**
      * Create a new instance.
      *
-     * @param string                                     $propertyName    The name of the multi column wizard widget.
-     *
-     * @param string                                     $subPropertyName The name of the sub widget.
-     *
-     * @param EnvironmentInterface                       $environment     The environment instance.
-     *
-     * @param ModelInterface                             $model           The current model.
-     *
-     * @param \MultiColumnWizard|BundleMultiColumnWizard $widget          The multi column wizard instance.
-     *
-     * @param array                                      $options         The current options (defaults to empty array).
+     * @param string                                    $propertyName    The name of the multi-column wizard widget.
+     * @param string                                    $subPropertyName The name of the sub widget.
+     * @param EnvironmentInterface                      $environment     The environment instance.
+     * @param ModelInterface                            $model           The current model.
+     * @param MultiColumnWizard|BundleMultiColumnWizard $widget          The multi-column wizard instance.
+     * @param array|null                                $options         The current options (defaults to empty array).
      */
     public function __construct(
         $propertyName,
@@ -101,7 +98,7 @@ class GetOptionsEvent extends Event
         EnvironmentInterface $environment,
         ModelInterface $model,
         $widget,
-        $options = array()
+        $options = []
     ) {
         $this->propertyName    = $propertyName;
         $this->subPropertyName = $subPropertyName;
@@ -112,7 +109,7 @@ class GetOptionsEvent extends Event
     }
 
     /**
-     * Retrieve the name of the multi column wizard property.
+     * Retrieve the name of the multi-column wizard property.
      *
      * @return string
      */
@@ -122,7 +119,7 @@ class GetOptionsEvent extends Event
     }
 
     /**
-     * Retrieve the name of the property within the multi column wizard.
+     * Retrieve the name of the property within the multi-column wizard.
      *
      * @return string
      */
@@ -152,9 +149,9 @@ class GetOptionsEvent extends Event
     }
 
     /**
-     * Retrieve the multi column wizard instance emitting the event.
+     * Retrieve the multi-column wizard instance emitting the event.
      *
-     * @return \MultiColumnWizard
+     * @return MultiColumnWizard
      */
     public function getWidget()
     {
@@ -164,7 +161,7 @@ class GetOptionsEvent extends Event
     /**
      * Retrieve the options.
      *
-     * @return array
+     * @return array|null
      */
     public function getOptions()
     {
@@ -174,7 +171,7 @@ class GetOptionsEvent extends Event
     /**
      * Set the options.
      *
-     * @param array $options The options.
+     * @param array|null $options The options.
      *
      * @return GetOptionsEvent
      */

@@ -3,7 +3,7 @@
 /**
  * This file is part of menatwork/contao-multicolumnwizard-bundle.
  *
- * (c) 2012-2020 MEN AT WORK.
+ * (c) 2012-2023 MEN AT WORK.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -16,37 +16,43 @@
  * @author     Stefan Heimes <stefan_heimes@hotmail.com>
  * @author     Sven Baumann <baumann.sv@gmail.com>
  * @author     Fritz Michael Gschwantner <fmg@inspiredminds.at>
+ * @author     Ingolf Steinhardt <info@e-spin.de>
  * @copyright  2011 Andreas Schempp
  * @copyright  2011 certo web & design GmbH
- * @copyright  2013-2020 MEN AT WORK
+ * @copyright  2013-2023 MEN AT WORK
  * @license    https://github.com/menatwork/contao-multicolumnwizard-bundle/blob/master/LICENSE LGPL-3.0-or-later
  * @filesource
  */
 
 namespace MenAtWork\MultiColumnWizardBundle\EventListener\Contao;
 
+use Contao\CoreBundle\Monolog\ContaoContext;
+use ContaoCommunityAlliance\DcGeneral\ContaoFrontend\View\WidgetManager;
+use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
+use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
+use ContaoCommunityAlliance\DcGeneral\DC\General;
+use ContaoCommunityAlliance\DcGeneral\DataContainerInterface;
+use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\PropertyInterface;
+use ContaoCommunityAlliance\DcGeneral\Exception\DcGeneralRuntimeException;
 use Contao\Config;
 use Contao\CoreBundle\Exception\ResponseException;
-use Contao\Database;
 use Contao\DataContainer;
+use Contao\Database;
 use Contao\Dbafs;
+use Contao\FileTree;
+use Contao\FilesModel;
 use Contao\Input;
 use Contao\PageTree;
 use Contao\StringUtil;
 use Contao\System;
 use Contao\Widget;
-use ContaoCommunityAlliance\DcGeneral\Contao\Compatibility\DcCompat;
-use ContaoCommunityAlliance\DcGeneral\Contao\View\Contao2BackendView\ContaoWidgetManager;
-use ContaoCommunityAlliance\DcGeneral\ContaoFrontend\View\WidgetManager;
-use ContaoCommunityAlliance\DcGeneral\DataContainerInterface;
-use ContaoCommunityAlliance\DcGeneral\DataDefinition\Definition\Properties\PropertyInterface;
-use ContaoCommunityAlliance\DcGeneral\DC\General;
-use ContaoCommunityAlliance\DcGeneral\Exception\DcGeneralRuntimeException;
-use FilesModel;
-use FileTree;
+use Doctrine\ORM\Mapping as ORM;
 use MenAtWork\MultiColumnWizardBundle\Contao\Widgets\MultiColumnWizard;
-use MenAtWork\MultiColumnWizardBundle\Event\CreateWidgetEvent;
 use MenAtWork\MultiColumnWizardBundle\EventListener\BaseListener;
+use MenAtWork\MultiColumnWizardBundle\Event\CreateWidgetEvent;
+use MenAtWork\MultiColumnWizardBundle\Service\ContaoApiService;
+use Monolog\Logger;
+use Psr\Log\LogLevel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -60,18 +66,37 @@ class ExecutePostActions extends BaseListener
      *
      * @var EventDispatcherInterface
      */
-    private $eventDispatcher;
+    private EventDispatcherInterface $eventDispatcher;
+
+    /**
+     * @var ContaoApiService
+     */
+    private ContaoApiService $contaoApi;
+
+    /**
+     * @var Logger
+     */
+    private Logger $logger;
 
     /**
      * ExecutePostActions constructor.
      *
      * @param EventDispatcherInterface $eventDispatcher The event dispatcher.
+     *
+     * @param ContaoApiService         $contaoApi       Bridge to Contao. Replacement for the deprecated functions.
+     *
+     * @param Logger                   $logger          Logging ;).
      */
-    public function __construct(EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        ContaoApiService $contaoApi,
+        Logger $logger
+    ) {
         parent::__construct();
 
+        $this->contaoApi       = $contaoApi;
         $this->eventDispatcher = $eventDispatcher;
+        $this->logger          = $logger;
     }
 
     /**
@@ -106,25 +131,34 @@ class ExecutePostActions extends BaseListener
         // Create a new event and dispatch it. Hope that someone have a good solution.
         $event = new CreateWidgetEvent($container);
         $this->eventDispatcher->dispatch($event, $event::NAME);
-        /** @var \Widget $widget */
         $widget = $event->getWidget();
 
         // Check the instance.
         if (!($widget instanceof MultiColumnWizard)) {
-            System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 'Field "' . $fieldName . '" is not a mcw in "' . $container->table . '"',
-                __METHOD__,
-                TL_ERROR
+                [
+                    'contao' => new ContaoContext(
+                        __CLASS__ . '::' . __FUNCTION__,
+                        'MCW Execute Post Action'
+                    )
+                ]
             );
             throw new BadRequestHttpException('Bad request');
         }
 
         // The field does not exist
         if (empty($widget)) {
-            System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 'Field "' . $fieldName . '" does not exist in definition "' . $container->table . '"',
-                __METHOD__,
-                TL_ERROR
+                [
+                    'contao' => new ContaoContext(
+                        __CLASS__ . '::' . __FUNCTION__,
+                        'MCW Execute Post Action'
+                    )
+                ]
             );
             throw new BadRequestHttpException('Bad request');
         }
@@ -164,14 +198,15 @@ class ExecutePostActions extends BaseListener
             return;
         }
 
-        $intId    = \Input::get('id');
+        $intId    = Input::get('id');
         $strField = $this->getInputName($container);
         // Contao changed the name for FileTree and PageTree widgets
         // @see https://github.com/menatwork/contao-multicolumnwizard-bundle/issues/51
-        $contaoVersion = VERSION . '.' . BUILD;
-        $vNameCheck    = (version_compare($contaoVersion, '4.4.41', '>=') &&
-                          version_compare($contaoVersion, '4.5.0', '<')) ||
-                         version_compare($contaoVersion, '4.7.7', '>=');
+        $contaoVersion = $this->contaoApi->getContaoVersion();
+        $vNameCheck    = (
+                version_compare($contaoVersion, '4.4.41', '>=')
+                && version_compare($contaoVersion, '4.5.0', '<')
+            ) || version_compare($contaoVersion, '4.7.7', '>=');
 
         $containerField = '';
         if ($vNameCheck) {
@@ -199,7 +234,7 @@ class ExecutePostActions extends BaseListener
         $mcwId = $mcwBaseName . '_row' . $intRow . '_' . $mcwSupFieldName;
 
         // Handle the keys in "edit multiple" mode
-        if (\Input::get('act') == 'editAll') {
+        if (Input::get('act') == 'editAll') {
             if ($vNameCheck) {
                 $intId       = preg_replace('/.*_([0-9a-zA-Z]+)$/', '$1', $mcwBaseName);
                 $mcwBaseName = preg_replace('/(.*)_[0-9a-zA-Z]+$/', '$1', $mcwBaseName);
@@ -212,7 +247,8 @@ class ExecutePostActions extends BaseListener
 
         // Add the sub configuration into the DCA. We need this for contao. Without it is not possible
         // to get the data for the picker.
-        if (($GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard')
+        if (
+            ($GLOBALS['TL_DCA'][$container->table]['fields'][$mcwBaseName]['inputType'] == 'multiColumnWizard')
             && !($container instanceof DataContainerInterface)
         ) {
             $widget = MultiColumnWizard::generateSimpleMcw($container->table, $mcwBaseName);
@@ -223,13 +259,19 @@ class ExecutePostActions extends BaseListener
         }
 
         // The field does not exist
-        if (!(isset($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]))
+        if (
+            !(isset($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]))
             && !($container instanceof DataContainerInterface)
         ) {
-            System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 'Field "' . $strField . '" does not exist in DCA "' . $container->table . '"',
-                __METHOD__,
-                TL_ERROR
+                [
+                    'contao' => new ContaoContext(
+                        __CLASS__ . '::' . __FUNCTION__,
+                        'MCW Execute Post Action'
+                    )
+                ]
             );
             throw new BadRequestHttpException('Bad request');
         }
@@ -248,10 +290,15 @@ class ExecutePostActions extends BaseListener
 
                 // The record does not exist
                 if ($objRow->numRows < 1) {
-                    System::log(
+                    $this->logger->log(
+                        LogLevel::ERROR,
                         'A record with the ID "' . $intId . '" does not exist in table "' . $container->table . '"',
-                        __METHOD__,
-                        TL_ERROR
+                        [
+                            'contao' => new ContaoContext(
+                                __CLASS__ . '::' . __FUNCTION__,
+                                'MCW Execute Post Action'
+                            )
+                        ]
                     );
                     throw new BadRequestHttpException('Bad request');
                 }
@@ -261,8 +308,11 @@ class ExecutePostActions extends BaseListener
             }
         }
 
-        // Call the load_callback
-        if (\is_array($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]['load_callback'])) {
+        // Call the load_callback.
+        if (
+            isset($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]['load_callback'])
+            && \is_array($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]['load_callback'])
+        ) {
             foreach ($GLOBALS['TL_DCA'][$container->table]['fields'][$strField]['load_callback'] as $callback) {
                 if (\is_array($callback)) {
                     $this->import($callback[0]);
@@ -325,6 +375,7 @@ class ExecutePostActions extends BaseListener
         $inputName = Input::post('name');
         if (!($container instanceof DataContainerInterface)) {
             $container->inputName = $inputName;
+
             return $inputName;
         }
 
@@ -356,14 +407,19 @@ class ExecutePostActions extends BaseListener
         $replace      = array('__', '');
         $propertyName = \trim(\preg_replace($search, $replace, $container->getPropertyName()), '__');
         if (!$properties->hasProperty($propertyName)) {
-            System::log(
+            $this->logger->log(
+                LogLevel::ERROR,
                 \sprintf(
                     'The property "%s" does not exist in the property definition of "%s"',
                     $container->getPropertyName(),
                     $definition->getName()
                 ),
-                __METHOD__,
-                TL_ERROR
+                [
+                    'contao' => new ContaoContext(
+                        __CLASS__ . '::' . __FUNCTION__,
+                        'MCW Execute Post Action'
+                    )
+                ]
             );
             throw new BadRequestHttpException('Bad request');
         }
@@ -440,7 +496,7 @@ class ExecutePostActions extends BaseListener
         $model->setId('mcw_' . $container->getPropertyName());
         $model->setProperty($property->getName(), $value);
 
-        if (TL_MODE === 'FE') {
+        if ($this->contaoApi->isFrontend()) {
             $manager = new WidgetManager($environment, $model);
         } else {
             $manager = new ContaoWidgetManager($environment, $model);

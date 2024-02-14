@@ -25,6 +25,7 @@ namespace MenAtWork\MultiColumnWizardBundle\EventListener\Mcw;
 use Contao\Config;
 use Contao\Date;
 use Contao\Image;
+use Contao\StringUtil;
 use MenAtWork\MultiColumnWizardBundle\Event\GetDatePickerStringEvent;
 
 /**
@@ -68,7 +69,7 @@ class DatePicker
         $strOnSelect = '';
 
         // Trigger the auto-submit function (see #8603)
-        if ($fieldConfiguration['eval']['submitOnChange']) {
+        if ($fieldConfiguration['eval']['submitOnChange'] ?? null) {
             $strOnSelect = ",\n        onSelect: function() { Backend.autoSubmit(\"" . $table . '"); }';
         }
 
@@ -97,7 +98,7 @@ HTML;
             '',
             sprintf(
                 'title="%s" id="toggle_%s" style="cursor:pointer"',
-                \StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['datepicker']),
+                StringUtil::specialchars($GLOBALS['TL_LANG']['MSC']['datepicker']),
                 $fieldId
             )
         );

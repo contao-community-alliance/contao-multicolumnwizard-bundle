@@ -35,12 +35,13 @@
 namespace MenAtWork\MultiColumnWizardBundle\Helper;
 
 use Contao\DataContainer;
+use Contao\System;
 use MenAtWork\MultiColumnWizardBundle\Event\GetDcaPickerWizardStringEvent;
 
 /**
  * Class MultiColumnWizardHelper
  */
-class MultiColumnWizardHelper extends \Contao\System
+class MultiColumnWizardHelper extends System
 {
     /**
      * Just here to make the constructor public.
@@ -77,7 +78,7 @@ class MultiColumnWizardHelper extends \Contao\System
         );
 
         // Create a new event and dispatch it. Hope that someone have a good solution.
-        $eventDispatcher    = \Contao\System::getContainer()->get('event_dispatcher');
+        $eventDispatcher    = System::getContainer()->get('event_dispatcher');
         $fieldConfiguration = [
             'label'     => ['MCW - Picker', ''],
             'exclude'   => true,
